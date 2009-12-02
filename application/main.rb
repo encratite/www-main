@@ -1,7 +1,7 @@
-$: << '../..'
+['..', 'application'].each { |path| $: << path }
 
-require 'utility/RequestManager'
+require 'site/RequestManager'
 require 'index'
 
-manager = RequestManager.new
-manager.addHandler('/', method(:getIndex))
+$manager = RequestManager.new
+$manager.addHandler('/', method(:getIndex))
