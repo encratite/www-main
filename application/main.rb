@@ -1,4 +1,4 @@
-['..', 'application'].each { |path| $: << path }
+$:.concat ['..', 'application']
 
 require 'site/RequestManager'
 require 'index'
