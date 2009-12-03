@@ -1,18 +1,18 @@
-create table pastebinEntry
+create table pastebin_entry
 (
 	id serial primary key,
 	
-	userId integer references siteUser(id),
+	user_id integer references site_user(id),
 	
 	author text,
 	ip text,
 
 	description text,
 	content text,
-	highlightedContent text,
+	highlighted_content text,
 	
-	pasteType text,
+	paste_type text,
 	
 	creation timestamp,
-	lastModification timestamp
+	last_modification timestamp
 );
