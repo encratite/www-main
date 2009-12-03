@@ -1,4 +1,5 @@
 require 'site/FormWriter'
+require 'PathMap'
 
 def visualLoginForm()
 	output =
@@ -13,7 +14,7 @@ If you do not have an account yet you may register one:
 <p>Specify your username and your password in the following form and submit the data in order to log into your account.</p>
 END
 
-	form = FormWriter.new(output, 'submitLogin')
+	form = FormWriter.new(output, PathMap::SubmitLogin)
 	['User name', 'Password'].each { |label| form.label label }
 	form.finish
 	
@@ -28,7 +29,7 @@ Fill out the following form and submit the data in order to create a new account
 It is not necessary to specify an e-mail address but it may be useful to do so in case you forget your password.
 </p>
 END
-	form = FormWriter.new(output, 'submitRegistration')
+	form = FormWriter.new(output, PathMap::SubmitRegistration)
 	form.label 'User'
 	form.label 'Password'
 	form.label 'Type your password again', name = 'passwordAgain'

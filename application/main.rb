@@ -1,38 +1,68 @@
 $:.concat ['..', 'application']
 
-require 'site/RequestManager'
-require 'site/SiteGenerator'
+def loadModules
+	require 'site/RequestManager'
+	require 'site/SiteGenerator'
 
-require 'configuration/database'
+	require 'configuration/database'
 
-applicationFiles =
-[
-	'index',
-	'environment',
-	'test'
-]
+	applicationFiles =
+	[
+		'index',
+		'user',
+		
+		'UserManager',
+		'Menu',
+		'PathMap',
+		
+		#Tests
+		'environment',
+		'test'
+	]
 
-applicationFiles.each { |name| require name }
+	applicationFiles.each { |name| require name }
+end
 
-handlers =
-[
-	['', :getIndex],
-	['environment', :visualiseEnvironment],
-	['post', :postTest],
-]
+def createRequestManager
+	handlers =
+	[
+		[PathMap::Index, :getIndex],
+		
+		[PathMap::Login, :loginFormRequest],
+		[PathMap::SubmitLogin, :performLoginRequest],
+		[PathMap::Register, :registerFormRequest],
+		[PathMap::SubmitRegistration, :performRegistrationRequest],
+		
+		[PathMap::Logout, :logoutRequest],
+		
+		#Tests
+		['environment', :visualiseEnvironment],
+		['post', :postTest],
+	]
 
-prefix = '/main/'
+	prefix = '/main/'
 
-manager = RequestManager.new
-handlers.each { |path, symbol| manager.addHandler(prefix + path, symbol) }
+	requestManager = RequestManager.new
+	handlers.each { |path, symbol| requestManager.addHandler(prefix + path, symbol) }
+	return requestManager
+end
 
+def getDatabaseObject
+	database = Sequel.connect
+	(
+		adapter: DatabaseConfiguration.Adapter,
+		host: DatabaseConfiguration.Host,
+		user: DatabaseConfiguration.User,
+		password: DatabaseConfiguration.Password,
+		database = DatabaseConfiguration.Database
+	)
+	return database
+end
+
+loadModules
+
+$requestManager = createRequestManager
 $generator = SiteGenerator.new
 
-$database = Sequel.connect
-(
-	adapter: DatabaseConfiguration.Adapter,
-	host: DatabaseConfiguration.Host,
-	user: DatabaseConfiguration.User,
-	password: DatabaseConfiguration.Password,
-	database = DatabaseConfiguration.Database
-)
+$database = getDatabaseObject
+$userManager = UserManager.new

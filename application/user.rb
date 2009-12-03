@@ -13,3 +13,6 @@ end
 
 def performRegistrationRequest(request)
 end
+
+def logoutRequest(request)
+end
