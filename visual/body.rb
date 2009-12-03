@@ -1,6 +1,6 @@
-def bodyHead()
-	
+def visualHead(request)
+	return $menu.render request
 end
 
-def bodyFoot()
+def visualFoot()
 end

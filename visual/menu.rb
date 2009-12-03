@@ -1,3 +1,3 @@
-def renderMenu(items)
+def renderMenu(items, request)
 	
 end

@@ -14,10 +14,7 @@ def loadModules
 		'UserManager',
 		'Menu',
 		'PathMap',
-		
-		#Tests
-		'environment',
-		'test'
+		'MainSiteGenerator'
 	]
 
 	applicationFiles.each { |name| require name }
@@ -26,24 +23,21 @@ end
 def createRequestManager
 	handlers =
 	[
-		[PathMap::Index, :getIndex],
+		[:Index, :getIndex],
 		
-		[PathMap::Login, :loginFormRequest],
-		[PathMap::SubmitLogin, :performLoginRequest],
-		[PathMap::Register, :registerFormRequest],
-		[PathMap::SubmitRegistration, :performRegistrationRequest],
+		[:Login, :loginFormRequest],
+		[:SubmitLogin, :performLoginRequest],
+		[:Register, :registerFormRequest],
+		[:SubmitRegistration, :performRegistrationRequest],
 		
-		[PathMap::Logout, :logoutRequest],
-		
-		#Tests
-		['environment', :visualiseEnvironment],
-		['post', :postTest],
+		[:Logout, :logoutRequest],
 	]
 
 	prefix = '/main/'
 
 	requestManager = RequestManager.new
-	handlers.each { |path, symbol| requestManager.addHandler(prefix + path, symbol) }
+	handlers.each do |path, symbol| requestManager.addHandler(prefix + PathMap.getPath(path), symbol)
+	end
 	return requestManager
 end
 
@@ -59,10 +53,32 @@ def getDatabaseObject
 	return database
 end
 
+def createMenu
+	menu = Menu.new
+	
+	loggedIn = lambda { |request| $userManager.isLoggedIn? request }
+	notLoggedIn = lambda { |request| !loggedIn(request) }
+	
+	items =
+	[
+		[:Index],
+		[:Login, notLoggedIn],
+		[:Register, notLoggedIn],
+		[:Logout, loggedIn]
+	]
+	
+	items.each do |item|
+		condition = item.size > 1 ? item[1] : lambda { |request| true }
+		menu.addItem(PathMap.getDescription(item), PathMap.getPath(item), condition)
+	end
+	
+	return menu
+end
+
 loadModules
 
 $requestManager = createRequestManager
-$generator = SiteGenerator.new
-
+$generator = MainSiteGenerator.new
 $database = getDatabaseObject
 $userManager = UserManager.new
+$menu = createMenu
