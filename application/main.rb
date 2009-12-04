@@ -59,7 +59,7 @@ def createMenu
 	menu = Menu.new
 	
 	loggedIn = lambda { |request| $userManager.isLoggedIn? request }
-	notLoggedIn = lambda { |request| !loggedIn(request) }
+	notLoggedIn = lambda { |request| !loggedIn.(request) }
 	
 	items =
 	[

@@ -3,4 +3,5 @@ def visualHead(request)
 end
 
 def visualFoot()
+	return ''
 end

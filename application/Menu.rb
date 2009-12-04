@@ -1,7 +1,7 @@
 require 'visual/menu'
 
 class MenuItem
-	attr_reader :description, :path
+	attr_reader :description, :path, :condition
 	def initialize(description, path, condition)
 		@description = description
 		@path = path
