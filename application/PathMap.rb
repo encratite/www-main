@@ -8,13 +8,13 @@ class PathMapEntry
 end
 
 class PathMap
-	Index = PathMapEntry('Index', '')
-	Login = PathMapEntry('Login', 'login')
-	Register = PathMapEntry('Registration', 'register')
+	Index = PathMapEntry.new('Index', '')
+	Login = PathMapEntry.new('Login', 'login')
+	Register = PathMapEntry.new('Registration', 'register')
+	Logout = PathMapEntry.new('Log out', 'logout')
 	
 	SubmitLogin = 'submitLogin'
 	SubmitRegistration = 'submitRegistration'
-	Logout = 'logout'
 	
 	def self.getPath(symbol)
 		pathOrMapEntry = self.const_get symbol

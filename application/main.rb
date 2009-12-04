@@ -1,6 +1,8 @@
 $:.concat ['..', 'application']
 
 def loadModules
+	require 'sequel'
+	
 	require 'site/RequestManager'
 	require 'site/SiteGenerator'
 
@@ -42,13 +44,13 @@ def createRequestManager
 end
 
 def getDatabaseObject
-	database = Sequel.connect
-	(
-		adapter: DatabaseConfiguration.Adapter,
-		host: DatabaseConfiguration.Host,
-		user: DatabaseConfiguration.User,
-		password: DatabaseConfiguration.Password,
-		database = DatabaseConfiguration.Database
+	database =
+	Sequel.connect(
+		adapter: DatabaseConfiguration::Adapter,
+		host: DatabaseConfiguration::Host,
+		user: DatabaseConfiguration::User,
+		password: DatabaseConfiguration::Password,
+		database: DatabaseConfiguration::Database
 	)
 	return database
 end
@@ -69,7 +71,8 @@ def createMenu
 	
 	items.each do |item|
 		condition = item.size > 1 ? item[1] : lambda { |request| true }
-		menu.addItem(PathMap.getDescription(item), PathMap.getPath(item), condition)
+		item = item[0]
+		menu.add(PathMap.getDescription(item), PathMap.getPath(item), condition)
 	end
 	
 	return menu

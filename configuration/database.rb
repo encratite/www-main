@@ -1,5 +1,5 @@
 class DatabaseConfiguration
-	Adapter = 'postgresql'
+	Adapter = 'postgres'
 	Host = '127.0.0.1'
 	
 	User = 'void'
