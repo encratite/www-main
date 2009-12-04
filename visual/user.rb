@@ -10,15 +10,16 @@ It allows you to edit/delete your old pastebin entries even after your IP has ch
 The login sessions depend on cookies so you will not be able to use this feature unless you enable them in your browser.
 If you do not have an account yet you may register one:
 </p>
-<p><a href="registerAccount">Register a new account</a></p>
+END
+	output += "<p><a href=\"#{PathMap.getPath :Register}\">Register a new account</a></p>\n"
+	output +=
+<<END
 <p>Specify your username and your password in the following form and submit the data in order to log into your account.</p>
 END
 
 	form = FormWriter.new(output, PathMap::SubmitLogin)
 	['User name', 'Password'].each { |label| form.label label }
 	form.finish
-	
-	return output
 end
 
 def visualRegisterForm()
@@ -32,9 +33,7 @@ END
 	form = FormWriter.new(output, PathMap::SubmitRegistration)
 	form.label 'User'
 	form.label 'Password'
-	form.label 'Type your password again', name = 'passwordAgain'
-	form.label 'Email address', name = 'email'
+	form.label 'Type your password again', 'password', 'passwordAgain'
+	form.label 'Email address', 'text', 'email'
 	form.finish
-
-	return output
 end

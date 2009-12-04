@@ -35,11 +35,8 @@ def createRequestManager
 		[:Logout, :logoutRequest],
 	]
 
-	prefix = '/main/'
-
 	requestManager = RequestManager.new
-	handlers.each do |path, symbol| requestManager.addHandler(prefix + PathMap.getPath(path), symbol)
-	end
+	handlers.each { |path, symbol| requestManager.addHandler(PathMap.getPath(path), symbol) }
 	return requestManager
 end
 
