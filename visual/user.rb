@@ -1,5 +1,6 @@
 require 'site/FormWriter'
 require 'PathMap'
+require 'UserForm'
 
 def visualLoginForm()
 	output =
@@ -11,14 +12,20 @@ The login sessions depend on cookies so you will not be able to use this feature
 If you do not have an account yet you may register one:
 </p>
 END
-	output += "<p><a href=\"#{PathMap.getPath :Register}\">Register a new account</a></p>\n"
+	output += "<p class=\"indent\"><a href=\"#{PathMap.getPath :Register}\">Register a new account</a></p>\n"
 	output +=
 <<END
 <p>Specify your username and your password in the following form and submit the data in order to log into your account.</p>
 END
 
+	fields =
+	[
+		['User name', UserForm::User],
+		['Password', UserForm::Password]
+	]
+
 	form = FormWriter.new(output, PathMap::SubmitLogin)
-	['User name', 'Password'].each { |label| form.label label }
+	fields.each { |description, fieldName| form.label label: description, name: fieldName }
 	form.finish
 end
 
@@ -30,10 +37,16 @@ Fill out the following form and submit the data in order to create a new account
 It is not necessary to specify an e-mail address but it may be useful to do so in case you forget your password.
 </p>
 END
-	form = FormWriter.new(output, PathMap::SubmitRegistration)
-	form.label 'User'
-	form.label 'Password'
-	form.label 'Type your password again', 'password', 'passwordAgain'
-	form.label 'Email address', 'text', 'email'
+
+	fields =
+	[
+		['User name', UserForm::User],
+		['Password', UserForm::Password],
+		['Type your password again', UserForm::PasswordAgain],
+		['Email address', UserForm::Email]
+	]
+	
+	form = FormWriter.new(output, PathMap::SubmitLogin)
+	fields.each { |description, fieldName| form.label label: description, name: fieldName }
 	form.finish
 end

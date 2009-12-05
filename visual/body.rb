@@ -4,5 +4,5 @@ def visualHead(request)
 end
 
 def visualFoot()
-	return "</div>"
+	return "</div>\n"
 end

@@ -1,3 +1,4 @@
+require 'UserForm'
 require 'visual/user'
 
 def loginFormRequest(request)

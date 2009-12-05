@@ -40,6 +40,11 @@ p
 	margin: 0 0 0.8em 0;
 }
 
+p.indent
+{
+	margin-left: 2em;
+}
+
 li
 {
 	list-style-type: none;
@@ -96,4 +101,30 @@ pre
 #siteContent
 {
 	margin: 2em 4em 2em 4em;
+}
+
+#menu
+{
+	background-color: #000;
+	padding: 0.2em 0 0.2em 4em;
+	margin: 0 0 1em 0;
+}
+
+#menu li
+{
+	font-weight: bold;
+	display: inline;
+	margin-right: 2em;
+}
+
+#menu a
+{
+	text-decoration: none;
+	color: #fff;
+	background: none;
+}
+
+#menu a:hover
+{
+	color: #aaa;
 }
