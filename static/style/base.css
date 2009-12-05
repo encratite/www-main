@@ -14,32 +14,30 @@ body
 
 a
 {
+	color: #008aff;
 	text-decoration: none;
-	color: #0020b0;
 	background: none;
 }
 
-
 a:visited
 {
-	color: #503090;
+	color: #0078de;
 }
 
 a:active
 {
-	color: #f0a000;
+	color: #30a0ff;
 }
 
 a:hover
 {
-	color: #2240b0;
-	text-decoration: underline;
+	color: #ffa200;
 }
 
 p
 {
 	text-align: justify;
-	margin: 0.4em 0 0.4em 0;
+	margin: 0 0 0.8em 0;
 }
 
 li
@@ -51,21 +49,22 @@ input
 {
 	color: #000;
 	border: 1px solid #000;
-	background-color: #f0f0f0;
+	background-color: #f8f8f8;
+	padding: 0 0.5em 0 0.5em;
 }
 
 textarea
 {
 	color: #000;
 	border: 1px solid #000;
-	background-color: #f0f0f0;
+	background-color: #f8f8f8;
 }
 
 select
 {
 	color: #000;
 	border: 1px solid #000;
-	background-color: #f0f0f0;
+	background-color: #f8f8f8;
 }
 
 table
@@ -92,4 +91,9 @@ pre
 	font-family: "Lucida Console", monospace;
 	margin: 0;
 	padding: 0;
+}
+
+#siteContent
+{
+	margin: 2em 4em 2em 4em;
 }

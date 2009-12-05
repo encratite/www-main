@@ -16,7 +16,8 @@ def loadModules
 		'UserManager',
 		'Menu',
 		'PathMap',
-		'MainSiteGenerator'
+		'MainSiteGenerator',
+		'static'
 	]
 
 	applicationFiles.each { |name| require name }
@@ -75,10 +76,16 @@ def createMenu
 	return menu
 end
 
+def getSiteGenerator
+	output = MainSiteGenerator.new
+	output.addStylesheet(getStylesheet 'base')
+	output
+end
+
 loadModules
 
 $requestManager = createRequestManager
-$generator = MainSiteGenerator.new
+$generator = getSiteGenerator
 $database = getDatabaseObject
 $userManager = UserManager.new
 $menu = createMenu
