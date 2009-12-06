@@ -2,7 +2,7 @@ create table site_user
 (
 	id serial primary key,
 
-	name text,
+	name text unique,
 	password text,
 	
 	email text,

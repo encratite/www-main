@@ -3,7 +3,7 @@ class DatabaseConfiguration
 	Host = '127.0.0.1'
 	
 	User = 'void'
-	Password = '5872357382'
+	Password = 'w4yh56yu6h'
 	
-	Database = 'mainSite'
+	Database = 'main_site'
 end

@@ -27,26 +27,53 @@ END
 	form = FormWriter.new(output, PathMap::SubmitLogin)
 	fields.each { |description, fieldName| form.label label: description, name: fieldName }
 	form.finish
+	
+	'Log in', output
 end
 
-def visualRegisterForm()
-	output =
+def visualRegisterForm(error = nil, user = nil, email = nil)
+	if error != nil do
+		output =
+<<END
+<p><b>Registration error:</b> An error occured while your request was being processed:</p>
+<ul class="error">
+END
+		error.each { |message| output += "<li>#{message}</li>\n" }
+		output +=
+<<END
+</ul>
+<p>Please go over the form again and correct the invalid entries.</p>
+END
+	else
+		output =
 <<END
 <p>
 Fill out the following form and submit the data in order to create a new account.
 It is not necessary to specify an e-mail address but it may be useful to do so in case you forget your password.
 </p>
 END
+	end
 
 	fields =
 	[
-		['User name', UserForm::User],
+		['User name', UserForm::User, user],
 		['Password', UserForm::Password],
 		['Type your password again', UserForm::PasswordAgain],
-		['Email address', UserForm::Email]
+		['Email address', UserForm::Email, email]
 	]
 	
 	form = FormWriter.new(output, PathMap::SubmitLogin)
-	fields.each { |description, fieldName| form.label label: description, name: fieldName }
+	fields.each do |field|
+		description = field[0]
+		fieldName = field[1]
+		labelHash = label: description, name: fieldName
+		if field.size == 3
+			value = field[2]
+			labelHash[:value] = value if value != nil
+		end
+		form.label labelHash
+	end
 	form.finish
+	
+	'Register a new account', output
 end
