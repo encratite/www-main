@@ -35,7 +35,7 @@ def performRegistrationRequest(request)
 		UserForm::Email
 	]
 	
-	input = request.input
+	input = request.postInput
 	
 	requiredFields.each { |field| return fieldError if input[field] == nil }
 	

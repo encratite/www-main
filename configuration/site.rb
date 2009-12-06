@@ -9,4 +9,7 @@ class SiteConfiguration
 	
 	UserNameLengthMaximum = GeneralStringLengthMaximum
 	PasswordLengthMaximum = GeneralStringLengthMaximum
+	
+	SessionStringLength = 128
+	SessionDurationInDays = 30
 end
