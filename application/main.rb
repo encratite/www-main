@@ -3,8 +3,15 @@ $:.concat ['..', 'application']
 def loadModules
 	require 'sequel'
 	
-	require 'site/RequestManager'
-	require 'site/SiteGenerator'
+	prefix = 'site'
+	siteFiles =
+	[
+		'RequestManager',
+		'SiteGenerator',
+		'RequestHandler',
+	]
+	
+	siteFiles.each { |name| require "#{prefix}/#{name}" }
 
 	require 'configuration/database'
 
@@ -27,17 +34,22 @@ def createRequestManager
 	handlers =
 	[
 		[:Index, :getIndex],
-		
 		[:Login, :loginFormRequest],
 		[:SubmitLogin, :performLoginRequest],
 		[:Register, :registerFormRequest],
 		[:SubmitRegistration, :performRegistrationRequest],
-		
 		[:Logout, :logoutRequest],
 	]
 
 	requestManager = RequestManager.new SiteRequest
-	handlers.each { |path, symbol| requestManager.addHandler(PathMap.getPath(path), method(symbol)) }
+	handlers.each do |arguments|
+		pathSymbol, handlerSymbol = arguments
+		path = PathMap.getPath pathSymbol
+		handler = method handlerSymbol
+		argumentCount = arguments.size > 2 ? arguments[2] : nil
+		requestHandler = RequestHandler.new(path, handler, argumentCount)
+		requestManager.addHandler requestHandler
+	end
 	return requestManager
 end
 
