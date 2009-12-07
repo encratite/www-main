@@ -36,14 +36,8 @@ def createRequestManager
 		[:Logout, :logoutRequest],
 	]
 
-	requestManager = RequestManager.new
-	handlers.each do |path, symbol|
-		handler = lambda do |request| 
-			siteRequest = SiteRequest.new request
-			method(symbol).(siteRequest)
-		end
-		requestManager.addHandler(PathMap.getPath(path), handler)
-	end
+	requestManager = RequestManager.new SiteRequest
+	handlers.each { |path, symbol| requestManager.addHandler(PathMap.getPath(path), method(:symbol)) }
 	return requestManager
 end
 
