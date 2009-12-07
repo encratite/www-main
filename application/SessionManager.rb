@@ -1,15 +1,18 @@
 require 'site/Session'
 require 'configuration/site'
+require 'configuration/cookie'
 require 'database'
 
-class UserManager
-	def isLoggedIn?(request)
+class SessionManager
+	def getSessionUser(request)
 		$database.transaction do
+			cookie = request.cookies[CookieConfiguration::Session]
+			return nil if cookie == nil
 			cleanSessions
-			dataset = getDataset :LoginSession
-			dataset
+			result = getDataset(:LoginSession).filter(session_string: cookie, ip: request.address).join(getTableSymbol(:User), user_id: id).all
+			return nil if result.size == 0
+			return result
 		end
-		return false
 	end
 	
 	def cleanSessions
@@ -27,6 +30,6 @@ class UserManager
 	
 	def createSession(userId, request, duration)
 		sessionString = generateSessionString
-		
+		#?
 	end
 end

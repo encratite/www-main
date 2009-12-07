@@ -1,5 +1,8 @@
 require 'configuration/table'
 
+def getTableSymbol(symbol)
+end
+
 def getDataset(symbol)
-	return $database[TableConfiguration.get_const symbol]
+	$database[getTableSymbol symbol]
 end

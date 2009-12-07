@@ -12,12 +12,12 @@ def loadModules
 	[
 		'index',
 		'user',
-		
-		'UserManager',
+		'SessionManager',
 		'Menu',
 		'PathMap',
 		'MainSiteGenerator',
-		'static'
+		'static',
+		'SiteRequest'
 	]
 
 	applicationFiles.each { |name| require name }
@@ -37,7 +37,13 @@ def createRequestManager
 	]
 
 	requestManager = RequestManager.new
-	handlers.each { |path, symbol| requestManager.addHandler(PathMap.getPath(path), symbol) }
+	handlers.each do |path, symbol|
+		handler = lambda do |request| 
+			siteRequest = SiteRequest.new request
+			method(symbol).(siteRequest)
+		end
+		requestManager.addHandler(PathMap.getPath(path), handler)
+	end
 	return requestManager
 end
 
@@ -56,8 +62,8 @@ end
 def createMenu
 	menu = Menu.new
 	
-	loggedIn = lambda { |request| $userManager.isLoggedIn? request }
-	notLoggedIn = lambda { |request| !loggedIn.(request) }
+	loggedIn = lambda { |request| request.sessionUser != nil }
+	notLoggedIn = lambda { |request| request.sessionUser == nil }
 	
 	items =
 	[
@@ -84,8 +90,8 @@ end
 
 loadModules
 
+$sessionManager = SessionManager.new
 $requestManager = createRequestManager
 $generator = getSiteGenerator
 $database = getDatabaseObject
-$userManager = UserManager.new
 $menu = createMenu
