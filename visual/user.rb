@@ -28,11 +28,11 @@ END
 	fields.each { |description, fieldName| form.label label: description, name: fieldName }
 	form.finish
 	
-	'Log in', output
+	['Log in', output]
 end
 
 def visualRegisterForm(error = nil, user = nil, email = nil)
-	if error != nil do
+	if error != nil
 		output =
 <<END
 <p><b>Registration error:</b> An error occured while your request was being processed:</p>
@@ -66,7 +66,7 @@ END
 	fields.each do |field|
 		description = field[0]
 		fieldName = field[1]
-		labelHash = label: description, name: fieldName
+		labelHash = {label: description, name: fieldName}
 		if field.size == 3
 			value = field[2]
 			labelHash[:value] = value if value != nil
@@ -75,5 +75,5 @@ END
 	end
 	form.finish
 	
-	'Register a new account', output
+	['Register a new account', output]
 end

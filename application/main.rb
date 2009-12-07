@@ -37,7 +37,7 @@ def createRequestManager
 	]
 
 	requestManager = RequestManager.new SiteRequest
-	handlers.each { |path, symbol| requestManager.addHandler(PathMap.getPath(path), method(:symbol)) }
+	handlers.each { |path, symbol| requestManager.addHandler(PathMap.getPath(path), method(symbol)) }
 	return requestManager
 end
 

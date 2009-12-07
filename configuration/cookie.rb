@@ -1,3 +1,3 @@
 class CookieConfiguration
-	SessionCookie = 'session'
+	Session = 'session'
 end

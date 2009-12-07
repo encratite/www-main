@@ -1,12 +1,12 @@
 require 'UserForm'
-require 'MIMEType'
+require 'site/MIMEType'
 require 'configuration/site'
 require 'configuration/table'
 require 'site/EMailValidator'
 require 'visual/user'
 
 def plainError(message)
-	MIMEType::Plain, message
+	[MIMEType::Plain, message]
 end
 
 def fieldError
