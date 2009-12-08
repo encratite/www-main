@@ -18,7 +18,7 @@ def loadModules
 	applicationFiles =
 	[
 		'index',
-		'user',
+		'userAccount',
 		'SessionManager',
 		'Menu',
 		'PathMap',

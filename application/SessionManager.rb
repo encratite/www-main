@@ -2,8 +2,13 @@ require 'site/Session'
 require 'configuration/site'
 require 'configuration/cookie'
 require 'database'
+require 'htmlentities'
 
 class SessionManager
+	def initialize
+		@htmlCoder = HTMLEntities.new
+	end
+	
 	def getSessionUser(request)
 		$database.transaction do
 			cookie = request.cookies[CookieConfiguration::Session]
@@ -11,7 +16,9 @@ class SessionManager
 			cleanSessions
 			result = getDataset(:LoginSession).filter(session_string: cookie, ip: request.address).join(getTableSymbol(:User), user_id: id).all
 			return nil if result.size == 0
-			return result
+			output = result[0]
+			output.name = @htmlCoder.encode output.name
+			return output
 		end
 	end
 	
@@ -28,8 +35,10 @@ class SessionManager
 		sessionString
 	end
 	
-	def createSession(userId, request, duration)
+	def createSession(userId, address)
 		sessionString = generateSessionString
-		#?
+		dataset = getDataset :LoginSession
+		dataset.insert(user_id: userId, session_string: sessionString, ip: address)
+		sessionString
 	end
 end

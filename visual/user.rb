@@ -1,8 +1,9 @@
 require 'site/FormWriter'
 require 'PathMap'
 require 'UserForm'
+require 'visual/general'
 
-def visualLoginForm()
+def visualLoginForm
 	output =
 <<END
 <p>
@@ -76,4 +77,10 @@ END
 	form.finish
 	
 	['Register a new account', output]
+end
+
+def visualRegistrationSuccess(userName)
+	title = 'Registration succesful'
+	content = visualMessage "Your account <b>#{userName}</b> has been created successfully. You have been automatically logged into your account."
+	[title, content]
 end
