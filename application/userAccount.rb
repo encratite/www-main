@@ -1,4 +1,5 @@
 require 'UserForm'
+require 'User'
 require 'site/MIMEType'
 require 'site/HTTPReply'
 require 'site/Cookie'
@@ -8,7 +9,7 @@ require 'configuration/cookie'
 require 'site/EMailValidator'
 require 'visual/user'
 require 'visual/general'
-require 'digest/md5'
+require 'hash'
 
 def plainError(message)
 	[MIMEType::Plain, message]
@@ -20,7 +21,7 @@ end
 
 def sessionCheck(request, title, message)
 	currentUser = request.sessionUser
-	return nil if if currentUser == nil
+	return nil if currentUser == nil
 	content = visualError "You are already logged into your account #{currentUser.name}. #{message}"
 	$generator.get title, request, content
 end
@@ -57,7 +58,27 @@ def performLoginRequest(request)
 	user = input[UserForm::User]
 	password = input[UserForm::Password]
 	
+	passwordHash = hashWithSalt password
+	
 	dataset = getDataset :User
+	result = dataset.where(name: user, password: passwordHash).first
+	if result == nil
+		title, content = visualLoginError
+		return $generator.get title, request, content
+	else
+		user = User.new result
+		request.sessionUser = user
+		
+		sessionString = $sessionManager.createSession(user.id, request.address)
+		sessionCookie = Cookie.new(CookieConfiguration::Session, sessionString, SiteConfiguration::SitePrefix)
+		
+		title, content = visualLoginSuccess user
+		fullContent = $generator.get title, request, content
+		
+		reply = HTTPReply.new fullContent
+		reply.addCokie sessionCookie
+		return reply
+	end
 end
 
 def registerFormRequest(request)
@@ -112,7 +133,7 @@ def performRegistrationRequest(request)
 		
 		return printErrorForm if errorOccured
 		
-		passwordHash = Digest::MD5.hexdigest password
+		passwordHash = hashWithSalt password
 		userId = dataset.insert(name: user, password: passwordHash, email: email)
 		sessionString = $sessionManager.createSession(userId, request.address)
 		sessionCookie = Cookie.new(CookieConfiguration::Session, sessionString, SiteConfiguration::SitePrefix)
@@ -126,4 +147,22 @@ def performRegistrationRequest(request)
 end
 
 def logoutRequest(request)
+	currentUser = request.sessionUser
+	if currentUser != nil
+		title = 'Logout error'
+		content = visualError 'You are currently not logged into any account.'
+		return $generator.get title, request, content
+	end
+	
+	sessionString = request.cookies[CookieConfiguration::Session]
+	dataset = getDataset :LoginSession
+	dataset.filter(session_string: sessionString).delete
+	
+	request.sessionUser = nil
+	
+	title, content = visualLogout
+	fullContent = $generator.get title, request, content
+	reply = HTTPReply.new fullContent
+	reply.deleteCookie CookieConfiguration::Session
+	reply
 end

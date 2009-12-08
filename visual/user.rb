@@ -1,4 +1,5 @@
 require 'site/FormWriter'
+require 'site/HTML'
 require 'PathMap'
 require 'UserForm'
 require 'visual/general'
@@ -80,7 +81,26 @@ END
 end
 
 def visualRegistrationSuccess(userName)
+	userName = HTMLEntities::encode userName
 	title = 'Registration succesful'
 	content = visualMessage "Your account <b>#{userName}</b> has been created successfully. You have been automatically logged into your account."
+	[title, content]
+end
+
+def visualLoginError
+	title = 'Invalid login'
+	content = visualError('The user name or the password you have specified are invalid. Please try again.') + visualLoginForm[1]
+	[title, content]
+end
+
+def visualLoginSuccess(user)
+	title = 'Login successful'
+	content = visualMessage "You are now logged in as #{user.htmlName}."
+	[title, content]
+end
+
+def visualLogout
+	title = 'Logout successful'
+	content = visualMessage 'You have successfully logged out of your account.'
 	[title, content]
 end

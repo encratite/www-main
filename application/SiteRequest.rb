@@ -1,7 +1,7 @@
 require 'site/HTTPRequest'
 
 class SiteRequest < HTTPRequest
-	attr_reader :sessionUser
+	attr_accessor :sessionUser
 	
 	def initialize(environment)
 		super environment
