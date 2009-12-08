@@ -64,7 +64,7 @@ END
 		['Email address', UserForm::Email, email]
 	]
 	
-	form = FormWriter.new(output, PathMap::SubmitLogin)
+	form = FormWriter.new(output, PathMap::SubmitRegistration)
 	fields.each do |field|
 		description = field[0]
 		fieldName = field[1]

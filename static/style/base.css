@@ -40,11 +40,6 @@ p
 	margin: 0 0 0.8em 0;
 }
 
-p.indent
-{
-	margin-left: 2em;
-}
-
 li
 {
 	list-style-type: none;
@@ -96,6 +91,21 @@ pre
 	font-family: "Lucida Console", monospace;
 	margin: 0;
 	padding: 0;
+}
+
+p.indent
+{
+	margin-left: 2em;
+}
+
+ul.error
+{
+	margin: 0 0 1em 2em;
+}
+
+ul.error li
+{
+	list-style-type: square;
 }
 
 #siteContent

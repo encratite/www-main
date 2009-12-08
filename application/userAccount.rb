@@ -51,12 +51,12 @@ def performLoginRequest(request)
 		UserForm::Password
 	]
 	
-	input = request.postInput
+	return fieldError if !request.postIsSet(requiredFields)
 	
-	requiredFields.each { |field| return fieldError if input[field] == nil }
+	user = request.getPost UserForm::User
+	password = request.getPost UserForm::Password
 	
-	user = input[UserForm::User]
-	password = input[UserForm::Password]
+	puts password
 	
 	passwordHash = hashWithSalt password
 	
@@ -100,14 +100,12 @@ def performRegistrationRequest(request)
 		UserForm::Email
 	]
 	
-	input = request.postInput
+	return fieldError if !request.postIsSet(requiredFields)
 	
-	requiredFields.each { |field| return fieldError if input[field] == nil }
-	
-	user = input[UserForm::User]
-	password = input[UserForm::Password]
-	passwordAgain = input[UserForm::PasswordAgain]
-	email = input[UserForm::Email]
+	user = request.getPost UserForm::User
+	password = request.getPost UserForm::Password
+	passwordAgain = request.getPost UserForm::PasswordAgain
+	email = request.getPost UserForm::Email
 	
 	errors = []
 	
@@ -118,20 +116,20 @@ def performRegistrationRequest(request)
 	end
 	errorOccured = lambda { !errors.empty? }
 	
-	error 'Your user name may not be empty.' if user.empty?
-	error 'Your user name is too long.' if user.size > SiteConfiguration::UserNameLengthMaximum
-	error 'Your passwords do not match.' if password != passwordAgain
-	error 'Your password is too long.' if password.size > SiteConfiguration::PasswordLengthMaximum
-	error 'The email address you have specified is invalid.' if !email.empty? && !EMailValidator.isValidEmailAddress(email)
+	error.call 'Your user name may not be empty.' if user.empty?
+	error.call 'Your user name is too long.' if user.size > SiteConfiguration::UserNameLengthMaximum
+	error.call 'Your passwords do not match.' if password != passwordAgain
+	error.call 'Your password is too long.' if password.size > SiteConfiguration::PasswordLengthMaximum
+	error.call 'The email address you have specified is invalid.' if !email.empty? && !EMailValidator.isValidEmailAddress(email)
 	
-	return printErrorForm if errorOccured
+	return printErrorForm.call if errorOccured.call
 	
 	dataset = getDataset :User
 	
 	$database.transaction do
-		error 'The user name you have chosen is already taken. Please choose another one.' if dataset.where(name: user).count > 0
+		error.call 'The user name you have chosen is already taken. Please choose another one.' if dataset.where(name: user).count > 0
 		
-		return printErrorForm if errorOccured
+		return printErrorForm.call if errorOccured.call
 		
 		passwordHash = hashWithSalt password
 		userId = dataset.insert(name: user, password: passwordHash, email: email)

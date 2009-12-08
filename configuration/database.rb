@@ -7,5 +7,5 @@ class DatabaseConfiguration
 	
 	Database = 'main_site'
 	
-	passwordSalt = 'GjrklklWX4Hc0sWASB0uWpO5nOc3fAxPEd01TnBVXSK2slDn0izsvJhUos56W7GnpHMoUYJSGpIfvIfw'
+	PasswordSalt = 'GjrklklWX4Hc0sWASB0uWpO5nOc3fAxPEd01TnBVXSK2slDn0izsvJhUos56W7GnpHMoUYJSGpIfvIfw'
 end
