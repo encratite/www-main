@@ -126,6 +126,8 @@ def performRegistrationRequest(request)
 	
 	dataset = getDataset :User
 	
+	reply = nil
+	
 	$database.transaction do
 		error.call 'The user name you have chosen is already taken. Please choose another one.' if dataset.where(name: user).count > 0
 		
@@ -135,7 +137,7 @@ def performRegistrationRequest(request)
 		userId = dataset.insert(name: user, password: passwordHash, email: email)
 		sessionString = $sessionManager.createSession(userId, request.address)
 		sessionCookie = Cookie.new(CookieConfiguration::Session, sessionString, SiteConfiguration::SitePrefix)
-		title, content = visualRegistrationSuccess
+		title, content = visualRegistrationSuccess user
 		fullContent = $generator.get title, request, content
 		reply = HTTPReply.new fullContent
 		reply.addCookie sessionCookie
