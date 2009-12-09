@@ -24,7 +24,9 @@ def loadModules
 		'PathMap',
 		'MainSiteGenerator',
 		'static',
-		'SiteRequest'
+		'SiteRequest',
+		
+		'environment'
 	]
 
 	applicationFiles.each { |name| require name }
@@ -50,6 +52,10 @@ def createRequestManager
 		requestHandler = RequestHandler.new(path, handler, argumentCount)
 		requestManager.addHandler requestHandler
 	end
+	
+	requestHandler = RequestHandler.new('/main/environment', method(:visualiseEnvironment), 0)
+	requestManager.addHandler requestHandler
+	
 	return requestManager
 end
 

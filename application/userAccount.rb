@@ -137,6 +137,7 @@ def performRegistrationRequest(request)
 		userId = dataset.insert(name: user, password: passwordHash, email: email)
 		sessionString = $sessionManager.createSession(userId, request.address)
 		sessionCookie = Cookie.new(CookieConfiguration::Session, sessionString, SiteConfiguration::SitePrefix)
+		sessionCookie.expirationDays SiteConfiguration::SessionDurationInDays
 		title, content = visualRegistrationSuccess user
 		fullContent = $generator.get title, request, content
 		reply = HTTPReply.new fullContent

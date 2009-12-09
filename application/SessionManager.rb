@@ -10,14 +10,14 @@ class SessionManager
 			cookie = request.cookies[CookieConfiguration::Session]
 			return nil if cookie == nil
 			cleanSessions
-			result = getDataset(:LoginSession).filter(session_string: cookie, ip: request.address).join(getTableSymbol(:User), user_id: id).first
+			result = getDataset(:LoginSession).filter(session_string: cookie, ip: request.address).join(getTableSymbol(:User), id: :user_id).first
 			return nil if result == nil
 			return User.new result
 		end
 	end
 	
 	def cleanSessions
-		$database.run "delete from login_session where session_begin + interval '#{SessionDurationInDays} days' > now()"
+		$database.run "delete from login_session where session_begin + interval '#{SiteConfiguration::SessionDurationInDays} days' > now()"
 	end
 	
 	def generateSessionString
