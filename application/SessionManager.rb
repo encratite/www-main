@@ -11,6 +11,7 @@ class SessionManager
 			return nil if cookie == nil
 			cleanSessions
 			result = getDataset(:LoginSession).filter(session_string: cookie, ip: request.address).join(getTableSymbol(:User), id: :user_id).first
+			puts "Cookie: #{cookie}, result: #{result}"
 			return nil if result == nil
 			return User.new result
 		end

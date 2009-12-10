@@ -5,14 +5,14 @@ create table pastebin_entry
 	user_id integer references site_user(id),
 	
 	author text,
-	ip text,
+	ip text not null,
 
-	description text,
-	content text,
-	highlighted_content text,
+	description text not null,
+	content text not null,
+	highlighted_content text not null,
 	
-	paste_type text,
+	paste_type text not null,
 	
-	creation timestamp,
-	last_modification timestamp
+	creation timestamp not null,
+	last_modification timestamp not null
 );

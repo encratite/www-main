@@ -89,13 +89,13 @@ end
 
 def visualLoginError
 	title = 'Invalid login'
-	content = visualError('The user name or the password you have specified are invalid. Please try again.') + visualLoginForm[1]
+	content = visualError('The user name or the password you have specified is invalid. Please try again.') + visualLoginForm[1]
 	[title, content]
 end
 
 def visualLoginSuccess(user)
 	title = 'Login successful'
-	content = visualMessage "You are now logged in as #{user.htmlName}."
+	content = visualMessage "You are now logged in as <b>#{user.htmlName}</b>."
 	[title, content]
 end
 

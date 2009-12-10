@@ -56,8 +56,6 @@ def performLoginRequest(request)
 	user = request.getPost UserForm::User
 	password = request.getPost UserForm::Password
 	
-	puts password
-	
 	passwordHash = hashWithSalt password
 	
 	dataset = getDataset :User
@@ -69,14 +67,18 @@ def performLoginRequest(request)
 		user = User.new result
 		request.sessionUser = user
 		
+		puts result
+		puts user
+		
 		sessionString = $sessionManager.createSession(user.id, request.address)
 		sessionCookie = Cookie.new(CookieConfiguration::Session, sessionString, SiteConfiguration::SitePrefix)
+		sessionCookie.expirationDays SiteConfiguration::SessionDurationInDays
 		
 		title, content = visualLoginSuccess user
 		fullContent = $generator.get title, request, content
 		
 		reply = HTTPReply.new fullContent
-		reply.addCokie sessionCookie
+		reply.addCookie sessionCookie
 		return reply
 	end
 end
@@ -141,11 +143,7 @@ def performRegistrationRequest(request)
 		title, content = visualRegistrationSuccess user
 		
 		newUser = User.new
-		newUser.id = userId
-		newUser.name = user
-		newUser.password = password
-		newUser.email = email
-		newUser.isAdministrator = false
+		newUser.set(userId, user, password, email, false)
 		
 		request.sessionUser = newUser
 		

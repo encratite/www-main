@@ -1,7 +1,7 @@
 require 'site/HTML'
 
 class User
-	attr_accessor :id, :name, :password, :email, :isAdministrator
+	attr_accessor :id, :name, :password, :email, :isAdministrator, :htmlName
 	
 	def initialize(data = nil)
 		return if data == nil
@@ -20,6 +20,16 @@ class User
 			next if ourKey == nil
 			instance_variable_set(ourKey, value)
 		end
+		
+		fixName
+	end
+	
+	def set(id, name, password, email, isAdministrator)
+		@id = id
+		@name = name
+		@password = password
+		@email = email
+		@isAdministrator = isAdministrator
 		
 		fixName
 	end
