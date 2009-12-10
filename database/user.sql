@@ -20,4 +20,4 @@ create table login_session
 	session_begin timestamp default current_timestamp not null
 );
 
-create index login_session_user_id_index on login_session (user_id);
+create index login_session_session_string on login_session (session_string);
