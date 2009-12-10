@@ -1,20 +1,30 @@
 require 'site/HTML'
 
 class User
-	attr_reader :id, :name, :password, :email, :isAdministrator
+	attr_accessor :id, :name, :password, :email, :isAdministrator
 	
-	def initialize(data)
+	def initialize(data = nil)
+		return if data == nil
+		
 		memberHash =
 		{
-			id: :@id,
+			user_id: :@id,
 			name: :@name,
 			password: :@password,
 			email: :@email,
 			is_administrator: :@isAdministrator,
 		}
 		
-		data.each { |key, value| set_instance_variable(memberHash[key], value) }
+		data.each do |key, value|
+			ourKey = memberHash[key]
+			next if ourKey == nil
+			instance_variable_set(ourKey, value)
+		end
 		
+		fixName
+	end
+	
+	def fixName
 		@htmlName = HTMLEntities::encode @name if @name != nil
 	end
 end

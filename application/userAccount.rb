@@ -139,6 +139,16 @@ def performRegistrationRequest(request)
 		sessionCookie = Cookie.new(CookieConfiguration::Session, sessionString, SiteConfiguration::SitePrefix)
 		sessionCookie.expirationDays SiteConfiguration::SessionDurationInDays
 		title, content = visualRegistrationSuccess user
+		
+		newUser = User.new
+		newUser.id = userId
+		newUser.name = user
+		newUser.password = password
+		newUser.email = email
+		newUser.isAdministrator = false
+		
+		request.sessionUser = newUser
+		
 		fullContent = $generator.get title, request, content
 		reply = HTTPReply.new fullContent
 		reply.addCookie sessionCookie
@@ -149,7 +159,7 @@ end
 
 def logoutRequest(request)
 	currentUser = request.sessionUser
-	if currentUser != nil
+	if currentUser == nil
 		title = 'Logout error'
 		content = visualError 'You are currently not logged into any account.'
 		return $generator.get title, request, content
@@ -164,6 +174,6 @@ def logoutRequest(request)
 	title, content = visualLogout
 	fullContent = $generator.get title, request, content
 	reply = HTTPReply.new fullContent
-	reply.deleteCookie CookieConfiguration::Session
+	reply.deleteCookie(CookieConfiguration::Session, SiteConfiguration::SitePrefix)
 	reply
 end
