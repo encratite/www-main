@@ -3,9 +3,9 @@ class DatabaseConfiguration
 	Host = '127.0.0.1'
 	
 	User = 'void'
-	Password = 'w4yh56yu6h'
+	Password = 'HMoUYJSGpIfvIfw'
 	
 	Database = 'main_site'
 	
-	PasswordSalt = 'GjrklklWX4Hc0sWASB0uWpO5nOc3fAxPEd01TnBVXSK2slDn0izsvJhUos56W7GnpHMoUYJSGpIfvIfw'
+	PasswordSalt = 'GjrklklWX4Hc0sWASB0uWpO5nOc3fAxP'
 end

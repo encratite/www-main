@@ -1,6 +1,8 @@
 require 'configuration/database'
-require 'digest/md5'
+require 'digest/sha2'
 
 def hashWithSalt(input)
-	Digest::MD5.hexdigest(DatabaseConfiguration::PasswordSalt + input)
+	hash = Digest::SHA256.hexdigest(DatabaseConfiguration::PasswordSalt + input)
+	size = hash.size
+	unpack('a2' * size).map{|x| x.hex}.pack('c' * size)
 end

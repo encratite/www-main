@@ -1,14 +1,18 @@
+drop table site_user cascade;
+
 create table site_user
 (
 	id serial primary key,
 
 	name text unique not null,
-	password char(32) not null,
+	password bytea not null,
 	
 	email text not null,
 	
 	is_administrator boolean default false not null
 );
+
+drop table login_session cascade;
 
 create table login_session
 (

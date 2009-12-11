@@ -1,3 +1,5 @@
+drop table pastebin_entry cascade;
+
 create table pastebin_entry
 (
 	id serial primary key,
