@@ -1,4 +1,4 @@
-drop table site_user cascade;
+drop table if exists site_user cascade;
 
 create table site_user
 (
@@ -12,7 +12,7 @@ create table site_user
 	is_administrator boolean default false not null
 );
 
-drop table login_session cascade;
+drop table if exists login_session cascade;
 
 create table login_session
 (

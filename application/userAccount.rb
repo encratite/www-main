@@ -67,8 +67,8 @@ def performLoginRequest(request)
 		user = User.new result
 		request.sessionUser = user
 		
-		puts result
-		puts user
+		#puts result
+		#puts user
 		
 		sessionString = $sessionManager.createSession(user.id, request.address)
 		sessionCookie = Cookie.new(CookieConfiguration::Session, sessionString, SiteConfiguration::SitePrefix)

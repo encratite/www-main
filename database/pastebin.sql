@@ -1,4 +1,4 @@
-drop table pastebin_entry cascade;
+drop table if exists pastebin_entry cascade;
 
 create table pastebin_entry
 (
