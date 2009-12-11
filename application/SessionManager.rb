@@ -31,6 +31,7 @@ class SessionManager
 	end
 	
 	def createSession(userId, address)
+		puts "Creating session for #{userId}, #{address}"
 		sessionString = generateSessionString
 		dataset = getDataset :LoginSession
 		dataset.insert(user_id: userId, session_string: sessionString, ip: address)

@@ -22,6 +22,10 @@ class User
 		end
 		
 		fixName
+		
+		puts memberHash
+		
+		@id = data[:id] if @id == nil
 	end
 	
 	def set(id, name, password, email, isAdministrator)
