@@ -21,7 +21,7 @@ drop table if exists pastebin_unit cascade;
 
 create table pastebin_unit
 (
-	id serial primary_key,
+	id serial primary key,
 	
 	post_id integer references pastebin_post(id),
 	
@@ -32,7 +32,7 @@ create table pastebin_unit
 	paste_type text not null,
 	
 	time_added timestamp not null default now(),
-	last_modification timestamp default null
+	last_modification timestamp default null,
 	
 	modification_counter integer not null default 0
 );

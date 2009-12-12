@@ -1,7 +1,12 @@
 require 'configuration/site'
+require 'configuration/pastebin'
 
 def newPath(path)
-	return SiteConfiguration::SitePrefix + path
+	SiteConfiguration::SitePrefix + path
+end
+
+def pastebinPath(path)
+	PastebinConfiguration::Prefix + '/' + path
 end
 
 class PathMapEntry
@@ -17,10 +22,18 @@ class PathMap
 	Index = PathMapEntry.new('Index', '')
 	Login = PathMapEntry.new('Login', 'login')
 	Register = PathMapEntry.new('Registration', 'register')
+	Pastebin = PathMapEntry.new('Pastebin', PastebinConfiguration::Prefix)
 	Logout = PathMapEntry.new('Log out', 'logout')
 	
 	SubmitLogin = newPath 'submitLogin'
 	SubmitRegistration = newPath 'submitRegistration'
+	
+	PastebinList = pastebinPath 'list'
+	PastebinView = pastebinPath 'view'
+	PastebinEdit = pastebinPath 'edit'
+	
+	PastebinSubmitPost = pastebinPath 'submitPost'
+	PastebinSubmitModification = pastebinPath 'submitModification'
 	
 	def self.getPath(symbol)
 		pathOrMapEntry = self.const_get symbol

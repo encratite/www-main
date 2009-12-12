@@ -106,5 +106,5 @@ def visualLogout
 end
 
 def visualAlreadyLoggedIn(currentUser, message)
-	visualError "You are already logged into your account <b>#{currentUser.name}<b>. #{message}"
+	visualError "You are already logged into your account <b>#{currentUser.name}</b>. #{message}"
 end

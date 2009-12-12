@@ -1,11 +1,7 @@
-require 'sequel'
+require 'PathMap'
 require 'configuration/pastebin'
+require 'visual/pastebin'
 
-class Pastebin
-	def initialize()
-		@database = 
-	end
-	
-	def processRequest(request)
-	end
+def newPastebinPost(request)
+	$generator.get(PathMap.getDescription(:Index), request, visualIndex)
 end
