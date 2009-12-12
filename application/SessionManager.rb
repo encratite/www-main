@@ -11,7 +11,6 @@ class SessionManager
 			return nil if cookie == nil
 			cleanSessions
 			result = getDataset(:LoginSession).filter(session_string: cookie, ip: request.address).join(getTableSymbol(:User), id: :user_id).first
-			#puts "Cookie: #{cookie}, result: #{result}"
 			return nil if result == nil
 			return User.new result
 		end
@@ -31,7 +30,6 @@ class SessionManager
 	end
 	
 	def createSession(userId, address)
-		puts "Creating session for #{userId}, #{address}"
 		sessionString = generateSessionString
 		dataset = getDataset :LoginSession
 		dataset.insert(user_id: userId, session_string: sessionString, ip: address)

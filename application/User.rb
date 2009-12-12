@@ -23,8 +23,6 @@ class User
 		
 		fixName
 		
-		puts memberHash
-		
 		@id = data[:id] if @id == nil
 	end
 	

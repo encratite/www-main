@@ -22,7 +22,7 @@ end
 def sessionCheck(request, title, message)
 	currentUser = request.sessionUser
 	return nil if currentUser == nil
-	content = visualError "You are already logged into your account #{currentUser.name}. #{message}"
+	content = visualAlreadyLoggedIn(currentUser, message)
 	$generator.get title, request, content
 end
 
@@ -66,9 +66,6 @@ def performLoginRequest(request)
 	else
 		user = User.new result
 		request.sessionUser = user
-		
-		#puts result
-		#puts user
 		
 		sessionString = $sessionManager.createSession(user.id, request.address)
 		sessionCookie = Cookie.new(CookieConfiguration::Session, sessionString, SiteConfiguration::SitePrefix)

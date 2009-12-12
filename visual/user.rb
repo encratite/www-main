@@ -104,3 +104,7 @@ def visualLogout
 	content = visualMessage 'You have successfully logged out of your account.'
 	[title, content]
 end
+
+def visualAlreadyLoggedIn(currentUser, message)
+	visualError "You are already logged into your account <b>#{currentUser.name}<b>. #{message}"
+end
