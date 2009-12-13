@@ -27,7 +27,7 @@ END
 	]
 
 	form = FormWriter.new(output, PathMap::SubmitLogin)
-	fields.each { |description, fieldName| form.label label: description, name: fieldName }
+	fields.each { |description, fieldName| form.field label: description, name: fieldName }
 	form.finish
 	
 	['Log in', output]
@@ -73,7 +73,7 @@ END
 			value = field[2]
 			labelHash[:value] = value if value != nil
 		end
-		form.label labelHash
+		form.field labelHash
 	end
 	form.finish
 	
