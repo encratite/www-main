@@ -1,6 +1,11 @@
 class PastebinForm
 	PostDescription = 'postDescription'
 	UnitDescription = 'unitDescription'
-	UnitType = 'unitType'
-	UnitContent = 'unitContent'
+	
+	HighlightingGroup = 'highlightingGroup'
+	CommonHighlighting = 'CommonHighlighting'
+	AdvancedHighlighting = 'advancedHighlighting'
+	ExpertHighlighting = 'expertHighlighting'
+	
+	Content = 'content'
 end
