@@ -3,7 +3,8 @@ class PastebinForm
 	UnitDescription = 'unitDescription'
 	
 	HighlightingGroup = 'highlightingGroup'
-	CommonHighlighting = 'CommonHighlighting'
+	
+	CommonHighlighting = 'commonHighlighting'
 	AdvancedHighlighting = 'advancedHighlighting'
 	ExpertHighlighting = 'expertHighlighting'
 	

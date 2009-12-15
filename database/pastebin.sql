@@ -14,6 +14,8 @@ create table pastebin_post
 	creation timestamp not null default now(),
 	last_modification timestamp default null,
 	
+	expiration timestamp,
+	
 	modification_counter integer not null default 0
 );
 

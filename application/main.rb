@@ -25,6 +25,7 @@ def loadModules
 		'MainSiteGenerator',
 		'static',
 		'SiteRequest',
+		'pastebin',
 		
 		'environment'
 	]
@@ -41,6 +42,7 @@ def createRequestManager
 		[:Register, :registerFormRequest],
 		[:SubmitRegistration, :performRegistrationRequest],
 		[:Logout, :logoutRequest],
+		[:Pastebin, :newPastebinPost],
 	]
 
 	requestManager = RequestManager.new SiteRequest
@@ -82,7 +84,8 @@ def createMenu
 		[:Index],
 		[:Login, notLoggedIn],
 		[:Register, notLoggedIn],
-		[:Logout, loggedIn]
+		[:Pastebin],
+		[:Logout, loggedIn],
 	]
 	
 	items.each do |item|

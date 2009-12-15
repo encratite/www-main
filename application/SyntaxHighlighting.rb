@@ -1,16 +1,27 @@
 require 'configuration/VimSyntax'
+require 'site/FormWriter'
 
 class SyntaxHighlighting
 	def self.generateList(isCommon)
 		output = []
 		VimSyntax::Scripts.each do |script|
-			if isCommon
-				output << script[0..1] if script.size >= 3 && script[2]
-			else
-				output << script[0..1]
+			value = script[0]
+			description = script[1]
+			if !isCommon || (script.size >= 3 && script[2])
+				output << SelectOption.new(description, value)
 			end
 		end
 		output
+	end
+	
+	def self.getSelectionList(isCommon, selection)
+		source = isCommon ? CommonScripts : AllScripts
+		source.map do |option|
+			return option if option.type != selection
+			output = option.clone
+			output.selected = true
+			output
+		end
 	end
 	
 	CommonScripts = self.generateList true

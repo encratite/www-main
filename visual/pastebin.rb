@@ -21,7 +21,7 @@ def visualPastebinForm(postDescription = nil, highlightingSelectionMode = 0)
 	form.field(label: 'Description', name: PostDescription::Description, value: postDescription)
 	writer = HTMLWriter.new output
 	writer.div id: 'pastebinPostLeft' do
-		writer.p 'Specify the syntax highlighting selection method you would like to use:'
+		writer.p { writer.write 'Specify the syntax highlighting selection method you would like to use:' }
 		counter = 0
 		highlightingGroups.each do |description|
 			arguments = {label: description, name: PastebinForm::HighlightingGroup, onclick: "highlightingMode(#{counter});"}
@@ -31,6 +31,9 @@ def visualPastebinForm(postDescription = nil, highlightingSelectionMode = 0)
 		end
 	end
 	writer.div id: 'pastebinPostRight' do
+		form.field(type: select, name: PastebinForm::CommonHighlighting, options: basicOptions)
+		form.field(type: select, name: PastebinForm::AdvancedHighlighting, options: advancedOptions)
+		form.field(label: 'Specify the vim script you want to loaded (e.g. "cpp")', name: PastebinForm::ExpertHighlighting)
 	end
 	form.finish
 end
