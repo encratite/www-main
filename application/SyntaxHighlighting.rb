@@ -1,12 +1,13 @@
 require 'configuration/VimSyntax'
 require 'site/FormWriter'
+require 'site/HTML'
 
 class SyntaxHighlighting
 	def self.generateList(isCommon)
 		output = []
 		VimSyntax::Scripts.each do |script|
 			value = script[0]
-			description = script[1]
+			description = HTMLEntities.encode script[1]
 			if !isCommon || (script.size >= 3 && script[2])
 				output << SelectOption.new(description, value)
 			end

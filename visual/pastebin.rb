@@ -18,13 +18,13 @@ def visualPastebinForm(postDescription = nil, highlightingSelectionMode = 0, las
 	]
 	output = ''
 	form = FormWriter.new(output, PathMap::PastebinSubmitPost)
-	form.field(label: 'Description', name: PostDescription::Description, value: postDescription)
+	form.field(label: 'Description', name: PastebinForm::PostDescription, value: postDescription)
 	writer = HTMLWriter.new output
 	writer.div id: 'pastebinPostLeft' do
 		writer.p { writer.write 'Specify the syntax highlighting selection method you would like to use:' }
 		counter = 0
 		highlightingGroups.each do |description|
-			arguments = {label: description, name: PastebinForm::HighlightingGroup, onclick: "highlightingMode(#{counter});"}
+			arguments = {type: :radio, label: description, name: PastebinForm::HighlightingGroup, onclick: "highlightingMode(#{counter});"}
 			arguments[:checked] = true if counter == highlightingSelectionMode
 			form.field arguments
 			counter += 1
@@ -33,9 +33,9 @@ def visualPastebinForm(postDescription = nil, highlightingSelectionMode = 0, las
 	writer.div id: 'pastebinPostRight' do
 		basicOptions = lastSelection ? SyntaxHighlighting.getSelectionList(true, lastSelection) : SyntaxHighlighting::CommonScripts
 		advancedOptions = lastSelection ? SyntaxHighlighting.getSelectionList(false, lastSelection) : SyntaxHighlighting::AllScripts
-		form.field(type: select, name: PastebinForm::CommonHighlighting, options: basicOptions)
-		form.field(type: select, name: PastebinForm::AdvancedHighlighting, options: advancedOptions)
-		form.field(label: 'Specify the vim script you want to loaded (e.g. "cpp")', name: PastebinForm::ExpertHighlighting)
+		form.field(type: :select, name: PastebinForm::CommonHighlighting, options: basicOptions)
+		form.field(type: :select, name: PastebinForm::AdvancedHighlighting, options: advancedOptions)
+		form.field(label: 'Specify the vim script you want to be used (e.g. "cpp")', name: PastebinForm::ExpertHighlighting)
 	end
 	form.finish
 end
