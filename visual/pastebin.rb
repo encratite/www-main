@@ -8,7 +8,7 @@ require 'site/HTMLWriter'
 def visualPastebinNewPost
 end
 
-def visualPastebinForm(postDescription = nil, highlightingSelectionMode = 0)
+def visualPastebinForm(postDescription = nil, highlightingSelectionMode = 0, lastSelection = nil)
 	highlightingGroups =
 	[
 		'Use no syntax highlighting (plain text)',
@@ -31,6 +31,8 @@ def visualPastebinForm(postDescription = nil, highlightingSelectionMode = 0)
 		end
 	end
 	writer.div id: 'pastebinPostRight' do
+		basicOptions = lastSelection ? SyntaxHighlighting.getSelectionList(true, lastSelection) : SyntaxHighlighting::CommonScripts
+		advancedOptions = lastSelection ? SyntaxHighlighting.getSelectionList(false, lastSelection) : SyntaxHighlighting::AllScripts
 		form.field(type: select, name: PastebinForm::CommonHighlighting, options: basicOptions)
 		form.field(type: select, name: PastebinForm::AdvancedHighlighting, options: advancedOptions)
 		form.field(label: 'Specify the vim script you want to loaded (e.g. "cpp")', name: PastebinForm::ExpertHighlighting)
