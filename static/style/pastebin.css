@@ -1,12 +1,15 @@
-#pastebinPostLeft
+#syntaxTable
 {
-	background-color: #aaa;
-	height: 14em;
+	background: none;
 }
 
-#pastebinPostRight
+#syntaxTable td
 {
-	height: 0;
-	margin: -12em 0 0 36em;
-	background-color: #ccc;
+	padding: 0.3em 1em 0.3em 1em;
+	vertical-align: center;
+}
+
+#commonHighlighting, #advancedHighlighting
+{
+	width: 100%;
 }

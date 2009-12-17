@@ -16,33 +16,46 @@ def visualPastebinForm(postDescription = nil, highlightingSelectionMode = 0, las
 		"All syntax highlighting types (#{SyntaxHighlighting::AllScripts.size} available)",
 		'Expert mode (manually specify the name of a vim script)'
 	]
+	
 	output = ''
 	form = FormWriter.new(output, PathMap::PastebinSubmitPost)
+	
+	radioCounter = 0
+	
+	radioField = lambda do
+		arguments =
+		{
+			type: :radio,
+			label: highlightingGroups[radioCounter],
+			name: PastebinForm::HighlightingGroup,
+			onClick: "highlightingMode(#{radioCounter});",
+			value: PastebinForm::HighlightingGroupIdentifiers[radioCounter]
+		}
+		
+		arguments[:checked] = true if radioCounter == highlightingSelectionMode
+		form.field arguments
+		radioCounter += 1
+	end
+	
+	basicOptions = lastSelection ? SyntaxHighlighting.getSelectionList(true, lastSelection) : SyntaxHighlighting::CommonScripts
+	advancedOptions = lastSelection ? SyntaxHighlighting.getSelectionList(false, lastSelection) : SyntaxHighlighting::AllScripts
+	formFields =
+	[
+		lambda { form.field(type: :select, name: PastebinForm::CommonHighlighting, options: basicOptions) },
+		lambda { form.field(type: :select, name: PastebinForm::AdvancedHighlighting, options: advancedOptions) },
+		lambda { form.field(label: 'Specify the vim script you want to be used (e.g. "cpp")', name: PastebinForm::ExpertHighlighting) }
+	]
+	
 	form.field(label: 'Description', name: PastebinForm::PostDescription, value: postDescription)
 	writer = HTMLWriter.new output
-	writer.div id: 'pastebinPostLeft' do
-		writer.p { writer.write 'Specify the syntax highlighting selection method you would like to use:' }
-		counter = 0
-		highlightingGroups.each do |description|
-			arguments =
-			{
-				type: :radio,
-				label: description,
-				name: PastebinForm::HighlightingGroup,
-				onClick: "highlightingMode(#{counter});",
-				value: PastebinForm::HighlightingGroupIdentifiers[counter]
-			}
-			arguments[:checked] = true if counter == highlightingSelectionMode
-			form.field arguments
-			counter += 1
+	writer.p { writer.write 'Specify the syntax highlighting selection method you would like to use:' }
+	writer.table id: 'syntaxTable' do
+		formFields.each do |formField|
+			writer.tr do
+				writer.td { radioField.call }
+				writer.td { formField.call }
+			end
 		end
-	end
-	writer.div id: 'pastebinPostRight' do
-		basicOptions = lastSelection ? SyntaxHighlighting.getSelectionList(true, lastSelection) : SyntaxHighlighting::CommonScripts
-		advancedOptions = lastSelection ? SyntaxHighlighting.getSelectionList(false, lastSelection) : SyntaxHighlighting::AllScripts
-		form.field(type: :select, name: PastebinForm::CommonHighlighting, options: basicOptions)
-		form.field(type: :select, name: PastebinForm::AdvancedHighlighting, options: advancedOptions)
-		form.field(label: 'Specify the vim script you want to be used (e.g. "cpp")', name: PastebinForm::ExpertHighlighting)
 	end
 	form.finish
 end
