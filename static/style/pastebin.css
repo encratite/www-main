@@ -1,4 +1,12 @@
-#pastebin
+#pastebinPostLeft
 {
-	font-family: "Lucida Console", monospace;
+	background-color: #aaa;
+	height: 14em;
+}
+
+#pastebinPostRight
+{
+	height: 0;
+	margin: -12em 0 0 36em;
+	background-color: #ccc;
 }

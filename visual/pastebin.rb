@@ -24,7 +24,14 @@ def visualPastebinForm(postDescription = nil, highlightingSelectionMode = 0, las
 		writer.p { writer.write 'Specify the syntax highlighting selection method you would like to use:' }
 		counter = 0
 		highlightingGroups.each do |description|
-			arguments = {type: :radio, label: description, name: PastebinForm::HighlightingGroup, onclick: "highlightingMode(#{counter});"}
+			arguments =
+			{
+				type: :radio,
+				label: description,
+				name: PastebinForm::HighlightingGroup,
+				onClick: "highlightingMode(#{counter});",
+				value: PastebinForm::HighlightingGroupIdentifiers[counter]
+			}
 			arguments[:checked] = true if counter == highlightingSelectionMode
 			form.field arguments
 			counter += 1

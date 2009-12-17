@@ -9,4 +9,12 @@ class PastebinForm
 	ExpertHighlighting = 'expertHighlighting'
 	
 	Content = 'content'
+	
+	HighlightingGroupIdentifiers =
+	[
+		'none',
+		'common',
+		'advanced',
+		'expert'
+	]
 end
