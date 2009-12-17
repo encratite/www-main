@@ -4,12 +4,14 @@
 	font-size: small;
 	margin: 0;
 	padding: 0;
+	white-space: nowrap;
 }
 
 body
 {
 	color: #000000;
 	background: #ffffff;
+	white-space:nowrap;
 }
 
 a
@@ -78,6 +80,7 @@ table
 	border-collapse: collapse;
 	background-color: #f8f8f8;
 	margin: 0 0 1em 0;
+	white-space:nowrap;
 }
 
 th
