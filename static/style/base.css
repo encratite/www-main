@@ -4,14 +4,12 @@
 	font-size: small;
 	margin: 0;
 	padding: 0;
-	white-space: nowrap;
 }
 
 body
 {
 	color: #000000;
 	background: #ffffff;
-	white-space:nowrap;
 }
 
 a
@@ -40,6 +38,7 @@ p
 {
 	text-align: justify;
 	margin: 0 0 0.8em 0;
+	min-width: 60em;
 }
 
 li
@@ -123,7 +122,12 @@ ul.error li
 	list-style-type: square;
 }
 
-li.formLabel
+ul.formLabel
+{
+	padding-bottom: 0.5em;
+}
+
+ul.formLabel li
 {
 	padding-bottom: 0.1em;
 }
@@ -138,6 +142,7 @@ li.formLabel
 	background-color: #000;
 	padding: 0.2em 0 0.2em 4em;
 	margin: 0 0 1em 0;
+	min-width: 62em;
 }
 
 #menu li

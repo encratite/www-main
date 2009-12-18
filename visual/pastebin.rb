@@ -62,7 +62,7 @@ def visualPastebinForm(postDescription = nil, highlightingSelectionMode = 0, las
 		end
 		writer.tr id: 'contentRow' do
 			writer.td colspan: 2 do
-				form.textarea(name: PastebinForm::Content)
+				form.textarea(label: 'Paste the content here', name: PastebinForm::Content)
 			end
 		end
 	end

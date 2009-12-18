@@ -36,7 +36,7 @@ class VimSyntax
 		['ave', 'avenue'],
 		['awk', 'awk, nawk, gawk, mawk'],
 		['ayacc', 'AYacc'],
-		['b', 'B (A Formal Method with refinement and mathematical proof)'],
+		['b', 'B'],
 		['baan', 'Baan'],
 		['basic', 'BASIC'],
 		['bc', 'bc - An arbitrary precision calculator language'],
