@@ -41,9 +41,9 @@ def visualPastebinForm(postDescription = nil, highlightingSelectionMode = 0, las
 	advancedOptions = lastSelection ? SyntaxHighlighting.getSelectionList(false, lastSelection) : SyntaxHighlighting::AllScripts
 	formFields =
 	[
-		lambda { form.field(type: :select, name: PastebinForm::CommonHighlighting, options: basicOptions) },
-		lambda { form.field(type: :select, name: PastebinForm::AdvancedHighlighting, options: advancedOptions) },
-		lambda { form.field(label: 'Specify the vim script you want to be used (e.g. "cpp")', name: PastebinForm::ExpertHighlighting) }
+		lambda { form.select(name: PastebinForm::CommonHighlighting, options: basicOptions) },
+		lambda { form.select(name: PastebinForm::AdvancedHighlighting, options: advancedOptions) },
+		lambda { form.text(label: 'Specify the vim script you want to be used (e.g. "cpp")', name: PastebinForm::ExpertHighlighting) }
 	]
 	
 	form.field(label: 'Description', name: PastebinForm::PostDescription, value: postDescription)
@@ -54,6 +54,11 @@ def visualPastebinForm(postDescription = nil, highlightingSelectionMode = 0, las
 			writer.tr do
 				writer.td { radioField.call }
 				writer.td { formField.call }
+			end
+		end
+		writer.tr id: 'contentRow' do
+			writer.td colspan: 2 do
+				form.textarea(name: PastebinForm::Content)
 			end
 		end
 	end
