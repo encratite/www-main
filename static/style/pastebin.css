@@ -6,16 +6,22 @@
 
 #syntaxTable tr
 {
-	border: 1px #000 solid;
+	border: 1px solid black;
 }
 
 #syntaxTable td
 {
 	padding: 0.3em 1em 0.3em 1em;
-	vertical-align: center;
-	border-top-style: solid;
+	vertical-align: middle;
+}
+
+#syntaxTable td.leftSide
+{
 	border-right-style: none;
-	border-bottom-style: solid;
+}
+
+#syntaxTable td.rightSide
+{
 	border-left-style: none;
 }
 
@@ -45,7 +51,6 @@
 	margin: 0;
 	padding: 1em 0 0 0;
 	border: 0;
-	/* background-color: #808080; */
 }
 
 #commonHighlighting, #advancedHighlighting, #expertHighlighting

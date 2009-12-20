@@ -50,14 +50,16 @@ def visualPastebinForm(postDescription = nil, highlightingSelectionMode = 0, las
 	writer = HTMLWriter.new output
 	writer.p { writer.write 'Specify the syntax highlighting selection method you would like to use:' }
 	writer.table id: 'syntaxTable' do
+		leftSide = {class: 'leftSide'}
+		rightSide = {class: 'rightSide'}
 		writer.tr do
-			writer.td { radioField.call }
-			writer.td {}
+			writer.td(leftSide) { radioField.call }
+			writer.td(rightSide) {}
 		end
 		formFields.each do |formField|
 			writer.tr do
-				writer.td { radioField.call }
-				writer.td { formField.call }
+				writer.td(leftSide) { radioField.call }
+				writer.td(rightSide) { formField.call }
 			end
 		end
 		writer.tr id: 'contentRow' do
