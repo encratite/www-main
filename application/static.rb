@@ -1,9 +1,17 @@
 require 'configuration/site'
 
+def getStaticPath(base, file)
+	SiteConfiguration::StaticPath + base + '/' + file
+end
+
 def getStylesheet(name)
-	SiteConfiguration::StaticPath + SiteConfiguration::StylesheetDirectory + '/' + name + '.css'
+	getStaticPath(SiteConfiguration::StylesheetDirectory, name + '.css')
 end
 
 def getImage(file)
-	SiteConfiguration::StaticPath + SiteConfiguration::ImageDirectory + '/' + file
+	getStaticPath(SiteConfiguration::ImageDirectory, file)
+end
+
+def getScript(name)
+	getStaticPath(SiteConfiguration::ScriptDirectory, name + '.js')
 end

@@ -43,7 +43,7 @@ def visualPastebinForm(postDescription = nil, highlightingSelectionMode = 0, las
 	[
 		lambda { form.select(name: PastebinForm::CommonHighlighting, options: basicOptions) },
 		lambda { form.select(name: PastebinForm::AdvancedHighlighting, options: advancedOptions) },
-		lambda { form.text(label: 'Specify the vim script you want to be used (e.g. "cpp")', name: PastebinForm::ExpertHighlighting) }
+		lambda { form.text(label: 'Specify the vim script you want to be used (e.g. "cpp")', name: PastebinForm::ExpertHighlighting, ulId: PastebinForm::ExpertHighlighting, id: PastebinForm::ExpertHighlighting + 'Id') }
 	]
 	
 	form.field(label: 'Description', name: PastebinForm::PostDescription, value: postDescription)

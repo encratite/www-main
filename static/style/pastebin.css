@@ -4,10 +4,19 @@
 	width: 60em;
 }
 
+#syntaxTable tr
+{
+	border: 1px #000 solid;
+}
+
 #syntaxTable td
 {
 	padding: 0.3em 1em 0.3em 1em;
 	vertical-align: center;
+	border-top-style: solid;
+	border-right-style: none;
+	border-bottom-style: solid;
+	border-left-style: none;
 }
 
 #postDescription
@@ -24,10 +33,11 @@
 	height: 30em;
 }
 
-#contentRow
+#syntaxTable #contentRow
 {
 	margin: 0;
 	padding: 0;
+	border: 0;
 }
 
 #contentRow td
@@ -36,4 +46,9 @@
 	padding: 1em 0 0 0;
 	border: 0;
 	/* background-color: #808080; */
+}
+
+#commonHighlighting, #advancedHighlighting, #expertHighlighting
+{
+	display: none;
 }

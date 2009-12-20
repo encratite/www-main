@@ -4,6 +4,7 @@ class SiteConfiguration
 	
 	StylesheetDirectory = 'style'
 	ImageDirectory = 'image'
+	ScriptDirectory = 'script'
 	
 	GeneralStringLengthMaximum = 64
 	

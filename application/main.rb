@@ -97,10 +97,11 @@ def createMenu
 	return menu
 end
 
-def getSiteGenerator(stylesheets = [])
+def getSiteGenerator(stylesheets = [], scripts = [])
 	stylesheets = ['base'] + stylesheets
 	output = MainSiteGenerator.new
 	stylesheets.each { |path| output.addStylesheet(getStylesheet path) }
+	scripts.each { |script| output.addScript(getScript script) }
 	output
 end
 
@@ -109,6 +110,6 @@ loadModules
 $sessionManager = SessionManager.new
 $requestManager = createRequestManager
 $generator = getSiteGenerator
-$pastebinGenerator = getSiteGenerator ['pastebin']
+$pastebinGenerator = getSiteGenerator(['pastebin'], ['pastebin'])
 $database = getDatabaseObject
 $menu = createMenu
