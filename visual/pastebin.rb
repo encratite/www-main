@@ -4,6 +4,7 @@ require 'SyntaxHighlighting'
 
 require 'site/FormWriter'
 require 'site/HTMLWriter'
+require 'site/JavaScript'
 
 def visualPastebinNewPost
 end
@@ -69,4 +70,5 @@ def visualPastebinForm(postDescription = nil, highlightingSelectionMode = 0, las
 		end
 	end
 	form.finish
+	output.concat writeJavaScript("highlightingMode(#{highlightingSelectionMode});")
 end
