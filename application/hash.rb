@@ -9,3 +9,19 @@ def hashWithSalt(input)
 	hash = hash.to_sequel_blob
 	return hash
 end
+
+def fnv1a(input)
+	hash = 2166136261
+	shifts = [1, 4, 7, 8, 24]
+	mask = 0xffffffff
+	input.each_byte do |byte|
+		hash ^= byte
+		shiftedHash = hash
+		shifts.each do |shift|
+			summand = (hash << shift) & mask
+			shiftedHash = (shiftedHash + summand) & mask
+		end
+		hash = shiftedHash
+	end
+	return hash.to_s(16).upcase
+end

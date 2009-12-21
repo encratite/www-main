@@ -3,4 +3,6 @@ class UserForm
 	Password = 'password'
 	PasswordAgain = 'passwordAgain'
 	Email = 'email'
+	
+	Security = 'security'
 end

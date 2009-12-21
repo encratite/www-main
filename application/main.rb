@@ -43,6 +43,7 @@ def createRequestManager
 		[:SubmitRegistration, :performRegistrationRequest],
 		[:Logout, :logoutRequest],
 		[:Pastebin, :newPastebinPost],
+		[:PastebinSubmitPost, :submitNewPastebinPost],
 	]
 
 	requestManager = RequestManager.new SiteRequest

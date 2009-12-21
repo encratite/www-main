@@ -9,7 +9,7 @@ require 'site/JavaScript'
 def visualPastebinNewPost
 end
 
-def visualPastebinForm(postDescription = nil, highlightingSelectionMode = 0, lastSelection = nil)
+def visualPastebinForm(postDescription = nil, unitDescription = nil, highlightingSelectionMode = 0, lastSelection = nil)
 	highlightingGroups =
 	[
 		'Use no syntax highlighting (plain text)',
@@ -47,7 +47,7 @@ def visualPastebinForm(postDescription = nil, highlightingSelectionMode = 0, las
 		lambda { form.text(label: 'Specify the vim script you want to be used (e.g. "cpp")', name: PastebinForm::ExpertHighlighting, ulId: PastebinForm::ExpertHighlighting, id: PastebinForm::ExpertHighlighting + 'Id') }
 	]
 	
-	form.field(label: 'Description', name: PastebinForm::PostDescription, value: postDescription)
+	form.field(label: 'Description of the post', name: PastebinForm::PostDescription, value: postDescription)
 	writer = HTMLWriter.new output
 	writer.p { writer.write 'Specify the syntax highlighting selection method you would like to use:' }
 	writer.table id: 'syntaxTable' do
@@ -65,6 +65,19 @@ def visualPastebinForm(postDescription = nil, highlightingSelectionMode = 0, las
 		end
 		writer.tr id: 'contentRow' do
 			writer.td colspan: 2 do
+				writer.p do
+					info =
+<<END
+Each post in this pastebin consists of one or multiple units.
+Each one of these units can use a different syntax highlighting mode.
+You can add further units to a post at a later time.
+For example, you might make a post which features a README file in plain text format without any syntax highlighting and a unit containing C++ source code which uses C++ syntax highlighting.
+You may enter a more precise description for the particular unit for this post.
+This is particularly useful if you intend to add further units to this post but you may also just leave it empty.
+END
+					writer.wite info
+				end
+				form.field(label: 'Description of this unit:', name: PastebinForm::PostDescription, value: postDescription)
 				form.textarea(label: 'Paste the content here', name: PastebinForm::Content)
 			end
 		end

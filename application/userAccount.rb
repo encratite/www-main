@@ -1,6 +1,7 @@
 require 'UserForm'
 require 'User'
-require 'site/MIMEType'
+require 'hash'
+require 'error'
 require 'site/HTTPReply'
 require 'site/Cookie'
 require 'configuration/site'
@@ -9,15 +10,6 @@ require 'configuration/cookie'
 require 'site/EMailValidator'
 require 'visual/user'
 require 'visual/general'
-require 'hash'
-
-def plainError(message)
-	[MIMEType::Plain, message]
-end
-
-def fieldError
-	plainError 'Not all required fields have been specified.'
-end
 
 def sessionCheck(request, title, message)
 	currentUser = request.sessionUser
