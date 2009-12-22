@@ -1,6 +1,7 @@
 require 'configuration/database'
 require 'digest/sha2'
 require 'sequel'
+require 'error'
 
 def hashWithSalt(input)
 	hash = Digest::SHA256.hexdigest(DatabaseConfiguration::PasswordSalt + input)
@@ -24,4 +25,10 @@ def fnv1a(input)
 		hash = shiftedHash
 	end
 	return hash.to_s(16).upcase
+end
+
+def hashCheck(fields, security)
+	return javaScriptError if security.empty?
+	hash = fnv1a(fields.join('\x00'))
+	return hashError if hash != security
 end

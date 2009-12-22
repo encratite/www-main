@@ -5,7 +5,7 @@ require 'configuration/pastebin'
 require 'visual/pastebin'
 
 def newPastebinPost(request)
-	$pastebinGenerator.get(PathMap.getDescription(:Pastebin), request, visualPastebinForm)
+	$pastebinGenerator.get([PathMap.getDescription(:Pastebin), visualPastebinForm], request)
 end
 
 def submitNewPastebinPost(request)

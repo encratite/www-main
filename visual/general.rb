@@ -5,3 +5,4 @@ end
 def visualError(message)
 	visualMessage "<b>Error:</b> #{message}"
 end
+

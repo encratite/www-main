@@ -2,7 +2,7 @@ require 'PathMap'
 require 'PastebinForm'
 require 'SyntaxHighlighting'
 
-require 'site/FormWriter'
+require 'HashFormWriter'
 require 'site/HTMLWriter'
 require 'site/JavaScript'
 
@@ -19,7 +19,7 @@ def visualPastebinForm(postDescription = nil, unitDescription = nil, highlightin
 	]
 	
 	output = ''
-	form = FormWriter.new(output, PathMap::PastebinSubmitPost)
+	form = HashFormWriter.new(output, PathMap::PastebinSubmitPost)
 	
 	radioCounter = 0
 	

@@ -15,7 +15,7 @@ def sessionCheck(request, title, message)
 	currentUser = request.sessionUser
 	return nil if currentUser == nil
 	content = visualAlreadyLoggedIn(currentUser, message)
-	$generator.get title, request, content
+	$generator.get [title, content], request
 end
 
 def loginCheck(request)
@@ -29,8 +29,7 @@ end
 def loginFormRequest(request)
 	content = loginCheck request
 	return content if content != nil
-	title, content = visualLoginForm
-	$generator.get title, request, content
+	$generator.get visualLoginForm, request
 end
 
 def performLoginRequest(request)
@@ -48,13 +47,15 @@ def performLoginRequest(request)
 	user = request.getPost UserForm::User
 	password = request.getPost UserForm::Password
 	
+	error = hashCheck([user, password], security)
+	return $generator.get error, request if error != nil
+	
 	passwordHash = hashWithSalt password
 	
 	dataset = getDataset :User
 	result = dataset.where(name: user, password: passwordHash).first
 	if result == nil
-		title, content = visualLoginError
-		return $generator.get title, request, content
+		return $generator.get visualLoginError, request
 	else
 		user = User.new result
 		request.sessionUser = user
@@ -63,8 +64,7 @@ def performLoginRequest(request)
 		sessionCookie = Cookie.new(CookieConfiguration::Session, sessionString, SiteConfiguration::SitePrefix)
 		sessionCookie.expirationDays SiteConfiguration::SessionDurationInDays
 		
-		title, content = visualLoginSuccess user
-		fullContent = $generator.get title, request, content
+		fullContent = $generator.get visualLoginSuccess(user), request
 		
 		reply = HTTPReply.new fullContent
 		reply.addCookie sessionCookie
@@ -75,8 +75,7 @@ end
 def registerFormRequest(request)
 	content = registrationCheck request
 	return content if content != nil
-	title, content = visualRegisterForm
-	$generator.get title, request, content
+	$generator.get visualRegisterForm, request
 end
 
 def performRegistrationRequest(request)
@@ -88,7 +87,8 @@ def performRegistrationRequest(request)
 		UserForm::User,
 		UserForm::Password,
 		UserForm::PasswordAgain,
-		UserForm::Email
+		UserForm::Email,
+		UserForm::Security
 	]
 	
 	return fieldError if !request.postIsSet(requiredFields)
@@ -97,14 +97,15 @@ def performRegistrationRequest(request)
 	password = request.getPost UserForm::Password
 	passwordAgain = request.getPost UserForm::PasswordAgain
 	email = request.getPost UserForm::Email
+	security = request.getPost UserForm::Security
+	
+	error = hashCheck([user, password, passwordAgain, email], security)
+	return $generator.get error, request if error != nil
 	
 	errors = []
 	
 	error = lambda { |message| errors << message }	
-	printErrorForm = lambda do
-		title, content = visualRegisterForm errors, user, email
-		$generator.get title, request, content
-	end
+	printErrorForm = lambda { $generator.get visualRegisterForm(errors, user, email), request }
 	errorOccured = lambda { !errors.empty? }
 	
 	error.call 'Your user name may not be empty.' if user.empty?
@@ -129,14 +130,14 @@ def performRegistrationRequest(request)
 		sessionString = $sessionManager.createSession(userId, request.address)
 		sessionCookie = Cookie.new(CookieConfiguration::Session, sessionString, SiteConfiguration::SitePrefix)
 		sessionCookie.expirationDays SiteConfiguration::SessionDurationInDays
-		title, content = visualRegistrationSuccess user
+		output = visualRegistrationSuccess user
 		
 		newUser = User.new
 		newUser.set(userId, user, password, email, false)
 		
 		request.sessionUser = newUser
 		
-		fullContent = $generator.get title, request, content
+		fullContent = $generator.get output, request
 		reply = HTTPReply.new fullContent
 		reply.addCookie sessionCookie
 	end
@@ -149,7 +150,7 @@ def logoutRequest(request)
 	if currentUser == nil
 		title = 'Logout error'
 		content = visualError 'You are currently not logged into any account.'
-		return $generator.get title, request, content
+		return $generator.get [title, content], request
 	end
 	
 	sessionString = request.cookies[CookieConfiguration::Session]
@@ -158,8 +159,7 @@ def logoutRequest(request)
 	
 	request.sessionUser = nil
 	
-	title, content = visualLogout
-	fullContent = $generator.get title, request, content
+	fullContent = $generator.get visualLogout, request
 	reply = HTTPReply.new fullContent
 	reply.deleteCookie(CookieConfiguration::Session, SiteConfiguration::SitePrefix)
 	reply

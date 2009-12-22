@@ -10,7 +10,8 @@ class MainSiteGenerator < SiteGenerator
 		return visualFoot + super
 	end
 	
-	def get(title, request, content)
+	def get(data, request)
+		title, content = data
 		return head(title, request) + content + foot
 	end
 end

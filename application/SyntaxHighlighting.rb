@@ -1,5 +1,5 @@
 require 'configuration/VimSyntax'
-require 'site/FormWriter'
+require 'HashFormWriter'
 require 'site/HTML'
 
 class SyntaxHighlighting
