@@ -1,11 +1,11 @@
-require 'HashFormWriter'
+require 'site/FormWriter'
 
-class HashFormWriter < HashFormWriter
+class HashFormWriter < FormWriter
 	Security = 'security'
 	
 	def initialize(output, action, hashFields)
-		arguments = hashFields.map { |field| "'#{field}" }
-		arguments = arguments.join(arguments, ', ')
+		arguments = hashFields.map { |field| "'#{field}'" }
+		arguments = arguments.join(', ')
 		onSubmit = "hashFields(#{arguments});"
 		super(output, action, onSubmit)
 	end

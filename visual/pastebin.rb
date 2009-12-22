@@ -90,9 +90,9 @@ For example, you might make a post which features a README file in plain text fo
 You may enter a more precise description for the particular unit for this post.
 This is particularly useful if you intend to add further units to this post but you may also just leave it empty.
 END
-					writer.wite info
+					writer.write info
 				end
-				form.field(label: 'Description of this unit:', name: PastebinForm::UnitDescription, value: unitDescription)
+				form.field(label: 'Description of this unit', name: PastebinForm::UnitDescription, value: unitDescription)
 				form.textarea(label: 'Paste the content here', name: PastebinForm::Content)
 			end
 		end

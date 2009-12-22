@@ -38,7 +38,7 @@ p
 {
 	text-align: justify;
 	margin: 0 0 0.8em 0;
-	min-width: 60em;
+	width: 64em;
 }
 
 li
@@ -85,7 +85,6 @@ table
 	border-collapse: collapse;
 	background-color: #f8f8f8;
 	margin: 0 0 1em 0;
-	white-space: nowrap;
 }
 
 th
@@ -149,7 +148,7 @@ ul.formLabel li
 {
 	font-weight: bold;
 	display: inline;
-	margin-right: 2em;
+	padding-right: 2em;
 }
 
 #menu a

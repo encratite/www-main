@@ -1,7 +1,7 @@
 #syntaxTable
 {
 	background: none;
-	width: 60em;
+	width: 64em;
 }
 
 #syntaxTable tr
@@ -25,10 +25,9 @@
 	border-left-style: none;
 }
 
-#postDescription
+#postDescription, #unitDescription
 {
 	width: 20em;
-	margin-bottom: 0.5em;
 }
 
 #content
