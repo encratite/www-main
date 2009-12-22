@@ -18,8 +18,23 @@ def visualPastebinForm(postDescription = nil, unitDescription = nil, highlightin
 		'Expert mode (manually specify the name of a vim script)'
 	]
 	
+	hashFields =
+	[
+		PastebinForm::PostDescription,
+		
+		PastebinForm::HighlightingGroup,
+		
+		PastebinForm::CommonHighlighting,
+		PastebinForm::AdvancedHighlighting,
+		PastebinForm::ExpertHighlighting,
+		
+		PastebinForm::UnitDescription,
+		
+		PastebinForm::Content,
+	]
+	
 	output = ''
-	form = HashFormWriter.new(output, PathMap::PastebinSubmitPost)
+	form = HashFormWriter.new(output, PathMap::PastebinSubmitPost, hashFields)
 	
 	radioCounter = 0
 	
@@ -77,7 +92,7 @@ This is particularly useful if you intend to add further units to this post but 
 END
 					writer.wite info
 				end
-				form.field(label: 'Description of this unit:', name: PastebinForm::PostDescription, value: postDescription)
+				form.field(label: 'Description of this unit:', name: PastebinForm::UnitDescription, value: unitDescription)
 				form.textarea(label: 'Paste the content here', name: PastebinForm::Content)
 			end
 		end

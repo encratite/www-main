@@ -35,3 +35,18 @@ function getHash()
 		
 	return number.toString(16).toUpperCase();
 }
+
+function hashFields()
+{
+	var arguments = hashFields.arguments;
+	var generator = new hashGenerator();
+	var first = true;
+	for(var i = 0; i < arguments.length; i++)
+	{
+		var argument = arguments[i];
+		var data = document.getElementById(argument).value;
+		generator.hashData(data);
+	}
+	var security = document.getElementById('security');
+	security.value = generator.getHash();
+}

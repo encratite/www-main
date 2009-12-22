@@ -26,7 +26,7 @@ END
 		['Password', UserForm::Password]
 	]
 
-	form = HashFormWriter.new(output, PathMap::SubmitLogin)
+	form = HashFormWriter.new(output, PathMap::SubmitLogin, fields.map { |description, fieldName| fieldName })
 	fields.each { |description, fieldName| form.field label: description, name: fieldName }
 	form.finish
 	
@@ -64,7 +64,7 @@ END
 		['Email address', UserForm::Email, email]
 	]
 	
-	form = HashFormWriter.new(output, PathMap::SubmitRegistration)
+	form = HashFormWriter.new(output, PathMap::SubmitRegistration, fields.map { |description, fieldName| fieldName })
 	fields.each do |field|
 		description = field[0]
 		fieldName = field[1]

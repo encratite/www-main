@@ -39,13 +39,15 @@ def performLoginRequest(request)
 	requiredFields =
 	[
 		UserForm::User,
-		UserForm::Password
+		UserForm::Password,
+		HashFormWriter::Security
 	]
 	
 	return fieldError if !request.postIsSet(requiredFields)
 	
 	user = request.getPost UserForm::User
 	password = request.getPost UserForm::Password
+	security = request.getPost HashFormWriter::Security
 	
 	error = hashCheck([user, password], security)
 	return $generator.get error, request if error != nil
@@ -88,7 +90,7 @@ def performRegistrationRequest(request)
 		UserForm::Password,
 		UserForm::PasswordAgain,
 		UserForm::Email,
-		UserForm::Security
+		HashFormWriter::Security
 	]
 	
 	return fieldError if !request.postIsSet(requiredFields)
@@ -97,7 +99,7 @@ def performRegistrationRequest(request)
 	password = request.getPost UserForm::Password
 	passwordAgain = request.getPost UserForm::PasswordAgain
 	email = request.getPost UserForm::Email
-	security = request.getPost UserForm::Security
+	security = request.getPost HashFormWriter::Security
 	
 	error = hashCheck([user, password, passwordAgain, email], security)
 	return $generator.get error, request if error != nil
