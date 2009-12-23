@@ -95,7 +95,7 @@ END
 					writer.write info
 				end
 				form.field(label: 'Description of this unit', name: PastebinForm::UnitDescription, value: unitDescription)
-				#form.textarea(label: 'Paste the content here', name: PastebinForm::Content)
+				form.textarea(label: 'Paste the content here', name: PastebinForm::Content)
 			end
 		end
 	end
