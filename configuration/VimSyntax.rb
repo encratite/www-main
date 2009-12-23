@@ -262,7 +262,7 @@ class VimSyntax
 		['mf', 'Metafont'],
 		['mgl', 'MGL'],
 		['mgp', 'mgp - MaGic Point'],
-		['mib', 'Vim syntax file for SNMPv1 and SNMPv2 MIB and SMI files'],
+		['mib', 'SNMPv1 and SNMPv2 MIB and SMI files'],
 		['mma', 'Mathematica'],
 		['mmix', 'MMIX'],
 		['mmp', 'Symbian meta-makefile definition (MMP)'],

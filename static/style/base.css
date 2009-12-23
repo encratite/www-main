@@ -87,6 +87,11 @@ table
 	margin: 0 0 1em 0;
 }
 
+table p
+{
+	width: auto;
+}
+
 th
 {
 	border: 1px solid #000;
@@ -167,3 +172,5 @@ ul.formLabel li
 {
 	color: #aaa;
 }
+
+

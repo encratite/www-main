@@ -45,7 +45,8 @@ def visualPastebinForm(postDescription = nil, unitDescription = nil, highlightin
 			label: highlightingGroups[radioCounter],
 			name: PastebinForm::HighlightingGroup,
 			onClick: "highlightingMode(#{radioCounter});",
-			value: PastebinForm::HighlightingGroupIdentifiers[radioCounter]
+			value: PastebinForm::HighlightingGroupIdentifiers[radioCounter],
+			paragraph: false
 		}
 		
 		arguments[:checked] = true if radioCounter == highlightingSelectionMode
@@ -57,9 +58,9 @@ def visualPastebinForm(postDescription = nil, unitDescription = nil, highlightin
 	advancedOptions = lastSelection ? SyntaxHighlighting.getSelectionList(false, lastSelection) : SyntaxHighlighting::AllScripts
 	formFields =
 	[
-		lambda { form.select(name: PastebinForm::CommonHighlighting, options: basicOptions) },
-		lambda { form.select(name: PastebinForm::AdvancedHighlighting, options: advancedOptions) },
-		lambda { form.text(label: 'Specify the vim script you want to be used (e.g. "cpp")', name: PastebinForm::ExpertHighlighting, ulId: PastebinForm::ExpertHighlighting, id: PastebinForm::ExpertHighlighting + 'Id') }
+		lambda { form.select(name: PastebinForm::CommonHighlighting, options: basicOptions, paragraph: false) },
+		lambda { form.select(name: PastebinForm::AdvancedHighlighting, options: advancedOptions, paragraph: false) },
+		lambda { form.text(label: 'Specify the vim script you want to be used (e.g. "cpp")', name: PastebinForm::ExpertHighlighting, ulId: PastebinForm::ExpertHighlighting, id: PastebinForm::ExpertHighlighting + 'Id', paragraph: false) }
 	]
 	
 	form.field(label: 'Description of the post', name: PastebinForm::PostDescription, value: postDescription)
