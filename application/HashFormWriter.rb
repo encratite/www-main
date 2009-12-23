@@ -1,4 +1,5 @@
 require 'site/FormWriter'
+require 'site/HTMLWriter'
 
 class HashFormWriter < FormWriter
 	Security = 'security'
@@ -11,7 +12,10 @@ class HashFormWriter < FormWriter
 	end
 	
 	def hashField
-		field type: :input, inputType: :hidden, name: Security
+		writer = HTMLWriter.new @output
+		writer.p class: 'security' do
+			field type: :input, inputType: :hidden, name: Security, paragraph: false
+		end
 	end
 	
 	def finish

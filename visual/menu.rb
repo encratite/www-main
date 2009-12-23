@@ -1,8 +1,16 @@
+require 'site/HTMLWriter'
+
 def renderMenu(items, request)
-	output = "<ul id=\"menu\">\n"
-	items.each do |item|
-		output += "<li><a href=\"#{item.path}\">#{item.description}</a></li>\n" if item.condition.(request)
+	output = ''
+	writer = HTMLWriter.new output
+	writer.ul(id: 'menu') do
+		items.each do |item|
+			if item.condition.(request)
+				writer.li do
+					writer.a(href: item.path) { item.description }
+				end
+			end
+		end
 	end
-	output += "</ul>\n"
 	return output
 end

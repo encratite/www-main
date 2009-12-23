@@ -16,7 +16,7 @@ end
 
 def visualLoginForm
 	output = ''
-	writer = HTMLWriter.new
+	writer = HTMLWriter.new output
 	writer.p do
 		writer.write accountExplanation
 		writer.write 'If you do not have an account yet you may register one:'
@@ -24,7 +24,7 @@ def visualLoginForm
 	
 	writer.p class: 'indent' do
 		path = PathMap.getPath :Register
-		writer.a href: path { 'Register a new account' }
+		writer.a(href: path) { 'Register a new account' }
 	end
 	
 	writer.p { 'Specify your username and your password in the following form and submit the data in order to log into your account.' }
@@ -44,7 +44,7 @@ end
 
 def visualRegisterForm(error = nil, user = nil, email = nil)
 	output = ''
-	writer = HTMLWriter.new
+	writer = HTMLWriter.new output
 	
 	if error != nil
 		writer.p do
@@ -52,24 +52,18 @@ def visualRegisterForm(error = nil, user = nil, email = nil)
 			'An error occured while your request was being processed:'
 		end
 		
-		#writer.ul class
-		output =
-<<END
-<ul class="error">
-END
-		error.each { |message| output += "<li>#{message}</li>\n" }
-		output +=
-<<END
-</ul>
-END
+		writer.ul class: 'error' do
+			error.each { |message| writer.li { message } }
+		end
 		writer.p 'Please go over the form again and correct the invalid entries.'
 	else
 		writer.p do
-			output =
+			lines =
 <<END
 Fill out the following form and submit the data in order to create a new account.
 It is not necessary to specify an e-mail address but it may be useful to do so in case you forget your password.
 END
+			writer.write lines
 		end
 	end
 

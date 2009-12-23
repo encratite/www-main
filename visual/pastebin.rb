@@ -72,12 +72,20 @@ def visualPastebinForm(postDescription = nil, unitDescription = nil, highlightin
 			writer.td(leftSide) { radioField.call }
 			writer.td(rightSide) {}
 		end
+		
+		count = lambda { puts output.scan(/<table/).length }
+
 		formFields.each do |formField|
 			writer.tr do
+				count.call
 				writer.td(leftSide) { radioField.call }
+				count.call
 				writer.td(rightSide) { formField.call }
 			end
 		end
+		
+		count.call
+	
 		writer.tr id: 'contentRow' do
 			writer.td colspan: 2 do
 				writer.p do
