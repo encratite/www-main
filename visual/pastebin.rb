@@ -72,19 +72,13 @@ def visualPastebinForm(postDescription = nil, unitDescription = nil, highlightin
 			writer.td(leftSide) { radioField.call }
 			writer.td(rightSide) {}
 		end
-		
-		count = lambda { puts output.scan(/<table/).length }
 
 		formFields.each do |formField|
 			writer.tr do
-				count.call
 				writer.td(leftSide) { radioField.call }
-				count.call
 				writer.td(rightSide) { formField.call }
 			end
 		end
-		
-		count.call
 	
 		writer.tr id: 'contentRow' do
 			writer.td colspan: 2 do
@@ -101,7 +95,7 @@ END
 					writer.write info
 				end
 				form.field(label: 'Description of this unit', name: PastebinForm::UnitDescription, value: unitDescription)
-				form.textarea(label: 'Paste the content here', name: PastebinForm::Content)
+				#form.textarea(label: 'Paste the content here', name: PastebinForm::Content)
 			end
 		end
 	end
