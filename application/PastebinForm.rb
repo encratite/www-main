@@ -19,4 +19,7 @@ class PastebinForm
 		'advanced',
 		'expert'
 	]
+	
+	PrivatePost = 'privatePost'
+	Expiration = 'expiration'
 end
