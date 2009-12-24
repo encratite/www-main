@@ -1,4 +1,6 @@
 class PastebinForm
+	Author = 'author'
+	
 	PostDescription = 'postDescription'
 	UnitDescription = 'unitDescription'
 	

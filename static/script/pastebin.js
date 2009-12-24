@@ -22,3 +22,17 @@ function highlightingMode(mode)
 		setElementVisibility(id, i == mode);
 	}
 }
+
+function showModeSelector()
+{
+	var radio = document.getElementById('highlightingGroup');
+	var selection = 0;
+	for(var i = 0; i < radio.length; i++)
+	{
+		if(radio[i].checked)
+		{
+			highlightingMode(i);
+			return;
+		}
+	}
+}

@@ -1,15 +1,17 @@
 require 'PathMap'
 require 'PastebinForm'
 require 'SyntaxHighlighting'
-
 require 'HashFormWriter'
+
 require 'site/HTMLWriter'
 require 'site/JavaScript'
+
+require 'configuration/cookie'
 
 def visualPastebinNewPost
 end
 
-def visualPastebinForm(postDescription = nil, unitDescription = nil, highlightingSelectionMode = 0, lastSelection = nil)
+def visualPastebinForm(request, postDescription = nil, unitDescription = nil, highlightingSelectionMode = 0, lastSelection = nil)
 	highlightingGroups =
 	[
 		'Use no syntax highlighting (plain text)',
@@ -63,8 +65,21 @@ def visualPastebinForm(postDescription = nil, unitDescription = nil, highlightin
 		lambda { form.text(label: 'Specify the vim script you want to be used (e.g. "cpp")', name: PastebinForm::ExpertHighlighting, ulId: PastebinForm::ExpertHighlighting, id: PastebinForm::ExpertHighlighting + 'Id', paragraph: false) }
 	]
 	
-	form.field(label: 'Description of the post', name: PastebinForm::PostDescription, value: postDescription)
 	writer = HTMLWriter.new output
+	
+	if request.sessionUser == nil
+		authorName = request.cookies[CookieConfiguration::Author]
+		form.field(label: 'Author', name: PastebinForm::Author, author: authorName)
+	else
+		writer.p do
+			writer.write 'Logged in as '
+			writer.b { request.sessionUser.name }
+			writer.write '.'
+		end
+		form.hidden(name: PastebinForm::Author, value: '')
+	end
+	
+	form.field(label: 'Description of the post', name: PastebinForm::PostDescription, value: postDescription)
 	writer.p { writer.write 'Specify the syntax highlighting selection method you would like to use:' }
 	writer.table id: 'syntaxTable' do
 		leftSide = {class: 'leftSide'}
@@ -101,5 +116,5 @@ END
 		end
 	end
 	form.finish
-	output.concat writeJavaScript("highlightingMode(#{highlightingSelectionMode});")
+	output.concat writeJavaScript("showModeSelector();")
 end

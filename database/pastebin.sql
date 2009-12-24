@@ -16,7 +16,11 @@ create table pastebin_post
 	
 	expiration timestamp,
 	
-	modification_counter integer not null default 0
+	modification_counter integer not null default 0,
+	
+	anonymous_string text,
+	
+	reply_to integer references pastebin_post(id)
 );
 
 drop table if exists pastebin_unit cascade;
@@ -39,4 +43,4 @@ create table pastebin_unit
 	modification_counter integer not null default 0
 );
 
-create index pastebin_unit_post_id on pastebin_unit (post_id);
+create index pastebin_unit_post_id on pastebin_unit(post_id);
