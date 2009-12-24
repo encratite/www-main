@@ -36,7 +36,7 @@ def visualPastebinForm(request, postDescription = nil, unitDescription = nil, hi
 	]
 	
 	output = ''
-	form = HashFormWriter.new(output, PathMap::PastebinSubmitPost, hashFields)
+	form = HashFormWriter.new(output, PathMap::PastebinSubmitPost, hashFields )
 	
 	radioCounter = 0
 	
@@ -71,11 +71,7 @@ def visualPastebinForm(request, postDescription = nil, unitDescription = nil, hi
 		authorName = request.cookies[CookieConfiguration::Author]
 		form.field(label: 'Author', name: PastebinForm::Author, author: authorName)
 	else
-		writer.p do
-			writer.write 'Logged in as '
-			writer.b { request.sessionUser.name }
-			writer.write '.'
-		end
+		writer.p { "You are currently logged in as <b>#{request.sessionUser.name}</b>." }
 		form.hidden(name: PastebinForm::Author, value: '')
 	end
 	

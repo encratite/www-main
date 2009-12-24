@@ -29,14 +29,10 @@ def visualLoginForm
 	
 	writer.p { 'Specify your username and your password in the following form and submit the data in order to log into your account.' }
 
-	fields =
-	[
-		['User name', UserForm::User],
-		['Password', UserForm::Password]
-	]
-
-	form = HashFormWriter.new(output, PathMap::SubmitLogin, fields.map { |description, fieldName| fieldName })
-	fields.each { |description, fieldName| form.field label: description, name: fieldName }
+	fields = [UserForm::User, UserForm::Password]
+	form = HashFormWriter.new(output, PathMap::SubmitLogin, fields)
+	form.field label: 'User name', name: UserForm::User
+	form.password label: 'Password', name: UserForm::Password
 	form.finish
 	
 	['Log in', output]
@@ -69,23 +65,14 @@ END
 
 	fields =
 	[
-		['User name', UserForm::User, user],
-		['Password', UserForm::Password],
-		['Type your password again', UserForm::PasswordAgain],
-		['Email address', UserForm::Email, email]
+		{label: 'User name', name: UserForm::User, value: user},
+		{label: 'Password', name: UserForm::Password, type: :input, inputType: :password},
+		{label: 'Type your password again', name: UserForm::PasswordAgain, type: :input, inputType: :password},
+		{label: 'Email address', name: UserForm::Email, value: email}
 	]
 	
-	form = HashFormWriter.new(output, PathMap::SubmitRegistration, fields.map { |description, fieldName| fieldName })
-	fields.each do |field|
-		description = field[0]
-		fieldName = field[1]
-		labelHash = {label: description, name: fieldName}
-		if field.size == 3
-			value = field[2]
-			labelHash[:value] = value if value != nil
-		end
-		form.field labelHash
-	end
+	form = HashFormWriter.new(output, PathMap::SubmitRegistration, fields.map { |fieldData| fieldData[:name] } )
+	fields.each { |fieldData| form.field fieldData }
 	form.finish
 	
 	['Register a new account', output]

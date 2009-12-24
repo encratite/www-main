@@ -29,6 +29,7 @@ end
 
 def hashCheck(fields, security)
 	return javaScriptError if security.empty?
-	hash = fnv1a(fields.join('\x00'))
+	data = fields.join "\x00"
+	hash = fnv1a data
 	return hashError if hash != security
 end

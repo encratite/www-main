@@ -14,13 +14,15 @@ function hashData(input)
 	
 	var hash = this.hash;
 	
+	var mask = 0xFFFFFFFF;
+	
 	for(var i = 0; i < input.length; i++)
 	{
 		var currentByte = input.charCodeAt(i);
 		hash ^= currentByte;
 		var shiftedHash = hash;
 		for(var j = 0; j < shifts.length; j++)
-			shiftedHash += hash << shifts[j];
+			shiftedHash = (shiftedHash + ((hash << shifts[j]) & mask)) & mask;
 		hash = shiftedHash;
 	}
 	
@@ -43,6 +45,10 @@ function hashFields()
 	var first = true;
 	for(var i = 0; i < arguments.length; i++)
 	{
+		if(first)
+			first = false;
+		else
+			generator.hashData('\x00');
 		var argument = arguments[i];
 		var data = document.getElementById(argument).value;
 		generator.hashData(data);
