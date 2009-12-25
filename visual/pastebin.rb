@@ -109,8 +109,8 @@ END
 		usePrivate = request.cookies[CookieConfiguration::Private] == '1'
 		
 		writer.tr do
-			writer.td { writer.radio label: 'Public', name: PastebinForm::PrivatePost, value: '0', checked: !usePrivate }
-			writer.td { writer.radio label: 'Private', name: PastebinForm::PrivatePost, checked: '1', usePrivate }
+			writer.td { writer.radio(label: 'Public', name: PastebinForm::PrivatePost, value: '0', checked: !usePrivate) }
+			writer.td { writer.radio(label: 'Private', name: PastebinForm::PrivatePost, checked: '1', usePrivate) }
 		end
 		
 		writer.tr do
@@ -123,6 +123,30 @@ Registered users may delete their posts at any time once they are logged in.
 Unregistered users may delete their posts as long as their IP address matches the address they used at the time of the creation of the post.
 END
 				writer.write info
+			end
+		end
+		
+		firstOffset = 0
+		
+		begin
+			expirationIndex = Integer request.cookies[CookieConfiguration::Expiration]
+		rescue ArgumentError
+			expirationIndex = firstOffset
+		end
+		
+		optionCount = PastebinConfiguration::ExpirationOptions.size
+		expirationIndex = firstOffset if !(firstOffset..(optionCount - 1)).include?(expirationIndex)
+		optionsPerLine = 2
+		rowCount = optionCount / optionsPerLine
+		offset = 0
+		
+		optionCount.times do
+			writer.tr do
+				optionsPerLine.times do
+					description, seconds = PastebinConfiguration::ExpirationOptions[offset]
+					writer.td { writer.radio(label: description, name: PastebinForm::Expiration, value: seconds.to_s, checked: offset == expirationIndex) }
+					offset++
+				end
 			end
 		end
 	
