@@ -109,8 +109,8 @@ END
 		usePrivate = request.cookies[CookieConfiguration::Private] == '1'
 		
 		writer.tr do
-			writer.td { writer.radio(label: 'Public', name: PastebinForm::PrivatePost, value: '0', checked: !usePrivate) }
-			writer.td { writer.radio(label: 'Private', name: PastebinForm::PrivatePost, checked: '1', usePrivate) }
+			writer.td { form.radio(label: 'Public', name: PastebinForm::PrivatePost, value: '0', checked: !usePrivate) }
+			writer.td { form.radio(label: 'Private', name: PastebinForm::PrivatePost, value: '1', checked: usePrivate) }
 		end
 		
 		writer.tr do
@@ -128,24 +128,30 @@ END
 		
 		firstOffset = 0
 		
-		begin
-			expirationIndex = Integer request.cookies[CookieConfiguration::Expiration]
-		rescue ArgumentError
+		cookie = request.cookies[CookieConfiguration::Expiration]
+		
+		if cookie != nil
+			begin
+				expirationIndex = Integer cookie
+			rescue ArgumentError
+				expirationIndex = firstOffset
+			end
+		else
 			expirationIndex = firstOffset
 		end
 		
 		optionCount = PastebinConfiguration::ExpirationOptions.size
 		expirationIndex = firstOffset if !(firstOffset..(optionCount - 1)).include?(expirationIndex)
-		optionsPerLine = 2
+		optionsPerLine = 4
 		rowCount = optionCount / optionsPerLine
 		offset = 0
 		
-		optionCount.times do
+		rowCount.times do
 			writer.tr do
 				optionsPerLine.times do
 					description, seconds = PastebinConfiguration::ExpirationOptions[offset]
-					writer.td { writer.radio(label: description, name: PastebinForm::Expiration, value: seconds.to_s, checked: offset == expirationIndex) }
-					offset++
+					writer.td { form.radio(label: description, name: PastebinForm::Expiration, value: seconds.to_s, checked: offset == expirationIndex) }
+					offset += 1
 				end
 			end
 		end
