@@ -4,11 +4,13 @@ require 'site/HTMLWriter'
 class HashFormWriter < FormWriter
 	Security = 'security'
 	
-	def initialize(output, action, hashFields)
-		arguments = hashFields.map { |field| "'#{field}'" }
-		arguments = arguments.join(', ')
-		onSubmit = "hashFields(#{arguments});"
-		super(output, action, onSubmit)
+	def initialize(output, action, hashFields, arguments = {}, &block)
+		hashFields = arguments[:hashFields]
+		raise 'No hash fields have been specified' if hashFields == nil
+		hashArguments = hashFields.map { |field| "'#{field}'" }
+		hashArguments = arguments.join(', ')
+		arguments[:onsubmit] = "hashFields(#{hashArguments});"
+		super(output, action, arguments, block)
 	end
 	
 	def hashField
@@ -18,7 +20,7 @@ class HashFormWriter < FormWriter
 		end
 	end
 	
-	def finish
+	def submit
 		hashField
 		super
 	end
