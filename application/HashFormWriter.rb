@@ -1,27 +1,21 @@
-require 'site/FormWriter'
 require 'site/HTMLWriter'
 
-class HashFormWriter < FormWriter
+class HashFormWriter < HTMLWriter
 	Security = 'security'
 	
-	def initialize(output, action, hashFields, arguments = {}, &block)
-		hashFields = arguments[:hashFields]
-		raise 'No hash fields have been specified' if hashFields == nil
+	def hashForm(action, hashFields, arguments = {}, &block)
 		hashArguments = hashFields.map { |field| "'#{field}'" }
 		hashArguments = arguments.join(', ')
 		arguments[:onsubmit] = "hashFields(#{hashArguments});"
-		super(output, action, arguments, block)
+		form(action, arguments, block)
 	end
 	
 	def hashField
-		writer = HTMLWriter.new @output
-		writer.p class: 'security' do
-			field type: :input, inputType: :hidden, name: Security, paragraph: false
-		end
+		p class: 'security' { hidden(Security) }
 	end
 	
-	def submit
+	def hashSubmit
 		hashField
-		super
+		submit
 	end
 end

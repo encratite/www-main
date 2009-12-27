@@ -1,7 +1,7 @@
 require 'PathMap'
 require 'PastebinForm'
 require 'SyntaxHighlighting'
-require 'HashFormform'
+require 'HashFormWriter'
 
 require 'site/HTMLform'
 require 'site/JavaScript'
@@ -11,7 +11,7 @@ require 'configuration/cookie'
 def visualPastebinNewPost
 end
 
-def visualPastebinForm(request, postDescription = nil, unitDescription = nil, highlightingSelectionMode = 0, lastSelection = nil)
+def visualPastebinForm(request, postDescription = nil, unitDescription = nil, content = nil, highlightingSelectionMode = 0, lastSelection = nil)
 	highlightingGroups =
 	[
 		'Use no syntax highlighting (plain text)',
@@ -36,7 +36,9 @@ def visualPastebinForm(request, postDescription = nil, unitDescription = nil, hi
 	]
 	
 	output = ''
-	form = HashFormform.new(output, PathMap::PastebinSubmitPost, hashFields) do
+	writer = HashFormWriter.new output
+	
+	writer.hashForm PathMap::PastebinSubmitPost, hashFields do
 	
 		radioCounter = 0
 		
@@ -52,7 +54,7 @@ def visualPastebinForm(request, postDescription = nil, unitDescription = nil, hi
 			}
 			
 			arguments[:checked] = true if radioCounter == highlightingSelectionMode
-			form.field arguments
+			writer.field arguments
 			radioCounter += 1
 		end
 		
@@ -60,41 +62,40 @@ def visualPastebinForm(request, postDescription = nil, unitDescription = nil, hi
 		advancedOptions = lastSelection ? SyntaxHighlighting.getSelectionList(false, lastSelection) : SyntaxHighlighting::AllScripts
 		formFields =
 		[
-			lambda { form.select(name: PastebinForm::CommonHighlighting, options: basicOptions, paragraph: false) },
-			lambda { form.select(name: PastebinForm::AdvancedHighlighting, options: advancedOptions, paragraph: false) },
-			lambda { form.text(label: 'Specify the vim script you want to be used (e.g. "cpp")', name: PastebinForm::ExpertHighlighting, ulId: PastebinForm::ExpertHighlighting, id: PastebinForm::ExpertHighlighting + 'Id', paragraph: false) }
+			lambda { writer.select(name: PastebinForm::CommonHighlighting, options: basicOptions, paragraph: false) },
+			lambda { writer.select(name: PastebinForm::AdvancedHighlighting, options: advancedOptions, paragraph: false) },
+			lambda { writer.text(label: 'Specify the vim script you want to be used (e.g. "cpp")', name: PastebinForm::ExpertHighlighting, ulId: PastebinForm::ExpertHighlighting, id: PastebinForm::ExpertHighlighting + 'Id', paragraph: false) }
 		]
 		
 		if request.sessionUser == nil
 			authorName = request.cookies[CookieConfiguration::Author]
-			form.field(label: 'Author', name: PastebinForm::Author, author: authorName)
+			writer.text(label: 'Author', name: PastebinForm::Author, author: authorName)
 		else
-			form.p { "You are currently logged in as <b>#{request.sessionUser.name}</b>." }
-			form.hidden(name: PastebinForm::Author, value: '')
+			writer.p { "You are currently logged in as <b>#{request.sessionUser.name}</b>." }
+			writer.hidden(PastebinForm::Author, '')
 		end
 		
 		columnCount = 2
 		
-		form.field(label: 'Description of the post', name: PastebinForm::PostDescription, value: postDescription)
-		form.p { form.write 'Specify the syntax highlighting selection method you would like to use:' }
-		form.table id: 'syntaxTable' do
+		writer.text('Description of the post', PastebinForm::PostDescription, postDescription)
+		writer.p { 'Specify the syntax highlighting selection method you would like to use:' }
+		writer.table id: 'syntaxTable' do
 			leftSide = {class: 'leftSide'}
 			rightSide = {class: 'rightSide'}
-			form.tr do
-				form.td(leftSide) { radioField.call }
-				form.td(rightSide) {}
+			writer.tr do
+				writer.td(leftSide) { radioField.call }
+				writer.td(rightSide) {}
 			end
 
 			formFields.each do |formField|
-				form.tr do
-					form.td(leftSide) { radioField.call }
-					form.td(rightSide) { formField.call }
+				writer.tr do
+					writer.td(leftSide) { radioField.call }
+					writer.td(rightSide) { formField.call }
 				end
 			end
 		end
 			
-		form.p do
-			info =
+		writer.p do
 <<END
 Public posts are listed on this site and can be accessed freely by all users by following links or guessing the URLs of posts using their numeric identifiers.
 If you do not wish this post to be visible to strangers you might want to mark this post as "Private".
@@ -111,19 +112,15 @@ END
 			SelectOption.new('Private', '1', usePrivate)
 		]
 		
-		form.select name: PastebinForm::PrivatePost,  privacyOptions
+		writer.select(PastebinForm::PrivatePost,  privacyOptions)
 		
-		form.tr do
-			form.td colspan: columnCount do
-				info =
+		writer.p
 <<END
 By default, all posts on this site are stored permanently and will not be removed automatically.
 If you do not wish your post to remain online indefinitely you may specify when it will expire.
 Registered users may delete their posts at any time once they are logged in.
 Unregistered users may delete their posts as long as their IP address matches the address they used at the time of the creation of the post.
 END
-				form.write info
-			end
 		end
 		
 		firstOffset = 0
@@ -142,24 +139,16 @@ END
 		
 		optionCount = PastebinConfiguration::ExpirationOptions.size
 		expirationIndex = firstOffset if !(firstOffset..(optionCount - 1)).include?(expirationIndex)
-		optionsPerLine = 4
-		rowCount = optionCount / optionsPerLine
 		offset = 0
 		
-		rowCount.times do
-			form.tr do
-				optionsPerLine.times do
-					description, seconds = PastebinConfiguration::ExpirationOptions[offset]
-					form.td { form.radio(label: description, name: PastebinForm::Expiration, value: seconds.to_s, checked: offset == expirationIndex) }
-					offset += 1
-				end
-			end
-		end
+		expirationOptions = PastebinConfiguration::ExpirationOptions.map do |description, seconds|
+			SelectOption.new(description, seconds.to_s, offset == expirationIndex)
+			offset += 1
+		end		
+		
+		writer.select(PastebinForm::Expiration, expirationOptions)
 
-		form.tr id: 'contentRow' do
-			form.td colspan: columnCount do
-				form.p do
-					info =
+		writer.p do
 <<END
 Each post in this pastebin consists of one or multiple units.
 Each one of these units can use a different syntax highlighting mode.
@@ -168,12 +157,10 @@ For example, you might make a post which features a README file in plain text fo
 You may enter a more precise description for the particular unit for this post.
 This is particularly useful if you intend to add further units to this post but you may also just leave it empty.
 END
-					form.write info
-				end
-				form.field(label: 'Description of this unit', name: PastebinForm::UnitDescription, value: unitDescription)
-				form.textarea(label: 'Paste the content here', name: PastebinForm::Content)
-			end
 		end
+		
+		writer.text('Description of this unit', PastebinForm::UnitDescription, unitDescription)
+		writer.textArea('Paste the content here', PastebinForm::Content, content)
 		
 	end
 	
