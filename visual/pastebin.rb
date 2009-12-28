@@ -56,8 +56,12 @@ def visualPastebinForm(request, postDescription = nil, unitDescription = nil, co
 		[
 			lambda { writer.select(PastebinForm::CommonHighlighting, basicOptions) },
 			lambda { writer.select(PastebinForm::AdvancedHighlighting, advancedOptions) },
-			#ulId: PastebinForm::ExpertHighlighting
-			lambda { writer.text('Specify the vim script you want to be used (e.g. "cpp")', PastebinForm::ExpertHighlighting, '', {id: PastebinForm::ExpertHighlighting + 'Id'}) }
+			lambda do
+				writer.ul class: 'formLabel', id: PastebinForm::ExpertHighlighting do
+					writer.li { 'Specify the vim script you want to be used (e.g. "cpp")' }
+					writer.li { writer.input(type: 'text', name: PastebinForm::ExpertHighlighting) }
+				end
+			end
 		]
 		
 		if request.sessionUser == nil
@@ -106,7 +110,7 @@ END
 			SelectOption.new('Private', '1', usePrivate)
 		]
 		
-		writer.select(PastebinForm::PrivatePost,  privacyOptions)
+		writer.p { writer.select(PastebinForm::PrivatePost,  privacyOptions) }
 		
 		writer.p do
 <<END
@@ -141,7 +145,7 @@ END
 			option
 		end		
 		
-		writer.select(PastebinForm::Expiration, expirationOptions)
+		writer.p { writer.select(PastebinForm::Expiration, expirationOptions) }
 
 		writer.p do
 <<END
@@ -155,8 +159,9 @@ END
 		end
 		
 		writer.text('Description of this unit', PastebinForm::UnitDescription, unitDescription)
-		writer.textArea('Paste the content here', PastebinForm::Content, content)
+		writer.textArea('Paste the content here', PastebinForm::Content, content, {cols: '30', rows: '10'})
 		
+		writer.hashSubmit
 	end
 	
 	output.concat writeJavaScript("showModeSelector();")
