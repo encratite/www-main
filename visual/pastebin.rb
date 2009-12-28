@@ -3,7 +3,6 @@ require 'PastebinForm'
 require 'SyntaxHighlighting'
 require 'HashFormWriter'
 
-require 'site/HTMLform'
 require 'site/JavaScript'
 
 require 'configuration/cookie'
@@ -43,18 +42,11 @@ def visualPastebinForm(request, postDescription = nil, unitDescription = nil, co
 		radioCounter = 0
 		
 		radioField = lambda do
-			arguments =
-			{
-				type: :radio,
-				label: highlightingGroups[radioCounter],
-				name: PastebinForm::HighlightingGroup,
-				onClick: "highlightingMode(#{radioCounter});",
-				value: PastebinForm::HighlightingGroupIdentifiers[radioCounter],
-				paragraph: false
-			}
+			checked = radioCounter == highlightingSelectionMode
+			arguments = {onclick: "highlightingMode(#{radioCounter});"}
 			
-			arguments[:checked] = true if radioCounter == highlightingSelectionMode
-			writer.field arguments
+			writer.radio(highlightingGroups[radioCounter], PastebinForm::HighlightingGroup, PastebinForm::HighlightingGroupIdentifiers[radioCounter], checked, arguments)
+			
 			radioCounter += 1
 		end
 		
@@ -62,14 +54,15 @@ def visualPastebinForm(request, postDescription = nil, unitDescription = nil, co
 		advancedOptions = lastSelection ? SyntaxHighlighting.getSelectionList(false, lastSelection) : SyntaxHighlighting::AllScripts
 		formFields =
 		[
-			lambda { writer.select(name: PastebinForm::CommonHighlighting, options: basicOptions, paragraph: false) },
-			lambda { writer.select(name: PastebinForm::AdvancedHighlighting, options: advancedOptions, paragraph: false) },
-			lambda { writer.text(label: 'Specify the vim script you want to be used (e.g. "cpp")', name: PastebinForm::ExpertHighlighting, ulId: PastebinForm::ExpertHighlighting, id: PastebinForm::ExpertHighlighting + 'Id', paragraph: false) }
+			lambda { writer.select(PastebinForm::CommonHighlighting, basicOptions) },
+			lambda { writer.select(PastebinForm::AdvancedHighlighting, advancedOptions) },
+			#ulId: PastebinForm::ExpertHighlighting
+			lambda { writer.text('Specify the vim script you want to be used (e.g. "cpp")', PastebinForm::ExpertHighlighting, '', {id: PastebinForm::ExpertHighlighting + 'Id'}) }
 		]
 		
 		if request.sessionUser == nil
 			authorName = request.cookies[CookieConfiguration::Author]
-			writer.text(label: 'Author', name: PastebinForm::Author, author: authorName)
+			writer.text('Author', PastebinForm::Author, authorName)
 		else
 			writer.p { "You are currently logged in as <b>#{request.sessionUser.name}</b>." }
 			writer.hidden(PastebinForm::Author, '')
@@ -94,6 +87,7 @@ def visualPastebinForm(request, postDescription = nil, unitDescription = nil, co
 				end
 			end
 		end
+
 			
 		writer.p do
 <<END
@@ -114,7 +108,7 @@ END
 		
 		writer.select(PastebinForm::PrivatePost,  privacyOptions)
 		
-		writer.p
+		writer.p do
 <<END
 By default, all posts on this site are stored permanently and will not be removed automatically.
 If you do not wish your post to remain online indefinitely you may specify when it will expire.
@@ -142,8 +136,9 @@ END
 		offset = 0
 		
 		expirationOptions = PastebinConfiguration::ExpirationOptions.map do |description, seconds|
-			SelectOption.new(description, seconds.to_s, offset == expirationIndex)
+			option = SelectOption.new(description, seconds.to_s, offset == expirationIndex)
 			offset += 1
+			option
 		end		
 		
 		writer.select(PastebinForm::Expiration, expirationOptions)

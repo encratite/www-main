@@ -5,13 +5,13 @@ class HashFormWriter < HTMLWriter
 	
 	def hashForm(action, hashFields, arguments = {}, &block)
 		hashArguments = hashFields.map { |field| "'#{field}'" }
-		hashArguments = arguments.join(', ')
+		hashArguments = hashArguments.join(', ')
 		arguments[:onsubmit] = "hashFields(#{hashArguments});"
-		form(action, arguments, block)
+		form(action, arguments) { block.call }
 	end
 	
 	def hashField
-		p class: 'security' { hidden(Security) }
+		p class: 'security' do hidden(Security) end
 	end
 	
 	def hashSubmit
