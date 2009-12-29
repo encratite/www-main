@@ -2,7 +2,6 @@ require 'HashFormWriter'
 require 'PathMap'
 require 'UserForm'
 require 'site/HTML'
-require 'site/HTMLWriter'
 require 'visual/general'
 
 def accountExplanation
@@ -15,8 +14,10 @@ END
 end
 
 def visualLoginForm
+	fields = [UserForm::User, UserForm::Password]
+	
 	output = ''
-	writer = HTMLWriter.new output
+	writer = HashFormWriter.new output
 	writer.p do
 		writer.write accountExplanation
 		writer.write 'If you do not have an account yet you may register one:'
@@ -24,23 +25,23 @@ def visualLoginForm
 	
 	writer.p class: 'indent' do
 		path = PathMap.getPath :Register
-		writer.a(href: path) { 'Register a new account' }
+		writer.a href: path do 'Register a new account' end
 	end
 	
-	writer.p { 'Specify your username and your password in the following form and submit the data in order to log into your account.' }
+	writer.p { 'Specify your username and your password in the following writer and submit the data in order to log into your account.' }
 
-	fields = [UserForm::User, UserForm::Password]
-	form = HashFormWriter.new(output, PathMap::SubmitLogin, fields)
-	form.field label: 'User name', name: UserForm::User
-	form.password label: 'Password', name: UserForm::Password
-	form.finish
+	writer.hashForm PathMap::SubmitLogin, fields do
+		writer.text('User name', UserForm::User)
+		writer.password('Password', UserForm::Password)
+		writer.hashSubmit
+	end
 	
 	['Log in', output]
 end
 
 def visualRegisterForm(error = nil, user = nil, email = nil)
 	output = ''
-	writer = HTMLWriter.new output
+	writer = HashFormWriter.new output
 	
 	if error != nil
 		writer.p do
@@ -51,29 +52,33 @@ def visualRegisterForm(error = nil, user = nil, email = nil)
 		writer.ul class: 'error' do
 			error.each { |message| writer.li { message } }
 		end
-		writer.p 'Please go over the form again and correct the invalid entries.'
+		writer.p 'Please go over the writer again and correct the invalid entries.'
 	else
 		writer.p do
 			lines =
 <<END
-Fill out the following form and submit the data in order to create a new account.
+Fill out the following writer and submit the data in order to create a new account.
 It is not necessary to specify an e-mail address but it may be useful to do so in case you forget your password.
 END
 			writer.write lines
 		end
 	end
-
-	fields =
+	
+	hashFields =
 	[
-		{label: 'User name', name: UserForm::User, value: user},
-		{label: 'Password', name: UserForm::Password, type: :input, inputType: :password},
-		{label: 'Type your password again', name: UserForm::PasswordAgain, type: :input, inputType: :password},
-		{label: 'Email address', name: UserForm::Email, value: email}
+		UserForm::User,
+		UserForm::Password,
+		UserForm::PasswordAgain,
+		UserForm::Email,
 	]
 	
-	form = HashFormWriter.new(output, PathMap::SubmitRegistration, fields.map { |fieldData| fieldData[:name] } )
-	fields.each { |fieldData| form.field fieldData }
-	form.finish
+	writer.hashForm(PathMap::SubmitRegistration, hashFields) do
+		writer.text('User name', UserForm::User, user)
+		writer.password('Password', UserForm::Password)
+		writer.password('Type your password again', UserForm::PasswordAgain)
+		writer.text('Email address', UserForm::Email, email)
+		writer.hashSubmit
+	end
 	
 	['Register a new account', output]
 end
