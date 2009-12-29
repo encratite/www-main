@@ -13,11 +13,11 @@ The login sessions depend on cookies so you will not be able to use this feature
 END
 end
 
-def visualLoginForm
+def visualLoginForm(request)
 	fields = [UserForm::User, UserForm::Password]
 	
 	output = ''
-	writer = HashFormWriter.new output
+	writer = HashFormWriter.new(output, request)
 	writer.p do
 		writer.write accountExplanation
 		writer.write 'If you do not have an account yet you may register one:'
@@ -39,9 +39,9 @@ def visualLoginForm
 	['Log in', output]
 end
 
-def visualRegisterForm(error = nil, user = nil, email = nil)
+def visualRegisterForm(request, error = nil, user = nil, email = nil)
 	output = ''
-	writer = HashFormWriter.new output
+	writer = HashFormWriter.new(output, request)
 	
 	if error != nil
 		writer.p do

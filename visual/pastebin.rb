@@ -64,7 +64,7 @@ def visualPastebinForm(request, postDescription = nil, unitDescription = nil, co
 	]
 	
 	output = ''
-	writer = HashFormWriter.new output
+	writer = HashFormWriter.new(output, request)
 	
 	writer.hashForm PathMap::PastebinSubmitPost, hashFields do
 	

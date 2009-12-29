@@ -60,6 +60,10 @@ input.radio
 	background: none;
 }
 
+input.submit
+{;
+}
+
 textarea
 {
 	color: #000;

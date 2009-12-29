@@ -29,7 +29,7 @@ end
 def loginFormRequest(request)
 	content = loginCheck request
 	return content if content != nil
-	$generator.get visualLoginForm, request
+	$generator.get(visualLoginForm(request), request)
 end
 
 def performLoginRequest(request)
@@ -77,7 +77,7 @@ end
 def registerFormRequest(request)
 	content = registrationCheck request
 	return content if content != nil
-	$generator.get visualRegisterForm, request
+	$generator.get(visualRegisterForm(request), request)
 end
 
 def performRegistrationRequest(request)
