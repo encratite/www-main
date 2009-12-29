@@ -19,6 +19,7 @@
 {
 	border-right-style: none;
 	white-space: nowrap;
+	width: 10em;
 }
 
 #syntaxTable td.rightSide
@@ -28,14 +29,24 @@
 
 #author, #postDescription, #unitDescription
 {
-	width: 20em;
+	width: 15em;
+}
+
+#commonHighlighting
+{
+	width: 10em;
+}
+
+#advancedHighlighting
+{
+	width: 28em;
 }
 
 #content
 {
 	margin: 0;
-	padding: 0;
-	width: 100%;
+	padding: 0.3em 0.5em 0.3em 0.5em;
+	width: 64em;
 	height: 30em;
 }
 
@@ -56,4 +67,9 @@
 #commonHighlighting, #advancedHighlighting, #expertHighlighting
 {
 	display: none;
+}
+
+#privatePost, #expiration
+{
+	width: 10em;
 }

@@ -58,7 +58,7 @@ def visualPastebinForm(request, postDescription = nil, unitDescription = nil, co
 			lambda { writer.select(PastebinForm::AdvancedHighlighting, advancedOptions) },
 			lambda do
 				writer.ul class: 'formLabel', id: PastebinForm::ExpertHighlighting do
-					writer.li { 'Specify the vim script you want to be used (e.g. "cpp")' }
+					writer.li { 'Specify the vim script you want to be used (e.g. "cpp"):' }
 					writer.li { writer.input(type: 'text', name: PastebinForm::ExpertHighlighting) }
 				end
 			end
@@ -66,7 +66,7 @@ def visualPastebinForm(request, postDescription = nil, unitDescription = nil, co
 		
 		if request.sessionUser == nil
 			authorName = request.cookies[CookieConfiguration::Author]
-			writer.text('Author', PastebinForm::Author, authorName)
+			writer.text('Author (not necessary)', PastebinForm::Author, authorName)
 		else
 			writer.p { "You are currently logged in as <b>#{request.sessionUser.name}</b>." }
 			writer.hidden(PastebinForm::Author, '')
@@ -110,7 +110,7 @@ END
 			SelectOption.new('Private', '1', usePrivate)
 		]
 		
-		writer.p { writer.select(PastebinForm::PrivatePost,  privacyOptions) }
+		writer.select(PastebinForm::PrivatePost,  privacyOptions, {label: 'Privacy options'})
 		
 		writer.p do
 <<END
@@ -145,7 +145,7 @@ END
 			option
 		end		
 		
-		writer.p { writer.select(PastebinForm::Expiration, expirationOptions) }
+		writer.select(PastebinForm::Expiration, expirationOptions, {label: 'Post expiration'})
 
 		writer.p do
 <<END
@@ -158,7 +158,7 @@ This is particularly useful if you intend to add further units to this post but 
 END
 		end
 		
-		writer.text('Description of this unit', PastebinForm::UnitDescription, unitDescription)
+		writer.text('Description of this unit (not necessary)', PastebinForm::UnitDescription, unitDescription)
 		writer.textArea('Paste the content here', PastebinForm::Content, content, {cols: '30', rows: '10'})
 		
 		writer.hashSubmit
