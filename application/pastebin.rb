@@ -9,7 +9,5 @@ def newPastebinPost(request)
 end
 
 def submitNewPastebinPost(request)
-	return fieldError if !request.postIsSet(PastebinForm::PostFields)
-	
-	return "FUCK YEAH"
+	FormCheck::Process.call(request, PastebinForm::PostFields)
 end

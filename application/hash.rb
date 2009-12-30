@@ -32,4 +32,7 @@ def hashCheck(fields, security)
 	data = fields.join "\x00"
 	hash = fnv1a data
 	return hashError if hash != security
+	return nil
 end
+
+

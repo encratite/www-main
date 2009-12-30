@@ -2,6 +2,7 @@ require 'UserForm'
 require 'User'
 require 'hash'
 require 'error'
+require 'FormCheck'
 require 'site/HTTPReply'
 require 'site/Cookie'
 require 'configuration/site'
@@ -36,14 +37,10 @@ def performLoginRequest(request)
 	content = loginCheck request
 	return content if content != nil
 	
-	return fieldError if !request.postIsSet(UserForm::LoginFields)
+	FormCheck::Process.call(request, UserForm::LoginFields)
 	
 	user = request.getPost UserForm::User
 	password = request.getPost UserForm::Password
-	security = request.getPost HashFormWriter::Security
-	
-	error = hashCheck([user, password], security)
-	return $generator.get error, request if error != nil
 	
 	passwordHash = hashWithSalt password
 	
@@ -77,16 +74,12 @@ def performRegistrationRequest(request)
 	content = registrationCheck request
 	return content if content != nil
 	
-	return fieldError if !request.postIsSet(HashFormWriter::RegistrationFields)
+	FormCheck::Process.call(request, UserForm::RegistrationFields)
 	
 	user = request.getPost UserForm::User
 	password = request.getPost UserForm::Password
 	passwordAgain = request.getPost UserForm::PasswordAgain
 	email = request.getPost UserForm::Email
-	security = request.getPost HashFormWriter::Security
-	
-	error = hashCheck([user, password, passwordAgain, email], security)
-	return $generator.get error, request if error != nil
 	
 	errors = []
 	
