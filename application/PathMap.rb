@@ -6,7 +6,7 @@ def newPath(path)
 end
 
 def pastebinPath(path)
-	PastebinConfiguration::Prefix + '/' + path
+	newPath(PastebinConfiguration::Prefix + '/' + path)
 end
 
 class PathMapEntry
@@ -32,7 +32,7 @@ class PathMap
 	PastebinView = pastebinPath 'view'
 	PastebinEdit = pastebinPath 'edit'
 	
-	PastebinSubmitPost = pastebinPath 'submitPost'
+	PastebinSubmitNewPost = pastebinPath 'submitNewPost'
 	PastebinSubmitModification = pastebinPath 'submitModification'
 	
 	def self.getPath(symbol)

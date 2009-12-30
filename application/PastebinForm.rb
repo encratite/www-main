@@ -22,4 +22,24 @@ class PastebinForm
 	
 	PrivatePost = 'privatePost'
 	Expiration = 'expiration'
+	
+	PostFields =
+	[
+		Author,
+		
+		PostDescription,
+		
+		HighlightingGroup,
+		
+		CommonHighlighting,
+		AdvancedHighlighting,
+		ExpertHighlighting,
+		
+		PrivatePost,
+		Expiration,
+		
+		UnitDescription,
+		
+		Content,
+	]
 end

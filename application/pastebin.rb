@@ -9,19 +9,7 @@ def newPastebinPost(request)
 end
 
 def submitNewPastebinPost(request)
-	requiredFields =
-	[
-		PastebinForm::PostDescription,
-		PastebinForm::UnitDescription,
-		
-		PastebinForm::HighlightingGroup,
-		
-		PastebinForm::CommonHighlighting,
-		PastebinForm::AdvancedHighlighting,
-		PastebinForm::ExpertHighlighting,
-		
-		PastebinForm::Content,
-	]
+	return fieldError if !request.postIsSet(PastebinForm::PostFields)
 	
-	return fieldError if !request.postIsSet(requiredFields)
+	return "FUCK YEAH"
 end

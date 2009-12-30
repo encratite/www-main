@@ -3,4 +3,18 @@ class UserForm
 	Password = 'password'
 	PasswordAgain = 'passwordAgain'
 	Email = 'email'
+	
+	LoginFields =
+	[
+		User,
+		Password
+	]
+	
+	RegistrationFields =
+	[
+		User,
+		Password,
+		PasswordAgain,
+		Email
+	]
 end

@@ -6,7 +6,7 @@ class SiteConfiguration
 	ImageDirectory = 'image'
 	ScriptDirectory = 'script'
 	
-	GeneralStringLengthMaximum = 64
+	GeneralStringLengthMaximum = 128
 	
 	UserNameLengthMaximum = GeneralStringLengthMaximum
 	PasswordLengthMaximum = GeneralStringLengthMaximum

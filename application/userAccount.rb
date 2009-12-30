@@ -36,14 +36,7 @@ def performLoginRequest(request)
 	content = loginCheck request
 	return content if content != nil
 	
-	requiredFields =
-	[
-		UserForm::User,
-		UserForm::Password,
-		HashFormWriter::Security
-	]
-	
-	return fieldError if !request.postIsSet(requiredFields)
+	return fieldError if !request.postIsSet(UserForm::LoginFields)
 	
 	user = request.getPost UserForm::User
 	password = request.getPost UserForm::Password
@@ -84,16 +77,7 @@ def performRegistrationRequest(request)
 	content = registrationCheck request
 	return content if content != nil
 	
-	requiredFields =
-	[
-		UserForm::User,
-		UserForm::Password,
-		UserForm::PasswordAgain,
-		UserForm::Email,
-		HashFormWriter::Security
-	]
-	
-	return fieldError if !request.postIsSet(requiredFields)
+	return fieldError if !request.postIsSet(HashFormWriter::RegistrationFields)
 	
 	user = request.getPost UserForm::User
 	password = request.getPost UserForm::Password

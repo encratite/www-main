@@ -43,7 +43,7 @@ def createRequestManager
 		[:SubmitRegistration, :performRegistrationRequest],
 		[:Logout, :logoutRequest],
 		[:Pastebin, :newPastebinPost],
-		[:PastebinSubmitPost, :submitNewPastebinPost],
+		[:PastebinSubmitNewPost, :submitNewPastebinPost],
 	]
 
 	requestManager = RequestManager.new SiteRequest
@@ -58,6 +58,8 @@ def createRequestManager
 	
 	requestHandler = RequestHandler.new('/main/environment', method(:visualiseEnvironment), 0)
 	requestManager.addHandler requestHandler
+	
+	puts requestManager.inspect
 	
 	return requestManager
 end

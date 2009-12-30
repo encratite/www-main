@@ -48,25 +48,10 @@ def visualPastebinForm(request, postDescription = nil, unitDescription = nil, co
 		'Expert mode (manually specify the name of a vim script)'
 	]
 	
-	hashFields =
-	[
-		PastebinForm::PostDescription,
-		
-		PastebinForm::HighlightingGroup,
-		
-		PastebinForm::CommonHighlighting,
-		PastebinForm::AdvancedHighlighting,
-		PastebinForm::ExpertHighlighting,
-		
-		PastebinForm::UnitDescription,
-		
-		PastebinForm::Content,
-	]
-	
 	output = ''
 	writer = HashFormWriter.new(output, request)
 	
-	writer.hashForm PathMap::PastebinSubmitPost, hashFields do
+	writer.hashForm PathMap::PastebinSubmitNewPost, PastebinForm::PostFields do
 	
 		radioCounter = 0
 		
@@ -95,7 +80,7 @@ def visualPastebinForm(request, postDescription = nil, unitDescription = nil, co
 		
 		if request.sessionUser == nil
 			authorName = request.cookies[CookieConfiguration::Author]
-			writer.text('Author (not necessary)', PastebinForm::Author, authorName)
+			writer.text('Author (optional)', PastebinForm::Author, authorName)
 		else
 			writer.p { "You are currently logged in as <b>#{request.sessionUser.name}</b>." }
 			writer.hidden(PastebinForm::Author, '')
@@ -103,7 +88,7 @@ def visualPastebinForm(request, postDescription = nil, unitDescription = nil, co
 		
 		columnCount = 2
 		
-		writer.text('Description of the post', PastebinForm::PostDescription, postDescription)
+		writer.text('Description of the post (optional)', PastebinForm::PostDescription, postDescription)
 		writer.p { 'Specify the syntax highlighting selection method you would like to use:' }
 		writer.table id: 'syntaxTable' do
 			leftSide = {class: 'leftSide'}
@@ -157,7 +142,7 @@ def visualPastebinForm(request, postDescription = nil, unitDescription = nil, co
 		
 		writer.select(PastebinForm::Expiration, expirationOptions, {label: 'Post expiration'})
 		
-		writer.text('Description of this unit (not necessary)', PastebinForm::UnitDescription, unitDescription)
+		writer.text('Description of this unit (optional)', PastebinForm::UnitDescription, unitDescription)
 		writer.textArea('Paste the content here', PastebinForm::Content, content, {cols: '30', rows: '10'})
 		
 		writer.hashSubmit
