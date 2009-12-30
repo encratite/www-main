@@ -25,21 +25,21 @@ class PastebinForm
 	
 	PostFields =
 	[
-		Author,
+		:Author,
 		
-		PostDescription,
+		:PostDescription,
 		
-		HighlightingGroup,
+		:HighlightingGroup,
 		
-		CommonHighlighting,
-		AdvancedHighlighting,
-		ExpertHighlighting,
+		:CommonHighlighting,
+		:AdvancedHighlighting,
+		:ExpertHighlighting,
 		
-		PrivatePost,
-		Expiration,
+		:PrivatePost,
+		:Expiration,
 		
-		UnitDescription,
+		:UnitDescription,
 		
-		Content,
+		:Content,
 	]
 end

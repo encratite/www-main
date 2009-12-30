@@ -1,6 +1,7 @@
 require 'PathMap'
 require 'PastebinForm'
 require 'error'
+require 'processForm'
 require 'configuration/pastebin'
 require 'visual/pastebin'
 
@@ -9,5 +10,5 @@ def newPastebinPost(request)
 end
 
 def submitNewPastebinPost(request)
-	FormCheck::Process.call(request, PastebinForm::PostFields)
+	processFormFields(request, PastebinForm::PostFields)
 end

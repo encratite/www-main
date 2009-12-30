@@ -2,7 +2,7 @@ require 'UserForm'
 require 'User'
 require 'hash'
 require 'error'
-require 'FormCheck'
+require 'processForm'
 require 'site/HTTPReply'
 require 'site/Cookie'
 require 'configuration/site'
@@ -37,7 +37,7 @@ def performLoginRequest(request)
 	content = loginCheck request
 	return content if content != nil
 	
-	FormCheck::Process.call(request, UserForm::LoginFields)
+	processFormFields(request, UserForm, :LoginFields)
 	
 	user = request.getPost UserForm::User
 	password = request.getPost UserForm::Password
@@ -74,7 +74,7 @@ def performRegistrationRequest(request)
 	content = registrationCheck request
 	return content if content != nil
 	
-	FormCheck::Process.call(request, UserForm::RegistrationFields)
+	processFormFields(request, UserForm::RegistrationFields)
 	
 	user = request.getPost UserForm::User
 	password = request.getPost UserForm::Password
