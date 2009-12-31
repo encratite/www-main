@@ -10,5 +10,20 @@ def newPastebinPost(request)
 end
 
 def submitNewPastebinPost(request)
-	processFormFields(request, PastebinForm::PostFields)
+	author,
+		
+	postDescription,
+	
+	highlightingGroup,
+	
+	commonHighlighting,
+	advancedHighlighting,
+	expertHighlighting,
+	
+	privatePost,
+	expiration,
+	
+	unitDescription,
+	
+	content = processFormFields(request, PastebinForm, :PostFields)
 end

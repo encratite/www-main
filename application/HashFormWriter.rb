@@ -3,7 +3,9 @@ require 'site/HTMLWriter'
 class HashFormWriter < HTMLWriter
 	Security = 'security'
 	
-	def hashForm(action, hashFields, arguments = {}, &block)
+	def hashForm(action, type, namesSymbol, arguments = {}, &block)
+		nameSymbols = type.const_get namesSymbol
+		hashFields = nameSymbols.map { |symbol| type.const_get symbol }
 		hashArguments = hashFields.map { |field| "'#{field}'" }
 		hashArguments = hashArguments.join(', ')
 		arguments[:onsubmit] = "hashFields(#{hashArguments});"

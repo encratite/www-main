@@ -51,7 +51,7 @@ def visualPastebinForm(request, postDescription = nil, unitDescription = nil, co
 	output = ''
 	writer = HashFormWriter.new(output, request)
 	
-	writer.hashForm PathMap::PastebinSubmitNewPost, PastebinForm::PostFields do
+	writer.hashForm PathMap::PastebinSubmitNewPost, PastebinForm, :PostFields do
 	
 		radioCounter = 0
 		

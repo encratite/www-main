@@ -37,10 +37,7 @@ def performLoginRequest(request)
 	content = loginCheck request
 	return content if content != nil
 	
-	processFormFields(request, UserForm, :LoginFields)
-	
-	user = request.getPost UserForm::User
-	password = request.getPost UserForm::Password
+	user, password = processFormFields(request, UserForm, :LoginFields)
 	
 	passwordHash = hashWithSalt password
 	
@@ -74,12 +71,7 @@ def performRegistrationRequest(request)
 	content = registrationCheck request
 	return content if content != nil
 	
-	processFormFields(request, UserForm::RegistrationFields)
-	
-	user = request.getPost UserForm::User
-	password = request.getPost UserForm::Password
-	passwordAgain = request.getPost UserForm::PasswordAgain
-	email = request.getPost UserForm::Email
+	user, password, passwordAgain,email = processFormFields(request, UserForm, :RegistrationFields)
 	
 	errors = []
 	

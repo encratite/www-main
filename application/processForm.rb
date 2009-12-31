@@ -11,4 +11,5 @@ def processFormFields(request, type, namesSymbol)
 	security = request.getPost(HashFormWriter::Security)
 	error = hashCheck(fields, security)
 	raise RequestManager::Exception.new($generator.get(error, request)) if error != nil
+	return fields
 end
