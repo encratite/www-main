@@ -3,9 +3,7 @@ require 'error'
 require 'HashFormWriter'
 require 'site/RequestManager'
 
-def processFormFields(request, type, namesSymbol)
-	nameSymbols = type.const_get namesSymbol
-	names = nameSymbols.map { |symbol| type.const_get symbol }
+def processFormFields(request, names)
 	raise RequestManager::Exception.new(fieldError) if !request.postIsSet(names)
 	fields = names.map { |name| request.getPost name }
 	security = request.getPost(HashFormWriter::Security)

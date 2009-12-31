@@ -28,7 +28,7 @@ def visualLoginForm(request)
 	
 	writer.p { 'Specify your username and your password in the following writer and submit the data in order to log into your account.' }
 
-	writer.hashForm PathMap::SubmitLogin, UserForm, :LoginFields do
+	writer.hashForm PathMap::SubmitLogin, UserForm::LoginFields do
 		writer.text('User name', UserForm::User)
 		writer.password('Password', UserForm::Password)
 		writer.hashSubmit
@@ -62,7 +62,7 @@ END
 		end
 	end
 	
-	writer.hashForm(PathMap::SubmitRegistration, UserForm, :RegistrationFields) do
+	writer.hashForm(PathMap::SubmitRegistration, UserForm::RegistrationFields) do
 		writer.text('User name', UserForm::User, user)
 		writer.password('Password', UserForm::Password)
 		writer.password('Type your password again', UserForm::PasswordAgain)

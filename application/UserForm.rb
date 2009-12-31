@@ -6,15 +6,15 @@ class UserForm
 	
 	LoginFields =
 	[
-		:User,
-		:Password
+		User,
+		Password
 	]
 	
 	RegistrationFields =
 	[
-		:User,
-		:Password,
-		:PasswordAgain,
-		:Email
+		User,
+		Password,
+		PasswordAgain,
+		Email
 	]
 end

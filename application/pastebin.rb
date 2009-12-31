@@ -25,5 +25,5 @@ def submitNewPastebinPost(request)
 	
 	unitDescription,
 	
-	content = processFormFields(request, PastebinForm, :PostFields)
+	content = processFormFields(request, PastebinForm::PostFields)
 end
