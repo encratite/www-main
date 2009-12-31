@@ -31,6 +31,8 @@ def hashCheck(fields, security)
 	return javaScriptError if security.empty?
 	data = fields.join "\x00"
 	hash = fnv1a data
+	#puts "Data: #{data} (#{data.length})"
+	#puts "#{hash} vs #{security}"
 	return hashError if hash != security
 	return nil
 end

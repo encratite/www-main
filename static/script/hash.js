@@ -51,6 +51,11 @@ function hashFields()
 			generator.hashData('\x00');
 		var argument = arguments[i];
 		var data = document.getElementById(argument).value;
+		if(data == null)
+		{
+			alert('Missing field: ' + argument);
+			return 0;
+		}
 		generator.hashData(data);
 	}
 	var security = document.getElementById('security');

@@ -64,7 +64,7 @@
 	border: 0;
 }
 
-#commonHighlighting, #advancedHighlighting, #expertHighlighting
+#commonHighlighting, #advancedHighlighting, #expertHighlightingList
 {
 	display: none;
 }

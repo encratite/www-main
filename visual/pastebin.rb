@@ -71,7 +71,7 @@ def visualPastebinForm(request, postDescription = nil, unitDescription = nil, co
 			lambda { writer.select(PastebinForm::CommonHighlighting, basicOptions) },
 			lambda { writer.select(PastebinForm::AdvancedHighlighting, advancedOptions) },
 			lambda do
-				writer.ul class: 'formLabel', id: PastebinForm::ExpertHighlighting do
+				writer.ul class: 'formLabel', id: (PastebinForm::ExpertHighlighting + 'List') do
 					writer.li { 'Specify the vim script you want to be used (e.g. "cpp"):' }
 					writer.li { writer.input(type: 'text', name: PastebinForm::ExpertHighlighting) }
 				end
@@ -135,7 +135,7 @@ def visualPastebinForm(request, postDescription = nil, unitDescription = nil, co
 		offset = 0
 		
 		expirationOptions = PastebinConfiguration::ExpirationOptions.map do |description, seconds|
-			option = SelectOption.new(description, seconds.to_s, offset == expirationIndex)
+			option = SelectOption.new(description, offset.to_s, offset == expirationIndex)
 			offset += 1
 			option
 		end		
