@@ -6,6 +6,7 @@ require 'HashFormWriter'
 require 'site/JavaScript'
 
 require 'configuration/cookie'
+require 'configuration/pastebin'
 
 def visualPastebinNewPost
 end
@@ -37,6 +38,10 @@ For example, you might make a post which features a README file in plain text fo
 You may enter a more precise description for the particular unit for this post.
 This is particularly useful if you intend to add further units to this post but you may also just leave it empty.
 END
+end
+
+def getFieldLength(symbol)
+	return {maxlength: PastebinConfiguration.const_get(symbol)}
 end
 
 def visualPastebinForm(request, postDescription = nil, unitDescription = nil, content = nil, highlightingSelectionMode = 0, lastSelection = nil)
@@ -80,7 +85,7 @@ def visualPastebinForm(request, postDescription = nil, unitDescription = nil, co
 		
 		if request.sessionUser == nil
 			authorName = request.cookies[CookieConfiguration::Author]
-			writer.text('Author (optional)', PastebinForm::Author, authorName)
+			writer.text('Author (optional)', PastebinForm::Author, authorName, getFieldLength(:VimScriptLengthMaximum))
 		else
 			writer.p { "You are currently logged in as <b>#{request.sessionUser.name}</b>." }
 			writer.hidden(PastebinForm::Author, '')
@@ -88,7 +93,7 @@ def visualPastebinForm(request, postDescription = nil, unitDescription = nil, co
 		
 		columnCount = 2
 		
-		writer.text('Description of the post (optional)', PastebinForm::PostDescription, postDescription)
+		writer.text('Description of the post (optional)', PastebinForm::PostDescription, postDescription, getFieldLength(:PostDescriptionLengthMaximum))
 		writer.p { 'Specify the syntax highlighting selection method you would like to use:' }
 		writer.table id: 'syntaxTable' do
 			leftSide = {class: 'leftSide'}
@@ -142,7 +147,7 @@ def visualPastebinForm(request, postDescription = nil, unitDescription = nil, co
 		
 		writer.select(PastebinForm::Expiration, expirationOptions, {label: 'Post expiration'})
 		
-		writer.text('Description of this unit (optional)', PastebinForm::UnitDescription, unitDescription)
+		writer.text('Description of this unit (optional)', PastebinForm::UnitDescription, unitDescription, getFieldLength(:UnitDescriptionLengthMaximum))
 		writer.textArea('Paste the content here', PastebinForm::Content, content, {cols: '30', rows: '10'})
 		
 		writer.hashSubmit

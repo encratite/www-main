@@ -3,6 +3,7 @@ require 'PathMap'
 require 'UserForm'
 require 'site/HTML'
 require 'visual/general'
+require 'configuration/site'
 
 def accountExplanation
 	output =
@@ -11,6 +12,10 @@ The primary purpose of user accounts on this site is currently all about offerin
 It allows you to edit/delete your old pastebin entries even after your IP has changed which can be of importance to users with dynamic IPs.
 The login sessions depend on cookies so you will not be able to use this feature unless you enable them in your browser.
 END
+end
+
+def getFieldLength(symbol)
+	return {maxlength: SiteConfiguration.const_get(symbol)}
 end
 
 def visualLoginForm(request)
@@ -29,8 +34,8 @@ def visualLoginForm(request)
 	writer.p { 'Specify your username and your password in the following writer and submit the data in order to log into your account.' }
 
 	writer.hashForm PathMap::SubmitLogin, UserForm::LoginFields do
-		writer.text('User name', UserForm::User)
-		writer.password('Password', UserForm::Password)
+		writer.text('User name', UserForm::User, nil, getFieldLength(:UserNameLengthMaximum))
+		writer.password('Password', UserForm::Password, nil, getFieldLength(:PasswordLengthMaximum))
 		writer.hashSubmit
 	end
 	
@@ -63,10 +68,10 @@ END
 	end
 	
 	writer.hashForm(PathMap::SubmitRegistration, UserForm::RegistrationFields) do
-		writer.text('User name', UserForm::User, user)
-		writer.password('Password', UserForm::Password)
-		writer.password('Type your password again', UserForm::PasswordAgain)
-		writer.text('Email address', UserForm::Email, email)
+		writer.text('User name', UserForm::User, user, getFieldLength(:UserNameLengthMaximum))
+		writer.password('Password', UserForm::Password, nil, getFieldLength(:PasswordLengthMaximum))
+		writer.password('Type your password again', UserForm::PasswordAgain, nil, getFieldLength(:PasswordLengthMaximum))
+		writer.text('Email address', UserForm::Email, email, getFieldLength(:EmailLengthMaximum))
 		writer.hashSubmit
 	end
 	

@@ -1,6 +1,13 @@
+require 'configuration/site'
+
 class PastebinConfiguration
 	PastesPerPage = 100
 	Prefix = 'pastebin'
+	
+	AuthorLengthMaximum = SiteConfiguration::GeneralStringLengthMaximum
+	PostDescriptionLengthMaximum = SiteConfiguration::GeneralStringLengthMaximum
+	UnitDescriptionLengthMaximum = SiteConfiguration::GeneralStringLengthMaximum
+	VimScriptLengthMaximum = 16
 	
 	#limit in bytes
 	UnitSizeLimit = 10 * 1024 * 1024
