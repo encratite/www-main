@@ -15,6 +15,13 @@ class SyntaxHighlighting
 		output
 	end
 	
+	def self.isValidScript(script)
+		VimSyntax::Scripts.each |file, description| do
+			return true if file == script
+		end
+		return fakse
+	end
+	
 	def self.getSelectionList(isCommon, selection)
 		source = isCommon ? CommonScripts : AllScripts
 		source.map do |option|

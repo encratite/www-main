@@ -148,7 +148,7 @@ def visualPastebinForm(request, postDescription = nil, unitDescription = nil, co
 		writer.select(PastebinForm::Expiration, expirationOptions, {label: 'Post expiration'})
 		
 		writer.text('Description of this unit (optional)', PastebinForm::UnitDescription, unitDescription, getFieldLength(:UnitDescriptionLengthMaximum))
-		writer.textArea('Paste the content here', PastebinForm::Content, content, {cols: '30', rows: '10'})
+		writer.textArea('Paste the content here', PastebinForm::Content, content, {cols: '30', rows: '10', maxlength: PastebinConfiguration::UnitSizeLimit})
 		
 		writer.hashSubmit
 	end

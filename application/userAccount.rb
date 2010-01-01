@@ -71,7 +71,7 @@ def performRegistrationRequest(request)
 	content = registrationCheck request
 	return content if content != nil
 	
-	user, password, passwordAgain,email = processFormFields(request, UserForm::RegistrationFields)
+	user, password, passwordAgain, email = processFormFields(request, UserForm::RegistrationFields)
 	
 	errors = []
 	
