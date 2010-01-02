@@ -1,4 +1,5 @@
 require 'configuration/site'
+require 'site/environment'
 
 class PastebinConfiguration
 	PastesPerPage = 100
@@ -27,4 +28,9 @@ class PastebinConfiguration
 		['One day', DayHours * HourSeconds],
 		['One week', WeekDays * DayHours * HourSeconds]
 	]
+	
+	VimPath =
+		getOS == :windows ? \
+		'"C:\\Program Files (x86)\\Vim\\vim72\\vim.exe"' : \
+		'vim'
 end

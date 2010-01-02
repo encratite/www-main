@@ -32,6 +32,39 @@ class SyntaxHighlighting
 		end
 	end
 	
+	def self.highlight(script, input)
+		outputFile = Tempfile.new('outputFile')
+		outputFile.close
+		
+		inputFile = Tempfile.new('inputFile')
+		inputFile << input
+		inputFile.close
+		
+		flags = ['f', 'n', 'X', 'e', 's']
+		
+		cFlags =
+		[
+			"set filetype=#{script}\"",
+			'syntax on',
+			'let html_use_css=1',
+			'run syntax/2html.vim',
+			"wq! \"#{outputFile.path}\"",
+			'q',
+		]
+		
+		flags = flags.map { |flag| "-#{flag}" }
+		flags = flags.join ' '
+		
+		cFlags = cFlags.map { |cFlag| "-c \"#{cFlag}\"" }
+		cFlags = cFlags.join ' '
+		
+		`vim #{flags} #{cFlags}`
+		
+		output = outputFile.open.read
+		
+		return output
+	end
+	
 	CommonScripts = self.generateList true
 	AllScripts = self.generateList false
 end
