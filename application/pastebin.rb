@@ -11,8 +11,8 @@ require 'visual/pastebin'
 
 require 'site/RequestManager'
 
-def pastebinError(message)
-	raise RequestManager::Exception(['Pastebin error', visualError(message)])
+def pastebinError(content)
+	raise RequestManager::Exception(['Pastebin error', content])
 end
 
 def newPastebinPost(request)
@@ -74,7 +74,7 @@ def submitNewPastebinPost(request)
 	$database.transaction do
 		isSpammer = floodCheck request
 		if isSpammer
-			errors << 'You have triggered the pastebin flood protection by posting too frequently so your request could not be processed. Please try again in a few minutes.'
+			errors << 'You have triggered the pastebin flood protection by posting too frequently so your request could not be processed.'
 		end
 		
 		stringLengthChecks.each do |field, name, limit|
@@ -91,12 +91,22 @@ def submitNewPastebinPost(request)
 			PastebinForm::HighlightingGroupIdentifiers.include?(highlightingGroup) &&
 			highlightingGroup != PastebinForm::NoHighlighting
 			
+		highlightingSelectionMode = nil
+		lastSelection = nil
+			
 		if useSyntaxHighlighting
-			offset = PastebinForm::HighlightingGroupIdentifiers.index highlightingGroup
-			syntaxHighlighting = syntaxHighlightingFields[offset]
-			if !SyntaxHighlighting::isValidScript syntaxHighlighting
+			highlightingSelectionMode = PastebinForm::HighlightingGroupIdentifiers.index highlightingGroup
+			syntaxHighlighting = syntaxHighlightingFields[highlightingSelectionMode - 1]
+			if SyntaxHighlighting::isValidScript syntaxHighlighting
+				lastSelection = syntaxHighlighting
+			else
 				errors << 'The vim syntax highlighting script you have specified does not exist.'
 			end
+		end
+		
+		if !errors.empty
+			errorContent = visualPastebinForm(request, errors, postDescription, unitDescription, content, highlightingSelectionMode, lastSelection)
+			pastebinError errorContent
 		end
 	end
 end

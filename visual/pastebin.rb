@@ -44,7 +44,7 @@ def getFieldLength(symbol)
 	return {maxlength: PastebinConfiguration.const_get(symbol)}
 end
 
-def visualPastebinForm(request, postDescription = nil, unitDescription = nil, content = nil, highlightingSelectionMode = 0, lastSelection = nil)
+def visualPastebinForm(request, errors = nil, postDescription = nil, unitDescription = nil, content = nil, highlightingSelectionMode = nil, lastSelection = nil)
 	highlightingGroups =
 	[
 		'Use no syntax highlighting (plain text)',
@@ -55,6 +55,28 @@ def visualPastebinForm(request, postDescription = nil, unitDescription = nil, co
 	
 	output = ''
 	writer = HashFormWriter.new(output, request)
+	
+	if errors != nil
+		writer.p { 'Your request could not be processed because one or multiple errors have occured:' }
+		writer.ul class: 'error' do
+			errors.each { |error| writer.li { error } }
+		end
+		writer.p { 'Please try again.' }
+	end
+	
+	if highlightingSelectionMode == nil
+		highlightingSelectionMode = request.cookies[CookieConfiguration::PastebinMode]
+		if highlightingSelectionMode == nil
+			highlightingSelectionMode = 0
+		else
+			highlightingSelectionMode = highlightingSelectionMode.to_i
+			highlightingSelectionMode = 0 if \
+				highlightingSelectionMode < 0 || \
+				highlightingSelectionMode >= highlightingGroups.size
+		end
+	end
+	
+	lastSelection = request.cookies[CookieConfiguration::VimScript] if lastSelection == nil
 	
 	writer.hashForm PathMap::PastebinSubmitNewPost, PastebinForm::PostFields do
 	
@@ -77,8 +99,10 @@ def visualPastebinForm(request, postDescription = nil, unitDescription = nil, co
 			lambda { writer.select(PastebinForm::AdvancedHighlighting, advancedOptions) },
 			lambda do
 				writer.ul class: 'formLabel', id: (PastebinForm::ExpertHighlighting + 'List') do
+					fieldArguments = {type: 'input', name: PastebinForm::ExpertHighlighting}
+					fieldArguments[:value] = lastSelection if lastSelection != nil
 					writer.li { 'Specify the vim script you want to be used (e.g. "cpp"):' }
-					writer.li { writer.input(type: 'text', name: PastebinForm::ExpertHighlighting) }
+					writer.li { writer.tag('input', fieldArguments) }
 				end
 			end
 		]
@@ -154,4 +178,6 @@ def visualPastebinForm(request, postDescription = nil, unitDescription = nil, co
 	end
 	
 	output.concat writeJavaScript("showModeSelector();")
+	
+	return output
 end

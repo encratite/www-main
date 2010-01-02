@@ -134,6 +134,7 @@ ul.error
 ul.error li
 {
 	list-style-type: square;
+	color: #ff0000;
 }
 
 ul.formLabel
