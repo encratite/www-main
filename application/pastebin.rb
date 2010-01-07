@@ -171,36 +171,19 @@ def submitNewPastebinPost(request)
 	end
 end
 
-def viewPastebinPost(request)
+def getPostId(request)
 	arguments = request.arguments
-	return argumentError if arguments.empty?
+	argumentError if arguments.empty?
 	postId = getId arguments[0]
-	return argumentError if postId == nil
+	argumentError if postId == nil
+end
+
+def viewPastebinPost(request)
+	postId = getPostId request
 	
 	invalidId = lambda { pastebinError 'You have specified an invalid post identifier.' }
 	
 	$database.transaction do
-		dataset = getDataset :PastebinPost
-		postData = dataset.where(id: postId)
 		
-		invalidId.call if postData.count == 0
-		
-		postData = postData.first
-		
-		invalidId.call if postData[:anonymous_string] != nil
-		
-		userId = postData[:user_id]
-		if userId == nil
-			user = nil
-		else
-			dataset = getDataset :SiteUser
-			userData = datast.where(id: userId)
-			internalError 'Unable to retrieve the user associated with this post.' if userData.count == 0
-			user = User.new userData.first
-		end
-		
-		dataset = getDataset :PastebinUnit
-		unitData = dataset.where(post_id: postId)
-		internalError 'No units are associated with this post.' if unitData.count == 0
 	end
 end

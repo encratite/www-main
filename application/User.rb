@@ -1,22 +1,24 @@
 require 'site/HTML'
 
 class User
-	attr_accessor :id, :name, :password, :email, :isAdministrator, :htmlName
+	MemberHash =
+	{
+		user_id: :id,
+		name: :name,
+		password: :password,
+		email: :email,
+		is_administrator: :isAdministrator,
+	}
+	
+	attr_accessor(*self.getAccessorSymbols)
+	
+	attr_accessor :htmlName
 	
 	def initialize(data = nil)
 		return if data == nil
 		
-		memberHash =
-		{
-			user_id: :@id,
-			name: :@name,
-			password: :@password,
-			email: :@email,
-			is_administrator: :@isAdministrator,
-		}
-		
 		data.each do |key, value|
-			ourKey = memberHash[key]
+			ourKey = MemberHash[key]
 			next if ourKey == nil
 			instance_variable_set(ourKey, value)
 		end
@@ -38,5 +40,8 @@ class User
 	
 	def fixName
 		@htmlName = HTMLEntities::encode @name if @name != nil
+	end
+	
+	def self.getAccessorSymbols
 	end
 end
