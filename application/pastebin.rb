@@ -2,6 +2,7 @@ require 'PathMap'
 require 'PastebinForm'
 require 'error'
 require 'processForm'
+require 'database'
 require 'SyntaxHighlighting'
 
 require 'configuration/pastebin'
@@ -10,6 +11,7 @@ require 'visual/general'
 require 'visual/pastebin'
 
 require 'site/RequestManager'
+require 'site/random'
 
 def pastebinError(content)
 	raise RequestManager::Exception(['Pastebin error', content])
@@ -23,6 +25,14 @@ def floodCheck(request)
 	query = "select count(*) from flood_protection where ip = '#{request.address}' and paste_time + interval '#{PastebinConfiguration::PasteInterval} seconds' >= now()"
 	count = $database.fetch(query).first.values.first
 	return count > PastebinConfiguration::PastesPerInterval
+end
+
+def createAnonymousString(length)
+	dataset = getDataset :PastebinPost
+	while true
+		string = RandomString.get length
+		break if dataset.where(anonymous_string: sessionString).count == 0
+	end
 end
 
 def submitNewPastebinPost(request)
@@ -108,5 +118,27 @@ def submitNewPastebinPost(request)
 			errorContent = visualPastebinForm(request, errors, postDescription, unitDescription, content, highlightingSelectionMode, lastSelection)
 			pastebinError errorContent
 		end
+
+		postAuthor = request.sessionUser == nil ? author : nil
+		postExpiration = expiration == 0 ? nil : PastebinConfiguration::ExpirationOptions[expiration][1]
+		anonymousString = privatePost == 1 ? createAnonymousString(PastebinConfiguration::AnonymousStringLength) : nil
+		postReply = nil
+
+		newPost =
+		{
+			author: postAuthor,
+			ip: request.address,
+			
+			description: postDescription,
+			
+			expiration: postExpiration,
+			
+			anonymous_string: anonymousString,
+			
+			reply_to: postReply
+		}
+
+		dataset = getDataset :PastebinPost
+		dataset.insert newPost
 	end
 end

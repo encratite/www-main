@@ -1,4 +1,4 @@
-require 'site/Session'
+require 'site/random'
 require 'configuration/site'
 require 'configuration/cookie'
 require 'database'
@@ -23,16 +23,16 @@ class SessionManager
 	def generateSessionString
 		dataset = getDataset :LoginSession
 		while true
-			sessionString = SessionString.get SiteConfiguration::SessionStringLength
+			sessionString = RandomString.get SiteConfiguration::SessionStringLength
 			break if dataset.where(session_string: sessionString).count == 0
 		end
-		sessionString
+		return sessionString
 	end
 	
 	def createSession(userId, address)
 		sessionString = generateSessionString
 		dataset = getDataset :LoginSession
 		dataset.insert(user_id: userId, session_string: sessionString, ip: address)
-		sessionString
+		return sessionString
 	end
 end
