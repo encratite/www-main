@@ -119,13 +119,18 @@ def submitNewPastebinPost(request)
 			pastebinError errorContent
 		end
 
-		postAuthor = request.sessionUser == nil ? author : nil
+		isLoggedIn = request.sessionUser != nil
+		
+		postUser = isLoggedIn ? request.sessionUser.id : nil
+		postAuthor = !isLoggedIn ? author : nil
 		postExpiration = expiration == 0 ? nil : PastebinConfiguration::ExpirationOptions[expiration][1]
 		anonymousString = privatePost == 1 ? createAnonymousString(PastebinConfiguration::AnonymousStringLength) : nil
 		postReply = nil
 
 		newPost =
 		{
+			user_id: postUser,
+			
 			author: postAuthor,
 			ip: request.address,
 			
@@ -139,6 +144,26 @@ def submitNewPastebinPost(request)
 		}
 
 		dataset = getDataset :PastebinPost
-		dataset.insert newPost
+		postId = dataset.insert newPost
+		
+		isPlain = highlightingGroup == PastebinForm::NoHighlighting
+		highlightedContent = isPlain ? nil : SyntaxHighlighting::highlight(syntaxHighlighting, content)
+		pasteType = isPlain ? nil : syntaxHighlighting
+		
+		newUnit =
+		{
+			post_id: postId,
+			
+			description: unitDescription,
+			content: content,
+			highlighted_content: highlightedContent,
+			
+			paste_type: pasteType
+		}
+		
+		dataset = getDataset :PastebinUnit
+		dataset.insert newUnit
+		
+		postPath = "#{PathMap::PastebinView}/#{postId}"
 	end
 end
