@@ -4,6 +4,7 @@ require 'error'
 require 'processForm'
 require 'database'
 require 'SyntaxHighlighting'
+require 'HTTPReply'
 
 require 'configuration/pastebin'
 
@@ -165,5 +166,6 @@ def submitNewPastebinPost(request)
 		dataset.insert newUnit
 		
 		postPath = "#{PathMap::PastebinView}/#{postId}"
+		return HTTPReply.localRefer postPath
 	end
 end
