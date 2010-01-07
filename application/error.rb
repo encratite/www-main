@@ -1,8 +1,13 @@
 require 'site/MIMEType'
+require 'site/RequestManager'
 require 'visual/general'
 
 def plainError(message)
-	[MIMEType::Plain, message]
+	raise RequestManager::Exception([MIMEType::Plain, message])
+end
+
+def internalError(message)
+	plainError "An internal error has occured: #{message}"
 end
 
 def fieldError
@@ -15,4 +20,8 @@ end
 
 def hashError
 	['Hash error', visualError('Invalid hash.')]
+end
+
+def argumentError
+	plainError 'You have specified invalid arguments.'
 end
