@@ -51,6 +51,8 @@ create table pastebin_unit
 
 create index pastebin_unit_post_id on pastebin_unit(post_id);
 
+drop table if exists flood_protection cascade;
+
 create table flood_protection
 (
 	ip text not null,

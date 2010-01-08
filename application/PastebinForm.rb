@@ -13,14 +13,13 @@ class PastebinForm
 	Content = 'content'
 	
 	NoHighlighting = 'none'
-	ExpertHighlighting = 'expert'
 	
 	HighlightingGroupIdentifiers =
 	[
 		NoHighlighting,
 		'common',
 		'advanced',
-		ExpertHighlighting,
+		'expert',
 	]
 	
 	PrivatePost = 'privatePost'

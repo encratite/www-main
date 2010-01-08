@@ -16,7 +16,7 @@ class SyntaxHighlighting
 	end
 	
 	def self.isValidScript(script)
-		VimSyntax::Scripts.each |file, description| do
+		VimSyntax::Scripts.each do |file, description|
 			return true if file == script
 		end
 		return fakse

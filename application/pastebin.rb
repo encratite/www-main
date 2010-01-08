@@ -4,7 +4,6 @@ require 'error'
 require 'processForm'
 require 'database'
 require 'SyntaxHighlighting'
-require 'HTTPReply'
 require 'PastebinPost'
 
 require 'configuration/pastebin'
@@ -15,6 +14,7 @@ require 'visual/pastebin'
 require 'site/RequestManager'
 require 'site/random'
 require 'site/input'
+require 'site/HTTPReply'
 
 def pastebinError(content)
 	raise RequestManager::Exception(['Pastebin error', content])

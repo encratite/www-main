@@ -1,6 +1,7 @@
 require 'User'
 require 'error'
-require 'SymbolTransfer'
+
+require 'site/SymbolTransfer'
 
 class PastebinPost < SymbolTransfer
 	attr_reader :units
