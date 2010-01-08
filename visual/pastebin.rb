@@ -182,6 +182,47 @@ def visualPastebinForm(request, errors = nil, postDescription = nil, unitDescrip
 	return output
 end
 
+def getModificationFields(fields, source)
+	if source.modificationCounter > 0
+		fields.concat [
+			['Last modification', source.lastModification],
+			['Number of modifications', source.modificationCounter]
+		]
+	end
+end
+
+def processPastebinUnit(writer, post)
+	post.units.each do |unit|
+		type =
+			unit.pasteType == nil ?
+				'Plain text' :
+				SyntaxHighlighting::getScriptDescription(unit.pasteType)
+				
+		unitFields =
+		[
+			['Description',  unit.description],
+			['Type', type]
+		]
+		
+		if post.timeAdded != post.creation
+			unitFields << ['Time added', post.timeAdded]
+		end
+		
+		getModificationFields(unitFields, unit)
+		
+		writer.table do
+			unitFields.each do |description, value|
+				writer.tr do
+					writer.td { description }
+					writer.td { value }
+				end
+			end
+		end
+		
+		content = unit.highlightedContent || unit.content
+	end
+end
+
 def visualShowPastebinPost(request, post)
 	output = ''
 	writer = HTMLWriter.new output
@@ -192,15 +233,10 @@ def visualShowPastebinPost(request, post)
 	[
 		['Author', author],
 		['Description', post.description],
-		['Created', post.creation]
+		['Time created', post.creation]
 	]
 	
-	if post.modificationCounter > 0
-		fields.concat [
-			['Last modification', post.lastModification],
-			['Number of modifications', post.modificationCounter]
-		]
-	end
+	getModificationFields(fields, post)
 	
 	if post.expiration != nil
 		fields << ['Expires', post.expiration]
@@ -214,4 +250,6 @@ def visualShowPastebinPost(request, post)
 			end
 		end
 	end
+	
+	content = post.content || post.
 end

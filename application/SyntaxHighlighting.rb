@@ -65,6 +65,13 @@ class SyntaxHighlighting
 		return output
 	end
 	
+	def self.getScriptDescription(script)
+		AllScripts.each do |option|
+			return option.description if option.value == script
+		end
+		raise 'Encountered an invalid script name in a unit.'
+	end
+	
 	CommonScripts = self.generateList true
 	AllScripts = self.generateList false
 end

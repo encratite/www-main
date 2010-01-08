@@ -3,6 +3,8 @@ require 'error'
 require 'SymbolTransfer'
 
 class PastebinPost < SymbolTransfer
+	attr_reader :units
+	
 	def initialize(target)
 		dataset = getDataset :PastebinPost
 		
