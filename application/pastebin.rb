@@ -5,6 +5,7 @@ require 'processForm'
 require 'database'
 require 'SyntaxHighlighting'
 require 'HTTPReply'
+require 'PastebinPost'
 
 require 'configuration/pastebin'
 
@@ -180,10 +181,5 @@ end
 
 def viewPastebinPost(request)
 	postId = getPostId request
-	
-	invalidId = lambda { pastebinError 'You have specified an invalid post identifier.' }
-	
-	$database.transaction do
-		
-	end
+	post = $database.transaction { PastebinPost.new postId }
 end

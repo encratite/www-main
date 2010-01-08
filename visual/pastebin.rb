@@ -181,3 +181,37 @@ def visualPastebinForm(request, errors = nil, postDescription = nil, unitDescrip
 	
 	return output
 end
+
+def visualShowPastebinPost(request, post)
+	output = ''
+	writer = HTMLWriter.new output
+	
+	author = post.author || post.user.name
+	
+	fields =
+	[
+		['Author', author],
+		['Description', post.description],
+		['Created', post.creation]
+	]
+	
+	if post.modificationCounter > 0
+		fields.concat [
+			['Last modification', post.lastModification],
+			['Number of modifications', post.modificationCounter]
+		]
+	end
+	
+	if post.expiration != nil
+		fields << ['Expires', post.expiration]
+	end
+	
+	writer.table do
+		fields.each do |description, value|
+			writer.tr do
+				writer.td { description }
+				writer.td { value }
+			end
+		end
+	end
+end
