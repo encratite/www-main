@@ -40,7 +40,7 @@ This is particularly useful if you intend to add further units to this post but 
 END
 end
 
-def getFieldLength(symbol)
+def pasteFieldLength(symbol)
 	return {maxlength: PastebinConfiguration.const_get(symbol)}
 end
 
@@ -109,7 +109,7 @@ def visualPastebinForm(request, errors = nil, postDescription = nil, unitDescrip
 		
 		if request.sessionUser == nil
 			authorName = request.cookies[CookieConfiguration::Author]
-			writer.text('Author (optional)', PastebinForm::Author, authorName, getFieldLength(:VimScriptLengthMaximum))
+			writer.text('Author (optional)', PastebinForm::Author, authorName, pasteFieldLength(:VimScriptLengthMaximum))
 		else
 			writer.p { "You are currently logged in as <b>#{request.sessionUser.name}</b>." }
 			writer.hidden(PastebinForm::Author, '')
@@ -117,7 +117,7 @@ def visualPastebinForm(request, errors = nil, postDescription = nil, unitDescrip
 		
 		columnCount = 2
 		
-		writer.text('Description of the post (optional)', PastebinForm::PostDescription, postDescription, getFieldLength(:PostDescriptionLengthMaximum))
+		writer.text('Description of the post (optional)', PastebinForm::PostDescription, postDescription, pasteFieldLength(:PostDescriptionLengthMaximum))
 		writer.p { 'Specify the syntax highlighting selection method you would like to use:' }
 		writer.table id: 'syntaxTable' do
 			leftSide = {class: 'leftSide'}
@@ -171,7 +171,7 @@ def visualPastebinForm(request, errors = nil, postDescription = nil, unitDescrip
 		
 		writer.select(PastebinForm::Expiration, expirationOptions, {label: 'Post expiration'})
 		
-		writer.text('Description of this unit (optional)', PastebinForm::UnitDescription, unitDescription, getFieldLength(:UnitDescriptionLengthMaximum))
+		writer.text('Description of this unit (optional)', PastebinForm::UnitDescription, unitDescription, pasteFieldLength(:UnitDescriptionLengthMaximum))
 		writer.textArea('Paste the content here', PastebinForm::Content, content, {cols: '30', rows: '10', maxlength: PastebinConfiguration::UnitSizeLimit})
 		
 		writer.hashSubmit
