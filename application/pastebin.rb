@@ -15,9 +15,10 @@ require 'site/RequestManager'
 require 'site/random'
 require 'site/input'
 require 'site/HTTPReply'
+require 'site/input'
 
 def pastebinError(content)
-	raise RequestManager::Exception(['Pastebin error', content])
+	raise RequestManager::Exception.new ['Pastebin error', content]
 end
 
 def newPastebinPost(request)
@@ -117,7 +118,7 @@ def submitNewPastebinPost(request)
 			end
 		end
 		
-		if !errors.empty
+		if !errors.empty?
 			errorContent = visualPastebinForm(request, errors, postDescription, unitDescription, content, highlightingSelectionMode, lastSelection)
 			pastebinError errorContent
 		end
@@ -168,14 +169,14 @@ def submitNewPastebinPost(request)
 		dataset.insert newUnit
 		
 		postPath = "#{PathMap::PastebinView}/#{postId}"
-		return HTTPReply.localRefer postPath
+		return HTTPReply.localRefer(request, postPath)
 	end
 end
 
 def getPostId(request)
 	arguments = request.arguments
 	argumentError if arguments.empty?
-	postId = getId arguments[0]
+	postId = readId arguments[0]
 	argumentError if postId == nil
 end
 

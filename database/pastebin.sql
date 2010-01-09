@@ -41,7 +41,7 @@ create table pastebin_unit
 	--null if the content type of this unit is marked as plain text
 	highlighted_content text,
 	
-	paste_type text not null,
+	paste_type text,
 	
 	time_added timestamp not null default now(),
 	last_modification timestamp default null,

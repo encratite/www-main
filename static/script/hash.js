@@ -6,10 +6,18 @@ function hashGenerator()
 	this.getHash = getHash;
 	
 	this.hash = ~this.hash;
+	
+	this.debugging = true;
+	
+	if(this.debugging)
+		this.content = '';
 }
 
 function hashData(input)
 {
+	if(this.debugging)
+		this.content += input;
+	
 	var shifts = new Array(1, 4, 7, 8, 24);
 	
 	var hash = this.hash;
@@ -60,4 +68,15 @@ function hashFields()
 	}
 	var security = document.getElementById('security');
 	security.value = generator.getHash();
+	
+	if(this.debugging)
+	{
+		var data = this.content;
+		data = data.replace("\x00", "\\x00");
+		data = data.replace("\r", "\\r");
+		data = data.replace("\n", "\\n");
+		prompt('Debug output', data);
+	}
+	else
+		alert("WTF");
 }
