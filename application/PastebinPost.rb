@@ -11,7 +11,6 @@ class PastebinPost < SymbolTransfer
 		
 		if target.class == String
 			postData = dataset.where(anonymous_string: target)
-			
 		else
 			postData = dataset.where(id: target, anonymous_string: nil)
 		end
@@ -31,7 +30,7 @@ class PastebinPost < SymbolTransfer
 		end
 		
 		dataset = getDataset :PastebinUnit
-		unitData = dataset.where(post_id: @postId)
+		unitData = dataset.where(post_id: @id)
 		internalError 'No units are associated with this post.' if unitData.empty?
 		
 		@units = []

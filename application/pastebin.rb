@@ -178,9 +178,11 @@ def getPostId(request)
 	argumentError if arguments.empty?
 	postId = readId arguments[0]
 	argumentError if postId == nil
+	return postId
 end
 
 def viewPastebinPost(request)
 	postId = getPostId request
 	post = $database.transaction { PastebinPost.new postId }
+	return visualShowPastebinPost(request, post)
 end

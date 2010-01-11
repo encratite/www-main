@@ -251,5 +251,5 @@ def visualShowPastebinPost(request, post)
 		end
 	end
 	
-	content = post.content || post.highlightedContent
+	processPastebinUnit(writer, post)
 end

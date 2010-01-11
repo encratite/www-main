@@ -69,14 +69,12 @@ function hashFields()
 	var security = document.getElementById('security');
 	security.value = generator.getHash();
 	
-	if(this.debugging)
+	if(generator.debugging)
 	{
-		var data = this.content;
+		var data = generator.content;
 		data = data.replace("\x00", "\\x00");
 		data = data.replace("\r", "\\r");
 		data = data.replace("\n", "\\n");
 		prompt('Debug output', data);
 	}
-	else
-		alert("WTF");
 }

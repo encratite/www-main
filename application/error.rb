@@ -3,7 +3,7 @@ require 'site/RequestManager'
 require 'visual/general'
 
 def plainError(message)
-	raise RequestManager::Exception([MIMEType::Plain, message])
+	raise RequestManager::Exception.new([MIMEType::Plain, message])
 end
 
 def internalError(message)
