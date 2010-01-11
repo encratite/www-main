@@ -204,7 +204,7 @@ def processPastebinUnit(writer, post)
 			['Type', type]
 		]
 		
-		if post.timeAdded != post.creation
+		if unit.timeAdded != post.creation
 			unitFields << ['Time added', post.timeAdded]
 		end
 		
@@ -252,4 +252,6 @@ def visualShowPastebinPost(request, post)
 	end
 	
 	processPastebinUnit(writer, post)
+	
+	return output
 end
