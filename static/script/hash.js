@@ -7,7 +7,7 @@ function hashGenerator()
 	
 	this.hash = ~this.hash;
 	
-	this.debugging = true;
+	this.debugging = false;
 	
 	if(this.debugging)
 		this.content = '';

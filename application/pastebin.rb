@@ -91,6 +91,8 @@ def submitNewPastebinPost(request)
 			errors << 'You have triggered the pastebin flood protection by posting too frequently so your request could not be processed.'
 		end
 		
+		errors << 'You have not specified any content for your post.' if content.empty?
+		
 		stringLengthChecks.each do |field, name, limit|
 			next if field.size <= limit
 			errors << "The #{name} you have specified is too long - the limit is #{limit}."
@@ -184,5 +186,6 @@ end
 def viewPastebinPost(request)
 	postId = getPostId request
 	post = $database.transaction { PastebinPost.new postId }
-	return visualShowPastebinPost(request, post)
+	data = visualShowPastebinPost(request, post)
+	return $pastebinGenerator.get(data, request)
 end

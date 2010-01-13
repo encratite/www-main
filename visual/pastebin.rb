@@ -191,6 +191,13 @@ def getModificationFields(fields, source)
 	end
 end
 
+def getDescription(post, inTopic = true)
+	description = post.description.empty? ? 'No description' : post.description
+	return inTopic ?
+		description :
+		"<i>#{description}</i>"
+end
+
 def processPastebinUnit(writer, post)
 	post.units.each do |unit|
 		type =
@@ -198,28 +205,47 @@ def processPastebinUnit(writer, post)
 				'Plain text' :
 				SyntaxHighlighting::getScriptDescription(unit.pasteType)
 				
-		unitFields =
-		[
-			['Description',  unit.description],
+		#puts "Unit: #{unit.inspect}"
+		
+		unitFields = []
+		
+		unitFields << ['Description',  unit.description] if !unit.description.empty?
+		
+		unitFields.concat [
 			['Type', type]
 		]
 		
 		if unit.timeAdded != post.creation
-			unitFields << ['Time added', post.timeAdded]
+			unitFields << ['Time added', unit.timeAdded]
 		end
 		
 		getModificationFields(unitFields, unit)
 		
-		writer.table do
+		writer.table(class: 'unitTable') do
 			unitFields.each do |description, value|
 				writer.tr do
 					writer.td { description }
-					writer.td { value }
+					writer.td { value.to_s }
 				end
 			end
 		end
 		
 		content = unit.highlightedContent || unit.content
+		contentLines = content.split "\n"
+		
+		lineCounter = 1
+		isEven = false
+		writer.table(class: 'contentTable') do
+			contentLines.each do |line|
+				lineClass = isEven ? 'evenLine' : 'oddLine'
+				writer.tr do
+					writer.td(class: 'counterColumn') { lineCounter.to_s }
+					writer.td(class: lineClass) { line }
+				end
+				lineCounter += 1
+				isEven = !isEven
+			end
+		end
 	end
 end
 
@@ -227,12 +253,15 @@ def visualShowPastebinPost(request, post)
 	output = ''
 	writer = HTMLWriter.new output
 	
+	#puts "Post: #{post.inspect}"
+	
 	author = post.author || post.user.name
+	author = '<i>Anonymous</i>' if author.empty?
 	
 	fields =
 	[
 		['Author', author],
-		['Description', post.description],
+		['Description', getDescription(post, false)],
 		['Time created', post.creation]
 	]
 	
@@ -242,16 +271,18 @@ def visualShowPastebinPost(request, post)
 		fields << ['Expires', post.expiration]
 	end
 	
-	writer.table do
+	writer.table(class: 'descriptionTable') do
 		fields.each do |description, value|
 			writer.tr do
 				writer.td { description }
-				writer.td { value }
+				writer.td { value.to_s }
 			end
 		end
 	end
 	
 	processPastebinUnit(writer, post)
 	
-	return output
+	title = "#{getDescription(post)} - Pastebin"
+	
+	return [title, output]
 end
