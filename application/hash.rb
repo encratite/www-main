@@ -29,9 +29,11 @@ end
 
 def hashCheck(fields, security)
 	return javaScriptError if security.empty?
-	data = fields.join "\x00"
+	#data = fields.join "\x00"
+	data = fields.join ':'
 	hash = fnv1a data
-	debug = fields.join("\\x00")
+	#debug = fields.join("\\x00")
+	debug = fields.join ':'
 	#debug["\n"] = "\\n"
 	#debug["\r"] = "\\r"
 	puts "Data: #{debug.inspect} (#{data.length})"

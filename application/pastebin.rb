@@ -17,8 +17,9 @@ require 'site/input'
 require 'site/HTTPReply'
 require 'site/input'
 
-def pastebinError(content)
-	raise RequestManager::Exception.new ['Pastebin error', content]
+def pastebinError(content, request)
+	data = ['Pastebin error', content]
+	raise RequestManager::Exception.new($pastebinGenerator.get(data, request))
 end
 
 def newPastebinPost(request)
@@ -122,7 +123,7 @@ def submitNewPastebinPost(request)
 		
 		if !errors.empty?
 			errorContent = visualPastebinForm(request, errors, postDescription, unitDescription, content, highlightingSelectionMode, lastSelection)
-			pastebinError errorContent
+			pastebinError(errorContent, request)
 		end
 
 		isLoggedIn = request.sessionUser != nil

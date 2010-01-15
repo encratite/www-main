@@ -233,17 +233,20 @@ def processPastebinUnit(writer, post)
 		content = unit.highlightedContent || unit.content
 		contentLines = content.split "\n"
 		
-		lineCounter = 1
 		isEven = false
-		writer.table(class: 'contentTable') do
+		writer.ul(class: 'contentList') do
 			contentLines.each do |line|
 				lineClass = isEven ? 'evenLine' : 'oddLine'
-				writer.tr do
-					writer.td(class: 'counterColumn') { lineCounter.to_s }
-					writer.td(class: lineClass) { line }
-				end
-				lineCounter += 1
+				writer.li { line }
 				isEven = !isEven
+			end
+		end
+		
+		writer.ul(class: 'lineNumbers') do
+			lineCounter = 1
+			contentLines.size.times do |i|
+				writer.li { lineCounter.to_s }
+				lineCounter += 1
 			end
 		end
 	end

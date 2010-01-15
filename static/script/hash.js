@@ -8,6 +8,7 @@ function hashGenerator()
 	this.hash = ~this.hash;
 	
 	this.debugging = false;
+	//this.debugging = true;
 	
 	if(this.debugging)
 		this.content = '';
@@ -15,6 +16,8 @@ function hashGenerator()
 
 function hashData(input)
 {
+	//alert("Adding \"" + input + "\" (" + input.length + ")");
+	
 	if(this.debugging)
 		this.content += input;
 	
@@ -46,6 +49,25 @@ function getHash()
 	return number.toString(16).toUpperCase();
 }
 
+function visualiseString(data)
+{
+	var replacements = new Array
+	(
+		"\x00", "\\\\x00",
+		"\r", "\\\\r",
+		"\n", "\\\\n"
+	);
+	
+	for(var i = 0; i < replacements.length; i += 2)
+	{
+		var target = replacements[i];
+		var replacement = replacements[i + 1];
+		data = data.replace(target, replacement);
+	}
+	
+	return data;
+}
+
 function hashFields()
 {
 	var arguments = hashFields.arguments;
@@ -56,7 +78,8 @@ function hashFields()
 		if(first)
 			first = false;
 		else
-			generator.hashData('\x00');
+			//generator.hashData("\x00");
+			generator.hashData(':');
 		var argument = arguments[i];
 		var data = document.getElementById(argument).value;
 		if(data == null)
@@ -71,10 +94,7 @@ function hashFields()
 	
 	if(generator.debugging)
 	{
-		var data = generator.content;
-		data = data.replace("\x00", "\\x00");
-		data = data.replace("\r", "\\r");
-		data = data.replace("\n", "\\n");
+		var data = visualiseString(generator.content);
 		prompt('Debug output', data);
 	}
 }
