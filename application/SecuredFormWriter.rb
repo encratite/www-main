@@ -9,15 +9,14 @@ class SecuredFormWriter < HTMLWriter
 	RandomStringLength = 128
 	
 	def securedForm(action,  request, arguments = {}, &block)
-		@randomString = RandomString::get(RandomStringLength)
 		addressHash = fnv1a(request.address)
-		arguments[:onsubmit] = "calculateHash('#{@randomString}', '#{addressHash}');"
+		arguments[:onsubmit] = "calculateHash('#{addressHash}');"
 		form(action, arguments) { block.call }
 	end
 	
 	def securedField
 		p class: 'security' do
-			hidden(RandomString, @randomString)
+			hidden(RandomString, ::RandomString.get(RandomStringLength))
 			hidden HashField
 		end
 	end

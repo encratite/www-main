@@ -46,10 +46,12 @@ function getHash()
 	return number.toString(16).toUpperCase();
 }
 
-function calculateHash(input1, input2)
+function calculateHash(input2)
 {
+	var input1 = document.getElementById('security1').value;
 	var generator = new hashGenerator();
-	generator.hashData(input1 + input2);
+	var data = input1 + input2;
+	generator.hashData(data);
 	var hash = generator.getHash();
 	document.getElementById('security2').value = hash;
 }
