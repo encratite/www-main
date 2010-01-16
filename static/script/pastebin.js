@@ -37,19 +37,21 @@ function showModeSelector()
 	}
 }
 
-function tabHandler(event)
+function isTab(event)
 {
-	if(navigator.userAgent.indexOf('Opera') != -1)
-		return true;
-		
+	return event.keyCode == 9;
+}
+
+function tabHandler(event)
+{	
 	var tab = '\t';
 	
 	if(!event)
 		event = window.event;
 
-	if(event.keyCode == 9)
+	if(isTab(event))
 	{
-		//Internet Explorer
+		//Internet Explorer/Opera
 		if(document.selection)
 		{
 			this.focus();
@@ -57,7 +59,7 @@ function tabHandler(event)
 			selection.text = tab;
 		}
 		
-		//Mozilla/Netscape
+		//Firefox
 		else if(this.selectionStart || this.selectionStart == '0')
 		{
 			var scrollX = this.scrollLeft;
@@ -83,5 +85,20 @@ function tabHandler(event)
 			return true;
 
 		return false;
+	}
+}
+
+function tabPressHandler(event)
+{
+	if(isTab(event))
+	{
+		try
+		{
+			event.preventDefault();
+		}
+		catch(error)
+		{
+			error.returnValue = false;
+		}
 	}
 }

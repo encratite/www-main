@@ -179,7 +179,13 @@ def visualPastebinForm(request, errors = nil, postDescription = nil, unitDescrip
 		writer.secureSubmit
 	end
 	
-	output.concat writeJavaScript("showModeSelector();\ndocument.getElementById('content').onkeydown = tabHandler;")
+	output.concat writeJavaScript(<<END
+showModeSelector();
+var content = document.getElementById('content');
+content.onkeydown = tabHandler;
+content.onkeypress = tabPressHandler;
+END
+	)
 	
 	return output
 end
