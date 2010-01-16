@@ -74,10 +74,15 @@
 	width: 10em;
 }
 
+table.descriptionTable
+{
+	margin: 0 0 1em 0;
+}
+
 table.descriptionTable td.description
 {
 	font-weight: bold;
-	width: 7em;
+	width: 8em;
 }
 
 table.descriptionTable td
@@ -85,10 +90,22 @@ table.descriptionTable td
 	padding: 0 0.6em 0 0.6em;
 }
 
+div.unitContainer
+{
+	margin-top: 1em;
+	position: absolute;
+}
+
 ul.contentList
 {
 	margin: 0 0 0 4em;
 	border: 1px solid black;
+}
+
+ul.contentList li
+{
+	height: 1.2em;
+	padding: 0 0.6em 0 0.6em;
 }
 
 ul.contentList li.oddLine
@@ -99,7 +116,7 @@ ul.contentList li.oddLine
 
 ul.contentList li.evenLine
 {
-	background-color: #f0f0f0;
+	background-color: #f4f4f4;
 	border-bottom: 1px dotted black;
 }
 
@@ -110,19 +127,28 @@ ul.contentList li.oddLastLine
 
 ul.contentList li.evenLastLine
 {
-	background-color: #f0f0f0;
+	background-color: #f4f4f4;
 }
 
 ul.lineNumbers
 {
 	position: absolute;
-	left: auto;
-	top: auto;
+	top: 0;
+	left: -1px;
 	width: 4em;
 	border: 1px solid black;
 }
 
 ul.lineNumbers li
 {
+	height: 1.2em;
+	margin-right: 0.5em;
 	text-align: right;
+	border-bottom: 1px dotted white;
+}
+
+ul.lineNumbers li.lastLine
+{
+	text-align: right;
+	border-bottom: none;
 }

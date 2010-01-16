@@ -179,7 +179,7 @@ def visualPastebinForm(request, errors = nil, postDescription = nil, unitDescrip
 		writer.secureSubmit
 	end
 	
-	output.concat writeJavaScript("showModeSelector();")
+	output.concat writeJavaScript("showModeSelector();\ndocument.getElementById('content').onkeydown = tabHandler;")
 	
 	return output
 end
@@ -216,8 +216,6 @@ def processPastebinUnit(writer, post)
 			unit.pasteType == nil ?
 				'Plain text' :
 				SyntaxHighlighting::getScriptDescription(unit.pasteType)
-				
-		#puts "Unit: #{unit.inspect}"
 		
 		unitFields = []
 		
@@ -264,7 +262,9 @@ def processPastebinUnit(writer, post)
 			writer.ul(class: 'lineNumbers') do
 				lineCounter = 1
 				contentLines.size.times do |i|
-					writer.li { lineCounter.to_s }
+					arguments = {}
+					arguments[:class] = 'lastLine' if lineCounter == contentLines.size
+					writer.li(arguments) { lineCounter.to_s }
 					lineCounter += 1
 				end
 			end
@@ -275,9 +275,7 @@ end
 def visualShowPastebinPost(request, post)
 	output = ''
 	writer = HTMLWriter.new output
-	
-	#puts "Post: #{post.inspect}"
-	
+
 	author = post.author || post.user.name
 	author = '<i>Anonymous</i>' if author.empty?
 	
