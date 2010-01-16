@@ -1,5 +1,5 @@
 require 'site/HTTPRequest'
-require 'HashFormWriter'
+require 'SecuredFormWriter'
 
 class SiteRequest < HTTPRequest
 	attr_accessor :sessionUser
@@ -10,7 +10,7 @@ class SiteRequest < HTTPRequest
 	end
 	
 	def postIsSet(names)
-		return true if @postInput[HashFormWriter::Security] != nil
+		return true if @postInput[SecuredFormWriter::Security] != nil
 		return super(names)
 	end
 end

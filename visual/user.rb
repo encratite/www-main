@@ -1,4 +1,4 @@
-require 'HashFormWriter'
+require 'SecuredFormWriter'
 require 'PathMap'
 require 'UserForm'
 require 'site/HTML'
@@ -20,7 +20,7 @@ end
 
 def visualLoginForm(request)
 	output = ''
-	writer = HashFormWriter.new(output, request)
+	writer = SecuredFormWriter.new(output, request)
 	writer.p do
 		writer.write accountExplanation
 		writer.write 'If you do not have an account yet you may register one:'
@@ -33,10 +33,10 @@ def visualLoginForm(request)
 	
 	writer.p { 'Specify your username and your password in the following writer and submit the data in order to log into your account.' }
 
-	writer.hashForm PathMap::SubmitLogin, UserForm::LoginFields do
+	writer.securedForm(PathMap::SubmitLogin, request) do
 		writer.text('User name', UserForm::User, nil, getFieldLength(:UserNameLengthMaximum))
 		writer.password('Password', UserForm::Password, nil, getFieldLength(:PasswordLengthMaximum))
-		writer.hashSubmit
+		writer.secureSubmit
 	end
 	
 	['Log in', output]
@@ -44,7 +44,7 @@ end
 
 def visualRegisterForm(request, error = nil, user = nil, email = nil)
 	output = ''
-	writer = HashFormWriter.new(output, request)
+	writer = SecuredFormWriter.new(output, request)
 	
 	if error != nil
 		writer.p do
@@ -67,12 +67,12 @@ END
 		end
 	end
 	
-	writer.hashForm(PathMap::SubmitRegistration, UserForm::RegistrationFields) do
+	writer.securedForm(PathMap::SubmitRegistration, request) do
 		writer.text('User name', UserForm::User, user, getFieldLength(:UserNameLengthMaximum))
 		writer.password('Password', UserForm::Password, nil, getFieldLength(:PasswordLengthMaximum))
 		writer.password('Type your password again', UserForm::PasswordAgain, nil, getFieldLength(:PasswordLengthMaximum))
 		writer.text('Email address', UserForm::Email, email, getFieldLength(:EmailLengthMaximum))
-		writer.hashSubmit
+		writer.secureSubmit
 	end
 	
 	['Register a new account', output]

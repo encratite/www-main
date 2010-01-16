@@ -27,19 +27,3 @@ def fnv1a(input)
 	end
 	return hash.to_s(16).upcase
 end
-
-def serialiseFields(fields)
-	return fields.join ':'
-end
-
-def hashCheck(fields, security)
-	return javaScriptError if security.empty?
-	data = serialiseFields fields
-	hash = fnv1a data
-	puts "Data: #{data.inspect} (#{data.length})"
-	puts "Actual input hash: #{hash} vs. security field: #{security}"
-	return hashError if hash != security
-	return nil
-end
-
-

@@ -1,7 +1,7 @@
 require 'PathMap'
 require 'PastebinForm'
 require 'SyntaxHighlighting'
-require 'HashFormWriter'
+require 'SecuredFormWriter'
 
 require 'site/JavaScript'
 
@@ -54,7 +54,7 @@ def visualPastebinForm(request, errors = nil, postDescription = nil, unitDescrip
 	]
 	
 	output = ''
-	writer = HashFormWriter.new(output, request)
+	writer = SecuredFormWriter.new(output, request)
 	
 	if errors != nil
 		writer.p { 'Your request could not be processed because one or multiple errors have occured:' }
@@ -78,7 +78,7 @@ def visualPastebinForm(request, errors = nil, postDescription = nil, unitDescrip
 	
 	lastSelection = request.cookies[CookieConfiguration::VimScript] if lastSelection == nil
 	
-	writer.hashForm PathMap::PastebinSubmitNewPost, PastebinForm::PostFields do
+	writer.securedForm(PathMap::PastebinSubmitNewPost, request) do
 	
 		radioCounter = 0
 		
@@ -176,7 +176,7 @@ def visualPastebinForm(request, errors = nil, postDescription = nil, unitDescrip
 		
 		writer.textArea('Debug', PastebinForm::Debug) if PastebinForm::DebugMode
 		
-		writer.hashSubmit
+		writer.secureSubmit
 	end
 	
 	output.concat writeJavaScript("showModeSelector();")

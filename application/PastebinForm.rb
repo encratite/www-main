@@ -1,5 +1,5 @@
 class PastebinForm
-	DebugMode = true
+	DebugMode = false
 	Debug = 'debug'
 	
 	Author = 'author'

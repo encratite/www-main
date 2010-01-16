@@ -1,5 +1,5 @@
 require 'configuration/VimSyntax'
-require 'HashFormWriter'
+require 'SecuredFormWriter'
 require 'site/HTML'
 
 class SyntaxHighlighting
@@ -58,7 +58,7 @@ class SyntaxHighlighting
 		cFlags = cFlags.map { |cFlag| "-c \"#{cFlag}\"" }
 		cFlags = cFlags.join ' '
 		
-		`vim #{flags} #{cFlags}`
+		`#{PastebinConfiguration::VimPath} #{flags} #{cFlags} #{inputFile}`
 		
 		output = outputFile.open.read
 		
