@@ -84,7 +84,7 @@ def visualPastebinForm(request, errors = nil, postDescription = nil, unitDescrip
 		
 		radioField = lambda do
 			checked = radioCounter == highlightingSelectionMode
-			arguments = {onclick: "highlightingMode(#{radioCounter});"}
+			arguments = {onclick: "highlightingMode(#{radioCounter});", id: "radio#{radioCounter}"}
 			
 			writer.radio(highlightingGroups[radioCounter], PastebinForm::HighlightingGroup, PastebinForm::HighlightingGroupIdentifiers[radioCounter], checked, arguments)
 			
@@ -173,6 +173,8 @@ def visualPastebinForm(request, errors = nil, postDescription = nil, unitDescrip
 		
 		writer.text('Description of this unit (optional)', PastebinForm::UnitDescription, unitDescription, pasteFieldLength(:UnitDescriptionLengthMaximum))
 		writer.textArea('Paste the content here', PastebinForm::Content, content, {cols: '30', rows: '10', maxlength: PastebinConfiguration::UnitSizeLimit})
+		
+		writer.textArea('Debug', PastebinForm::Debug) if PastebinForm::DebugMode
 		
 		writer.hashSubmit
 	end

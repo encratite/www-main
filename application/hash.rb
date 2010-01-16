@@ -27,10 +27,14 @@ def fnv1a(input)
 	return hash.to_s(16).upcase
 end
 
+def serialiseFields(fields)
+	return fields.join ':'
+end
+
 def hashCheck(fields, security)
 	return javaScriptError if security.empty?
 	#data = fields.join "\x00"
-	data = fields.join ':'
+	data = serialiseFields fields
 	hash = fnv1a data
 	#debug = fields.join("\\x00")
 	debug = fields.join ':'

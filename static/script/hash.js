@@ -7,8 +7,8 @@ function hashGenerator()
 	
 	this.hash = ~this.hash;
 	
-	this.debugging = false;
-	//this.debugging = true;
+	//this.debugging = false;
+	this.debugging = true;
 	
 	if(this.debugging)
 		this.content = '';
@@ -81,12 +81,27 @@ function hashFields()
 			//generator.hashData("\x00");
 			generator.hashData(':');
 		var argument = arguments[i];
-		var data = document.getElementById(argument).value;
+		var data = document.getElementById(argument);
 		if(data == null)
 		{
-			alert('Missing field: ' + argument);
-			return 0;
+			var fields = document.getElementsByName(argument);
+			if(fields == null)
+			{
+				alert('Missing field: ' + argument);
+				return 0;
+			}
+			
+			for(var j = 0; j < fields.length; j++)
+			{
+				var element = fields[j];
+				if(element.checked)
+				{
+					data = element;
+					break;
+				}
+			}
 		}
+		data = data.value;
 		generator.hashData(data);
 	}
 	var security = document.getElementById('security');
@@ -95,6 +110,7 @@ function hashFields()
 	if(generator.debugging)
 	{
 		var data = visualiseString(generator.content);
-		prompt('Debug output', data);
+		//prompt('Debug output', data);
+		document.getElementById('debug').value = generator.content;
 	}
 }

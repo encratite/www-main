@@ -25,7 +25,7 @@ function highlightingMode(mode)
 
 function showModeSelector()
 {
-	var radio = document.getElementById('highlightingGroup');
+	var radio = document.getElementsByName('highlightingGroup');
 	var selection = 0;
 	for(var i = 0; i < radio.length; i++)
 	{

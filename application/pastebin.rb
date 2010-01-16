@@ -41,6 +41,24 @@ def createAnonymousString(length)
 end
 
 def submitNewPastebinPost(request)
+
+	if PastebinForm::DebugMode
+		actualData = serialiseFields(getFieldValues(request, PastebinForm::PostFields))
+		debugData = request.getPost(PastebinForm::Debug)
+		
+		if debugData == actualData
+			pastebinError('Data matches.', request)
+		else
+			data = ''
+			writer = HTMLWriter.new data
+			writer.p { 'Data does not match:' }
+			textAreaArguments = {cols: '50', rows: '30'}
+			writer.textArea('Actual data', 'test1', actualData, textAreaArguments)
+			writer.textArea('Debug data', 'test2', debugData, textAreaArguments)
+			pastebinError(data, request)
+		end
+	end
+
 	author,
 		
 	postDescription,

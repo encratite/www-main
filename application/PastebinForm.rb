@@ -1,4 +1,7 @@
 class PastebinForm
+	DebugMode = true
+	Debug = 'debug'
+	
 	Author = 'author'
 	
 	PostDescription = 'postDescription'
