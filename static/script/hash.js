@@ -7,8 +7,8 @@ function hashGenerator()
 	
 	this.hash = ~this.hash;
 	
-	//this.debugging = false;
-	this.debugging = true;
+	this.debugging = false;
+	//this.debugging = true;
 	
 	if(this.debugging)
 		this.content = '';
@@ -30,6 +30,8 @@ function hashData(input)
 	for(var i = 0; i < input.length; i++)
 	{
 		var currentByte = input.charCodeAt(i);
+		if(currentByte < 32)
+			continue;
 		hash ^= currentByte;
 		var shiftedHash = hash;
 		for(var j = 0; j < shifts.length; j++)
@@ -53,9 +55,8 @@ function visualiseString(data)
 {
 	var replacements = new Array
 	(
-		"\x00", "\\\\x00",
-		"\r", "\\\\r",
-		"\n", "\\\\n"
+		"\r", "\\r",
+		"\n", "\\n"
 	);
 	
 	for(var i = 0; i < replacements.length; i += 2)
@@ -109,8 +110,27 @@ function hashFields()
 	
 	if(generator.debugging)
 	{
-		var data = visualiseString(generator.content);
-		//prompt('Debug output', data);
+		/*
+		var check = new hashGenerator();
+		check.hashData('abc');
+		check.hashData(':');
+		check.hashData('def');
+		var hash1 = check.getHash();
+		
+		var check2 = new hashGenerator();
+		check2.hashData(check.content);
+		var hash2 = check2.getHash();
+		
+		alert(hash1 + ' vs. ' + hash2);
+		* */
+		
 		document.getElementById('debug').value = generator.content;
+		
+		prompt("Test:", visualiseString(generator.content));
+		
+		var test = new hashGenerator();
+		test.hashData(generator.content);
+		//test.hashData("author:description:common:cpp:a2ps::0:0:unit:content1\r\ncontent2");
+		alert('Check: ' + test.getHash() + ", security: " + generator.getHash());
 	}
 }

@@ -16,6 +16,7 @@ def fnv1a(input)
 	shifts = [1, 4, 7, 8, 24]
 	mask = 0xffffffff
 	input.each_byte do |byte|
+		next if byte < 32
 		hash ^= byte
 		shiftedHash = hash
 		shifts.each do |shift|
@@ -33,15 +34,10 @@ end
 
 def hashCheck(fields, security)
 	return javaScriptError if security.empty?
-	#data = fields.join "\x00"
 	data = serialiseFields fields
 	hash = fnv1a data
-	#debug = fields.join("\\x00")
-	debug = fields.join ':'
-	#debug["\n"] = "\\n"
-	#debug["\r"] = "\\r"
-	puts "Data: #{debug.inspect} (#{data.length})"
-	puts "#{hash} vs #{security}"
+	puts "Data: #{data.inspect} (#{data.length})"
+	puts "Actual input hash: #{hash} vs. security field: #{security}"
 	return hashError if hash != security
 	return nil
 end

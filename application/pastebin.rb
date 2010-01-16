@@ -47,15 +47,20 @@ def submitNewPastebinPost(request)
 		debugData = request.getPost(PastebinForm::Debug)
 		
 		if debugData == actualData
-			pastebinError('Data matches.', request)
+			puts 'Data matches'
+			#pastebinError('Data matches.', request)
 		else
+			puts 'Data does not match!'
+			puts "Actual data:\n#{actualData}"
+			puts "Debug data:\n#{debugData}"
+			
 			data = ''
 			writer = HTMLWriter.new data
 			writer.p { 'Data does not match:' }
 			textAreaArguments = {cols: '50', rows: '30'}
 			writer.textArea('Actual data', 'test1', actualData, textAreaArguments)
 			writer.textArea('Debug data', 'test2', debugData, textAreaArguments)
-			pastebinError(data, request)
+			#pastebinError(data, request)
 		end
 	end
 
