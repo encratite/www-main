@@ -233,10 +233,10 @@ def processPastebinUnit(writer, post)
 		
 		getModificationFields(unitFields, unit)
 		
-		writer.table(class: 'unitTable') do
+		writer.table(class: 'descriptionTable') do
 			unitFields.each do |description, value|
 				writer.tr do
-					writer.td { description }
+					writer.td(class: 'description') { description }
 					writer.td { value.to_s }
 				end
 			end
@@ -248,10 +248,16 @@ def processPastebinUnit(writer, post)
 		writer.div(class: 'unitContainer') do
 			isEven = false
 			writer.ul(class: 'contentList') do
+				lineCounter = 1
 				contentLines.each do |line|
-					lineClass = isEven ? 'evenLine' : 'oddLine'
-					writer.li { line }
+					if lineCounter == contentLines.size
+						lineClass = isEven ? 'evenLastLine' : 'oddLastLine'
+					else
+						lineClass = isEven ? 'evenLine' : 'oddLine'
+					end
+					writer.li(class: lineClass) { line }
 					isEven = !isEven
+					lineCounter += 1
 				end
 			end
 			
@@ -295,7 +301,7 @@ def visualShowPastebinPost(request, post)
 		end
 		fields.each do |description, value|
 			writer.tr do
-				writer.td { description }
+				writer.td(class: 'description') { description }
 				writer.td { value.to_s }
 			end
 		end

@@ -74,12 +74,55 @@
 	width: 10em;
 }
 
-table.descriptionTable td, table.unitTable td
+table.descriptionTable td.description
+{
+	font-weight: bold;
+	width: 7em;
+}
+
+table.descriptionTable td
 {
 	padding: 0 0.6em 0 0.6em;
 }
 
-col.description
+ul.contentList
 {
-	font-weight: bold;
+	margin: 0 0 0 4em;
+	border: 1px solid black;
+}
+
+ul.contentList li.oddLine
+{
+	background-color: #ffffff;
+	border-bottom: 1px dotted black;
+}
+
+ul.contentList li.evenLine
+{
+	background-color: #f0f0f0;
+	border-bottom: 1px dotted black;
+}
+
+ul.contentList li.oddLastLine
+{
+	background-color: #ffffff;
+}
+
+ul.contentList li.evenLastLine
+{
+	background-color: #f0f0f0;
+}
+
+ul.lineNumbers
+{
+	position: absolute;
+	left: auto;
+	top: auto;
+	width: 4em;
+	border: 1px solid black;
+}
+
+ul.lineNumbers li
+{
+	text-align: right;
 }
