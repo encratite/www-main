@@ -194,10 +194,20 @@ def getModificationFields(fields, source)
 end
 
 def getDescription(post, inTopic = true)
-	description = post.description.empty? ? 'No description' : post.description
-	return inTopic ?
-		description :
-		"<i>#{description}</i>"
+	noDescription = post.description.empty?
+	if noDescription
+		description = 'No description'
+	else
+		description = post.description
+	end
+	
+	return description if inTopic
+	
+	if noDescription
+		return "<i>#{description}</i>"
+	else
+		return description
+	end
 end
 
 def processPastebinUnit(writer, post)
@@ -235,20 +245,22 @@ def processPastebinUnit(writer, post)
 		content = unit.highlightedContent || unit.content
 		contentLines = content.split "\n"
 		
-		isEven = false
-		writer.ul(class: 'contentList') do
-			contentLines.each do |line|
-				lineClass = isEven ? 'evenLine' : 'oddLine'
-				writer.li { line }
-				isEven = !isEven
+		writer.div(class: 'unitContainer') do
+			isEven = false
+			writer.ul(class: 'contentList') do
+				contentLines.each do |line|
+					lineClass = isEven ? 'evenLine' : 'oddLine'
+					writer.li { line }
+					isEven = !isEven
+				end
 			end
-		end
-		
-		writer.ul(class: 'lineNumbers') do
-			lineCounter = 1
-			contentLines.size.times do |i|
-				writer.li { lineCounter.to_s }
-				lineCounter += 1
+			
+			writer.ul(class: 'lineNumbers') do
+				lineCounter = 1
+				contentLines.size.times do |i|
+					writer.li { lineCounter.to_s }
+					lineCounter += 1
+				end
 			end
 		end
 	end
@@ -277,6 +289,10 @@ def visualShowPastebinPost(request, post)
 	end
 	
 	writer.table(class: 'descriptionTable') do
+		writer.colgroup do
+			writer.col(class: 'description')
+			writer.col
+		end
 		fields.each do |description, value|
 			writer.tr do
 				writer.td { description }
