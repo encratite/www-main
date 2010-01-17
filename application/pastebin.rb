@@ -177,8 +177,13 @@ def submitNewPastebinPost(request)
 		postId = dataset.insert newPost
 		
 		isPlain = highlightingGroup == PastebinForm::NoHighlighting
-		highlightedContent = isPlain ? nil : SyntaxHighlighting::highlight(syntaxHighlighting, content)
-		pasteType = isPlain ? nil : syntaxHighlighting
+		if isPlain
+			highlightedContent = nil
+			pasteType = nil
+		else
+			highlightingStyle, highlightedContent = SyntaxHighlighting::highlight(syntaxHighlighting, content)
+			pasteType = syntaxHighlighting
+		end
 		
 		newUnit =
 		{
@@ -186,6 +191,8 @@ def submitNewPastebinPost(request)
 			
 			description: unitDescription,
 			content: content,
+			
+			highlighting_style: highlightingStyle,
 			highlighted_content: highlightedContent,
 			
 			paste_type: pasteType

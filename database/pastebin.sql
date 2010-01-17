@@ -39,6 +39,7 @@ create table pastebin_unit
 	content text not null,
 	
 	--null if the content type of this unit is marked as plain text
+	highlighting_style text,
 	highlighted_content text,
 	
 	paste_type text,

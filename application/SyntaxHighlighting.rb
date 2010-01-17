@@ -1,6 +1,10 @@
-require 'configuration/VimSyntax'
 require 'SecuredFormWriter'
+require 'error'
+
+require 'configuration/VimSyntax'
+
 require 'site/HTML'
+require 'site/string'
 
 class SyntaxHighlighting
 	def self.generateList(isCommon)
@@ -60,9 +64,17 @@ class SyntaxHighlighting
 		
 		`#{PastebinConfiguration::VimPath} #{flags} #{cFlags} #{inputFile.path}`
 		
-		output = outputFile.open.read
+		markup = outputFile.open.read
 		
-		return output
+		puts markup
+		
+		css = extractString(markup, '<style type="text/css">', '</style>')
+		plainError 'Unable to extract stylesheets from vim output.' if css == nil
+		
+		code = extractString(markup, '<pre>', '</pre>')
+		plainError 'Unable to extract code from vim output.' if code == nil
+		
+		return [css, code]
 	end
 	
 	def self.getScriptDescription(script)
