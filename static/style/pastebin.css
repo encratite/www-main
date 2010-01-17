@@ -106,19 +106,19 @@ ul.contentList li
 {
 	font-family: "Lucida Console", monospace;
 	height: 1.2em;
-	padding: 0 0.6em 0 0.6em;
+	padding: 0 1em 0 1em;
 }
 
 ul.contentList li.oddLine
 {
 	background-color: #ffffff;
-	border-bottom: 1px dotted black;
+	border-bottom: 1px dotted #808080;
 }
 
 ul.contentList li.evenLine
 {
-	background-color: #f4f4f4;
-	border-bottom: 1px dotted black;
+	background-color: #f8f8f8;
+	border-bottom: 1px dotted #808080;
 }
 
 ul.contentList li.oddLastLine
@@ -161,17 +161,17 @@ ul.contentList span, ul.contentList a
 
 .Comment
 {
-	color: #181880;
+	color: #008000;
 }
 
 .Constant
 {
-	color: #c00058;
+	color: #ff0000;
 }
 
 .Special
 {
-	color: #404010;
+	color: #ff00ff;
 }
 
 .Identifier
@@ -181,17 +181,17 @@ ul.contentList span, ul.contentList a
 
 .Statement
 {
-	color: brown;
+	color: #0000ff;
 }
 
 .PreProc
 {
-	color: DarkMagenta;
+	color: #0000ff;
 }
 
 .Type
 {
-	color: SeaGreen;
+	color: #0000ff;
 }
 
 .Ignore
@@ -201,10 +201,10 @@ ul.contentList span, ul.contentList a
 
 .Error
 {
-	color: red;
+	color: #ff0000;
 }
 
 .Todo
 {
-	color: yellow;
+	color: #ff00ff;
 }
