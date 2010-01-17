@@ -166,7 +166,7 @@ def submitNewPastebinPost(request)
 			
 			description: postDescription,
 			
-			expiration: postExpiration,
+			expiration: :NOW.sql_function + "#{postExpiration} second",
 			
 			anonymous_string: anonymousString,
 			

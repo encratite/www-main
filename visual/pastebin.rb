@@ -298,6 +298,8 @@ def visualShowPastebinPost(request, post)
 		fields << ['Expires', post.expiration]
 	end
 	
+	fields << ['Number of units', post.units.size]
+	
 	writer.table(class: 'descriptionTable') do
 		writer.colgroup do
 			writer.col(class: 'description')
