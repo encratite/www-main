@@ -58,7 +58,7 @@ class SyntaxHighlighting
 		cFlags = cFlags.map { |cFlag| "-c \"#{cFlag}\"" }
 		cFlags = cFlags.join ' '
 		
-		`#{PastebinConfiguration::VimPath} #{flags} #{cFlags} #{inputFile}`
+		`#{PastebinConfiguration::VimPath} #{flags} #{cFlags} #{inputFile.path}`
 		
 		output = outputFile.open.read
 		

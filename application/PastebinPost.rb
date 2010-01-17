@@ -40,6 +40,6 @@ end
 
 class PastebinUnit < SymbolTransfer
 	def initialize(input)
-		transferSymbols input
+		transferSymbols(input, {}, {highlightedContent})
 	end
 end

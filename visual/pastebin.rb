@@ -217,18 +217,22 @@ def getDescription(post, inTopic = true)
 end
 
 def processPastebinUnit(writer, post)
+	unitOffset = 1
 	post.units.each do |unit|
 		type =
 			unit.pasteType == nil ?
 				'Plain text' :
 				SyntaxHighlighting::getScriptDescription(unit.pasteType)
 		
-		unitFields = []
+		unitFields =
+		[
+			['Unit', "#{unitOffset}/#{post.units.size}"],
+		]
 		
 		unitFields << ['Description',  unit.description] if !unit.description.empty?
 		
 		unitFields.concat [
-			['Type', type]
+			['Type', type],
 		]
 		
 		if unit.timeAdded != post.creation
@@ -275,6 +279,7 @@ def processPastebinUnit(writer, post)
 				end
 			end
 		end
+		unitOffset += 1
 	end
 end
 
