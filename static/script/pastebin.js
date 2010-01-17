@@ -13,7 +13,7 @@ function highlightingMode(mode)
 		false,
 		'commonHighlighting',
 		'advancedHighlighting',
-		'expertHighlighting'
+		'expertHighlightingList'
 	);
 	
 	for(var i = 1; i < ids.length; i++)
@@ -39,15 +39,25 @@ function showModeSelector()
 
 function isTab(event)
 {
-	return event.keyCode == 9;
+	var code = event.keyCode;
+	if(code == null)
+		code = event.which;
+		
+	return code == 9;
+}
+
+function getEvent(event)
+{
+	if(!event)
+		return window.event;
+	return event;
 }
 
 function tabHandler(event)
 {	
 	var tab = '\t';
 	
-	if(!event)
-		event = window.event;
+	event = getEvent(event);
 
 	if(isTab(event))
 	{
@@ -90,6 +100,8 @@ function tabHandler(event)
 
 function tabPressHandler(event)
 {
+	event = getEvent(event);
+	
 	if(isTab(event))
 	{
 		try
