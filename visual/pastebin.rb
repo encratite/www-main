@@ -251,6 +251,7 @@ def processPastebinUnit(writer, post)
 		end
 		
 		content = unit.highlightedContent || unit.content
+		content = content.gsub('  ', '&nbsp;&nbsp;')
 		contentLines = content.split "\n"
 		
 		writer.div(class: 'unitContainer') do
@@ -283,7 +284,25 @@ def processPastebinUnit(writer, post)
 	end
 end
 
+def extractCSS(post)
+	targets = [
+		' font-weight: bold;',
+		' text-decoration: underline;'
+	]
+	cssLines = []
+	post.units.each do |unit|
+		lines = unit.highlightingStyle.split("\n")
+		#puts "Input lines in extractCSS:\n#{lines}"
+		lines.each do |line|
+			targets.each { |target| line = line.gsub(target, '') }
+			(cssLines << line) if !cssLines.include?(line)
+		end
+	end
+	return cssLines.join("\n")
+end
+
 def visualShowPastebinPost(request, post)
+	#puts 'visualShowPastebinPost'
 	output = ''
 	writer = HTMLWriter.new output
 
@@ -306,10 +325,6 @@ def visualShowPastebinPost(request, post)
 	fields << ['Number of units', post.units.size]
 	
 	writer.table(class: 'descriptionTable') do
-		writer.colgroup do
-			writer.col(class: 'description')
-			writer.col
-		end
 		fields.each do |description, value|
 			writer.tr do
 				writer.td(class: 'description') { description }
@@ -322,5 +337,7 @@ def visualShowPastebinPost(request, post)
 	
 	title = "#{getDescription(post)} - Pastebin"
 	
-	return [title, output]
+	cssGenerator = $pastebinGenerator.clone
+	cssGenerator.addInlineStylesheet(extractCSS(post))
+	return cssGenerator.get([title, output], request)
 end

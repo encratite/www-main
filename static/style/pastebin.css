@@ -96,6 +96,11 @@ div.unitContainer
 	position: absolute;
 }
 
+span
+{
+	font-family: "Lucida Console", monospace;
+}
+
 ul.contentList
 {
 	margin: 0 0 0 4em;
@@ -104,6 +109,7 @@ ul.contentList
 
 ul.contentList li
 {
+	font-family: "Lucida Console", monospace;
 	height: 1.2em;
 	padding: 0 0.6em 0 0.6em;
 }

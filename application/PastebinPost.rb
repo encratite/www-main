@@ -40,6 +40,6 @@ end
 
 class PastebinUnit < SymbolTransfer
 	def initialize(input)
-		transferSymbols(input, {}, [:highlightedContent])
+		transferSymbols(input, {}, [:highlightingStyle, :highlightedContent])
 	end
 end

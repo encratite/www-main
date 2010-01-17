@@ -153,7 +153,7 @@ def submitNewPastebinPost(request)
 		
 		postUser = isLoggedIn ? request.sessionUser.id : nil
 		postAuthor = !isLoggedIn ? author : nil
-		postExpiration = expiration == 0 ? nil : PastebinConfiguration::ExpirationOptions[expiration][1]
+		postExpiration = expiration == 0 ? nil : (:NOW.sql_function + "#{PastebinConfiguration::ExpirationOptions[expiration][1]} second")
 		anonymousString = privatePost == 1 ? createAnonymousString(PastebinConfiguration::AnonymousStringLength) : nil
 		postReply = nil
 
@@ -166,7 +166,7 @@ def submitNewPastebinPost(request)
 			
 			description: postDescription,
 			
-			expiration: :NOW.sql_function + "#{postExpiration} second",
+			expiration: postExpiration,
 			
 			anonymous_string: anonymousString,
 			
@@ -217,6 +217,5 @@ end
 def viewPastebinPost(request)
 	postId = getPostId request
 	post = $database.transaction { PastebinPost.new(postId, request) }
-	data = visualShowPastebinPost(request, post)
-	return $pastebinGenerator.get(data, request)
+	return visualShowPastebinPost(request, post)
 end

@@ -40,6 +40,7 @@ class SyntaxHighlighting
 		outputFile = Tempfile.new('outputFile')
 		outputFile.close
 		
+		input = input.delete("\r")
 		inputFile = Tempfile.new('inputFile')
 		inputFile << input
 		inputFile.close
@@ -66,12 +67,32 @@ class SyntaxHighlighting
 		
 		markup = outputFile.open.read
 		
-		puts markup
+		#debug = File.new("G:\\test", "w+")
+		#debug.write(markup)
+		#debug.close
 		
-		css = extractString(markup, '<style type="text/css">', '</style>')
+		css = extractString(markup, "<style type=\"text/css\">\n<!--\n", "-->\n</style>")
+		#puts "Input:\n#{css}"
 		plainError 'Unable to extract stylesheets from vim output.' if css == nil
+		cssLines = css.split("\n")
+		cssLines.reject! do |line|
+			tokens = line.split(' ')
+			output = nil
+			if tokens.empty?
+				output = true
+			else
+				token = tokens[0]
+				output = token.empty? || token[0] != '.'
+			end
+			output
+		end
+		cssLines = cssLines.map { |line| 'span' + line }
+		#puts "Output:\n#{cssLines}"
+		css = cssLines.join("\n")
+		#puts css.class
+		#puts "Output:\n#{css}"
 		
-		code = extractString(markup, '<pre>', '</pre>')
+		code = extractString(markup, "<pre>\n", "</pre>")
 		plainError 'Unable to extract code from vim output.' if code == nil
 		
 		return [css, code]
