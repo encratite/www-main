@@ -209,7 +209,7 @@ end
 
 def viewPastebinPost(request)
 	postId = getPostId request
-	post = $database.transaction { PastebinPost.new postId }
+	post = $database.transaction { PastebinPost.new(postId, request) }
 	data = visualShowPastebinPost(request, post)
 	return $pastebinGenerator.get(data, request)
 end

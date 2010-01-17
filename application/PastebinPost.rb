@@ -6,7 +6,7 @@ require 'site/SymbolTransfer'
 class PastebinPost < SymbolTransfer
 	attr_reader :units
 	
-	def initialize(target)
+	def initialize(target, request)
 		dataset = getDataset :PastebinPost
 		
 		if target.class == String
@@ -15,7 +15,7 @@ class PastebinPost < SymbolTransfer
 			postData = dataset.where(id: target, anonymous_string: nil)
 		end
 		
-		pastebinError 'You have specified an invalid post identifier.' if postData.empty?
+		pastebinError('You have specified an invalid post identifier.', request) if postData.empty?
 		
 		postData = postData.first
 		transferSymbols postData
