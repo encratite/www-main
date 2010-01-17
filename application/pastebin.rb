@@ -181,7 +181,7 @@ def submitNewPastebinPost(request)
 			highlightedContent = nil
 			pasteType = nil
 		else
-			highlightingStyle, highlightedContent = SyntaxHighlighting::highlight(syntaxHighlighting, content)
+			highlightedContent = SyntaxHighlighting::highlight(syntaxHighlighting, content)
 			pasteType = syntaxHighlighting
 		end
 		
@@ -192,7 +192,6 @@ def submitNewPastebinPost(request)
 			description: unitDescription,
 			content: content,
 			
-			highlighting_style: highlightingStyle,
 			highlighted_content: highlightedContent,
 			
 			paste_type: pasteType

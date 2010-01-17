@@ -284,25 +284,7 @@ def processPastebinUnit(writer, post)
 	end
 end
 
-def extractCSS(post)
-	targets = [
-		' font-weight: bold;',
-		' text-decoration: underline;'
-	]
-	cssLines = []
-	post.units.each do |unit|
-		lines = unit.highlightingStyle.split("\n")
-		#puts "Input lines in extractCSS:\n#{lines}"
-		lines.each do |line|
-			targets.each { |target| line = line.gsub(target, '') }
-			(cssLines << line) if !cssLines.include?(line)
-		end
-	end
-	return cssLines.join("\n")
-end
-
 def visualShowPastebinPost(request, post)
-	#puts 'visualShowPastebinPost'
 	output = ''
 	writer = HTMLWriter.new output
 
@@ -337,7 +319,5 @@ def visualShowPastebinPost(request, post)
 	
 	title = "#{getDescription(post)} - Pastebin"
 	
-	cssGenerator = $pastebinGenerator.clone
-	cssGenerator.addInlineStylesheet(extractCSS(post))
-	return cssGenerator.get([title, output], request)
+	return $pastebinGenerator.get([title, output], request)
 end

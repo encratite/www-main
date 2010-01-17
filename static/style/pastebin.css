@@ -96,11 +96,6 @@ div.unitContainer
 	position: absolute;
 }
 
-span
-{
-	font-family: "Lucida Console", monospace;
-}
-
 ul.contentList
 {
 	margin: 0 0 0 4em;
@@ -157,4 +152,59 @@ ul.lineNumbers li.lastLine
 {
 	text-align: right;
 	border-bottom: none;
+}
+
+ul.contentList span, ul.contentList a
+{
+	font-family: "Lucida Console", monospace;
+}
+
+.Comment
+{
+	color: #181880;
+}
+
+.Constant
+{
+	color: #c00058;
+}
+
+.Special
+{
+	color: #404010;
+}
+
+.Identifier
+{
+	color: #106060;
+}
+
+.Statement
+{
+	color: brown;
+}
+
+.PreProc
+{
+	color: DarkMagenta;
+}
+
+.Type
+{
+	color: SeaGreen;
+}
+
+.Ignore
+{
+	color: #808080;
+}
+
+.Error
+{
+	color: red;
+}
+
+.Todo
+{
+	color: yellow;
 }
