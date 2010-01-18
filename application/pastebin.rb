@@ -218,3 +218,25 @@ def viewPastebinPost(request)
 	post = $database.transaction { PastebinPost.new(postId, request) }
 	return visualShowPastebinPost(request, post)
 end
+
+def viewPastebinPosts(request)
+	arguments = request.arguments
+	argumentError if arguments.size > 1
+	if arguments.empty?
+		page = 0
+	else
+		page = readId(arguments[0]) - 1
+	end
+	
+	$database.transaction do
+		dataset = getDataset :PastebinPost
+		postsPerPage = PastebinConfiguration::PostsPerPage
+		posts = dataset.where { |row| row.anonymous_string != nil && row.reply_to == nil }
+		posts = posts.select(:id, :user_id, :author, :description, :creation)
+		pageCount = (Float(posts.size) / postsPerPage).ceil
+		pastebinError 'Invalid page specified.' if page >= pageCount
+		offset = pageCount - (page + 1) * postsPerPage
+		posts = posts.left_outer_join(:site_user, :user_id => :id)
+		posts = posts.limit(postsPerPage, offset)
+	end
+end

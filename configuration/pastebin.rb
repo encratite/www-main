@@ -2,7 +2,7 @@ require 'configuration/site'
 require 'site/environment'
 
 class PastebinConfiguration
-	PastesPerPage = 100
+	PostsPerPage = 100
 	Prefix = 'pastebin'
 	
 	AnonymousStringLength = 64

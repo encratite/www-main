@@ -1,10 +1,14 @@
 require 'User'
 require 'error'
 
+require 'site/HTMLWriter'
 require 'site/SymbolTransfer'
 
 class PastebinPost < SymbolTransfer
-	attr_reader :units
+	AnonymousAuthor = 'Anonymous'
+	NoDescription = 'No description'
+	
+	attr_reader :units, :isAnonymous, :noDescription
 	
 	def initialize(target, request)
 		dataset = getDataset :PastebinPost
@@ -35,6 +39,30 @@ class PastebinPost < SymbolTransfer
 		
 		@units = []
 		unitData.each { |unit| @units << PastebinUnit.new(unit) }
+		
+		@author = @author || @user.name
+		@isAnonymous = @author.empty?
+		if @isAnonymous
+			@author = AnonymousAuthor
+			@bodyAuthor = markString @author
+		else
+			@bodyAuthor = @author
+		end
+		
+		@noDescription = @description.empty?
+		if @noDescription
+			@description = NoDescription
+			@bodyDescription = markString @description
+		else
+			@bodyDescription = @description
+		end
+	end
+	
+	def markString(input)
+		output = ''
+		writer = HTMLWriter.new output
+		writer.i { input }
+		return output
 	end
 end
 

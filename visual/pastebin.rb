@@ -200,20 +200,8 @@ def getModificationFields(fields, source)
 end
 
 def getDescription(post, inTopic = true)
-	noDescription = post.description.empty?
-	if noDescription
-		description = 'No description'
-	else
-		description = post.description
-	end
-	
-	return description if inTopic
-	
-	if noDescription
-		return "<i>#{description}</i>"
-	else
-		return description
-	end
+	return post.description if inTopic
+	return post.bodyDescription
 end
 
 def processPastebinUnit(writer, post)
@@ -288,12 +276,9 @@ def visualShowPastebinPost(request, post)
 	output = ''
 	writer = HTMLWriter.new output
 
-	author = post.author || post.user.name
-	author = '<i>Anonymous</i>' if author.empty?
-	
 	fields =
 	[
-		['Author', author],
+		['Author', post.bodyAuthor],
 		['Description', getDescription(post, false)],
 		['Time created', post.creation]
 	]
