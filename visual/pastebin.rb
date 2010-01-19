@@ -306,3 +306,6 @@ def visualShowPastebinPost(request, post)
 	
 	return $pastebinGenerator.get([title, output], request)
 end
+
+def visualListPastebinPosts(request, posts)
+end

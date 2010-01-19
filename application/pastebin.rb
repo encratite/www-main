@@ -219,7 +219,7 @@ def viewPastebinPost(request)
 	return visualShowPastebinPost(request, post)
 end
 
-def viewPastebinPosts(request)
+def listPastebinPosts(request)
 	arguments = request.arguments
 	argumentError if arguments.size > 1
 	if arguments.empty?
@@ -231,12 +231,23 @@ def viewPastebinPosts(request)
 	$database.transaction do
 		dataset = getDataset :PastebinPost
 		postsPerPage = PastebinConfiguration::PostsPerPage
-		posts = dataset.where { |row| row.anonymous_string != nil && row.reply_to == nil }
-		posts = posts.select(:id, :user_id, :author, :description, :creation)
-		pageCount = (Float(posts.size) / postsPerPage).ceil
-		pastebinError 'Invalid page specified.' if page >= pageCount
-		offset = pageCount - (page + 1) * postsPerPage
-		posts = posts.left_outer_join(:site_user, :user_id => :id)
+		#posts = dataset.where { |row| row.anonymous_string != nil && row.reply_to == nil }
+		posts = dataset.where(anonymous_string: nil, reply_to: nil)
+		#posts = posts.select(:id, :user_id, :author, :description, :creation)
+		count = posts.count
+		pageCount = count == 0 ? 1 : (Float(count) / postsPerPage).ceil
+		pastebinError('Invalid page specified.', request) if page >= pageCount
+		offset = [count - (page + 1) * postsPerPage, 0].max
+		posts = posts.select(
+			:pastebin_post__id, :pastebin_post__user_id, :pastebin_post__author, :pastebin_post__description, :pastebin_post__creation,
+			:site_user__name
+		)
+		posts = posts.left_outer_join(:site_user, :id => :user_id)
 		posts = posts.limit(postsPerPage, offset)
+		#11:55:36 <jeremyevans> [07:07:16] yq: dataset.select(:right_table__column1, :right_table__column2).left_join(:right_table, :right_table_column=>:left_table_column)
+		puts posts.sql
+		puts posts.first.inspect
 	end
+	
+	return plainError 'Not finished'
 end
