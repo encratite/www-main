@@ -236,12 +236,18 @@ def listPastebinPosts(request)
 		pageCount = count == 0 ? 1 : (Float(count) / postsPerPage).ceil
 		pastebinError('Invalid page specified.', request) if page >= pageCount
 		offset = [count - (page + 1) * postsPerPage, 0].max
-		posts = posts.select(
-			:pastebin_post__id, :pastebin_post__user_id, :pastebin_post__author, :pastebin_post__description, :pastebin_post__creation,
-			:site_user__name
-		)
-		posts = posts.left_outer_join(:site_user, :id => :user_id)
+		
+		dataset = getDataset :PastebinPost
+		posts = dataset.left_outer_join(:site_user, :id => :user_id)
 		posts = posts.limit(postsPerPage, offset)
+		posts = posts.filter(pastebin_post__anonymous_string: nil, pastebin_post__reply_to: nil)
+		posts = posts.filter(
+			:pastebin_post__id, :pastebin_post__user_id, :pastebin_post__author, :pastebin_post__description, :pastebin_post__creation,
+			:site_user__name,
+		)
+		#:pastebin_unit__paste_type
+		posts = posts.left_outer_join(:pastebin_unit, :post_id => :pastebin_post__id)
+		puts posts.sql
 		posts = posts.all
 		output = visualListPastebinPosts(request, posts)
 		return $pastebinGenerator.get(output, request)
