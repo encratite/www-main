@@ -231,9 +231,7 @@ def listPastebinPosts(request)
 	$database.transaction do
 		dataset = getDataset :PastebinPost
 		postsPerPage = PastebinConfiguration::PostsPerPage
-		#posts = dataset.where { |row| row.anonymous_string != nil && row.reply_to == nil }
 		posts = dataset.where(anonymous_string: nil, reply_to: nil)
-		#posts = posts.select(:id, :user_id, :author, :description, :creation)
 		count = posts.count
 		pageCount = count == 0 ? 1 : (Float(count) / postsPerPage).ceil
 		pastebinError('Invalid page specified.', request) if page >= pageCount
@@ -244,10 +242,8 @@ def listPastebinPosts(request)
 		)
 		posts = posts.left_outer_join(:site_user, :id => :user_id)
 		posts = posts.limit(postsPerPage, offset)
-		#11:55:36 <jeremyevans> [07:07:16] yq: dataset.select(:right_table__column1, :right_table__column2).left_join(:right_table, :right_table_column=>:left_table_column)
-		puts posts.sql
-		puts posts.first.inspect
+		posts = posts.all
+		output = visualListPastebinPosts(request, posts)
+		return $pastebinGenerator.get(output, request)
 	end
-	
-	return plainError 'Not finished'
 end

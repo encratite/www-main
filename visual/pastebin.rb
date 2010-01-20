@@ -308,4 +308,19 @@ def visualShowPastebinPost(request, post)
 end
 
 def visualListPastebinPosts(request, posts)
+	output = ''
+	writer = HTMLWriter.new output
+	
+	columns =
+	[
+		'Description',
+		'Author',
+		'Date',
+	]
+	
+	writer.table do
+		writer.tr do
+			
+		end
+	end
 end
