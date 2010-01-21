@@ -237,17 +237,25 @@ def listPastebinPosts(request)
 		pastebinError('Invalid page specified.', request) if page >= pageCount
 		offset = [count - (page + 1) * postsPerPage, 0].max
 		
-		dataset = getDataset :PastebinPost
-		posts = dataset.left_outer_join(:site_user, :id => :user_id)
-		posts = posts.limit(postsPerPage, offset)
+		posts = posts.left_outer_join(:site_user, :id => :user_id)
 		posts = posts.filter(pastebin_post__anonymous_string: nil, pastebin_post__reply_to: nil)
-		posts = posts.filter(
-			:pastebin_post__id, :pastebin_post__user_id, :pastebin_post__author, :pastebin_post__description, :pastebin_post__creation,
+		
+		posts = posts.select(
+			:pastebin_post__id.as(:pastebin_post_id), :pastebin_post__user_id, :pastebin_post__author, :pastebin_post__description, :pastebin_post__creation,
 			:site_user__name,
 		)
-		#:pastebin_unit__paste_type
-		#17:31:38 <jeremyevans> yq: DB[:a].join(:b).limit(20, 10).from_self.join(:c)
-		posts = posts.left_outer_join(:pastebin_unit, :post_id => :pastebin_post__id)
+		
+		posts = posts.limit(postsPerPage, offset)
+
+		posts = posts.from_self(alias: :user_post)
+		posts = posts.left_outer_join(:pastebin_unit, :post_id => :user_post__pastebin_post_id)
+		
+		posts = posts.select(
+			:user_post__pastebin_post_id, :user_post__user_id, :user_post__author, :user_post__description, :user_post__creation,
+			:user_post__name,
+			:pastebin_unit__paste_type
+		)
+		
 		puts posts.sql
 		posts = posts.all
 		output = visualListPastebinPosts(request, posts)
