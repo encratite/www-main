@@ -246,6 +246,7 @@ def listPastebinPosts(request)
 			:site_user__name,
 		)
 		#:pastebin_unit__paste_type
+		#17:31:38 <jeremyevans> yq: DB[:a].join(:b).limit(20, 10).from_self.join(:c)
 		posts = posts.left_outer_join(:pastebin_unit, :post_id => :pastebin_post__id)
 		puts posts.sql
 		posts = posts.all
