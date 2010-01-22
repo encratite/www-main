@@ -2,7 +2,6 @@ require 'PathMap'
 require 'PastebinForm'
 require 'error'
 require 'processForm'
-require 'database'
 require 'SyntaxHighlighting'
 require 'PastebinPost'
 
@@ -33,7 +32,7 @@ def floodCheck(request)
 end
 
 def createAnonymousString(length)
-	dataset = getDataset :PastebinPost
+	dataset = $database[:pastebin_post]
 	while true
 		string = RandomString.get length
 		break if dataset.where(anonymous_string: sessionString).count == 0
@@ -173,7 +172,7 @@ def submitNewPastebinPost(request)
 			reply_to: postReply
 		}
 
-		dataset = getDataset :PastebinPost
+		dataset = $database[:pastebin_post]
 		postId = dataset.insert newPost
 		
 		isPlain = highlightingGroup == PastebinForm::NoHighlighting
@@ -197,7 +196,7 @@ def submitNewPastebinPost(request)
 			paste_type: pasteType
 		}
 		
-		dataset = getDataset :PastebinUnit
+		dataset = $database[:pastebin_unit]
 		dataset.insert newUnit
 		
 		postPath = "#{PathMap::PastebinView}/#{postId}"
@@ -229,7 +228,7 @@ def listPastebinPosts(request)
 	end
 	
 	$database.transaction do
-		dataset = getDataset :PastebinPost
+		dataset = $database[:pastebin_post]
 		postsPerPage = PastebinConfiguration::PostsPerPage
 		posts = dataset.where(anonymous_string: nil, reply_to: nil)
 		count = posts.count
@@ -258,6 +257,7 @@ def listPastebinPosts(request)
 		
 		puts posts.sql
 		posts = posts.all
+		put posts.inspect
 		output = visualListPastebinPosts(request, posts)
 		return $pastebinGenerator.get(output, request)
 	end

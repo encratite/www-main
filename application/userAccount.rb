@@ -41,7 +41,7 @@ def performLoginRequest(request)
 	
 	passwordHash = hashWithSalt password
 	
-	dataset = getDataset :User
+	dataset = $dabtase[:site_user]
 	result = dataset.where(name: user, password: passwordHash).first
 	if result == nil
 		return $generator.get visualLoginError, request
@@ -87,7 +87,7 @@ def performRegistrationRequest(request)
 	
 	return printErrorForm.call if errorOccured.call
 	
-	dataset = getDataset :User
+	dataset = $dabtase[:site_user]
 	
 	reply = nil
 	
@@ -125,7 +125,7 @@ def logoutRequest(request)
 	end
 	
 	sessionString = request.cookies[CookieConfiguration::Session]
-	dataset = getDataset :LoginSession
+	dataset = $database[:login_session]
 	dataset.filter(session_string: sessionString).delete
 	
 	request.sessionUser = nil

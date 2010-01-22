@@ -1,7 +1,6 @@
 require 'site/random'
 require 'configuration/site'
 require 'configuration/cookie'
-require 'database'
 require 'User'
 
 class SessionManager
@@ -10,7 +9,7 @@ class SessionManager
 			cookie = request.cookies[CookieConfiguration::Session]
 			return nil if cookie == nil
 			cleanSessions
-			result = getDataset(:LoginSession).filter(session_string: cookie, ip: request.address).join(getTableSymbol(:User), id: :user_id).first
+			result = $database[:login_session].filter(session_string: cookie, ip: request.address).join(getTableSymbol(:User), id: :user_id).first
 			return nil if result == nil
 			return User.new result
 		end
@@ -21,7 +20,7 @@ class SessionManager
 	end
 	
 	def generateSessionString
-		dataset = getDataset :LoginSession
+		dataset = $database[:login_session]
 		while true
 			sessionString = RandomString.get SiteConfiguration::SessionStringLength
 			break if dataset.where(session_string: sessionString).count == 0
@@ -31,7 +30,7 @@ class SessionManager
 	
 	def createSession(userId, address)
 		sessionString = generateSessionString
-		dataset = getDataset :LoginSession
+		dataset = $database[:login_session]
 		dataset.insert(user_id: userId, session_string: sessionString, ip: address)
 		return sessionString
 	end
