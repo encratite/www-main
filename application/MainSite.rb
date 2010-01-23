@@ -25,7 +25,7 @@ class MainSite
 	def initialize
 		@database = getDatabaseObject
 		@menu = createMenu
-		@sessionManager = SessionManager.new
+		@sessionManager = SessionManager.new @database
 		@requestManager = RequestManager.new SiteRequest
 		@generator = getSiteGenerator
 		@pastebinGenerator = getSiteGenerator(['pastebin'], ['pastebin'])
