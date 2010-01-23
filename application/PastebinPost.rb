@@ -27,7 +27,7 @@ class PastebinPost < SymbolTransfer
 		if @userId == nil
 			@user = nil
 		else
-			dataset = $dabtase[:site_user]
+			dataset = $database[:site_user]
 			userData = datast.where(id: @userId)
 			internalError 'Unable to retrieve the user associated with this post.' if userData.empty?
 			@user = User.new(userData.first)

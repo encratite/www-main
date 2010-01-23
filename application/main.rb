@@ -1,38 +1,11 @@
 $:.concat ['..', 'application']
 
-def loadModules
-	require 'sequel'
-	
-	prefix = 'site'
-	siteFiles =
-	[
-		'RequestManager',
-		'SiteGenerator',
-		'RequestHandler',
-	]
-	
-	siteFiles.each { |name| require "#{prefix}/#{name}" }
+require 'MainSite'
 
-	require 'configuration/database'
+require 'IndexHandler'
+require 'PastebinHandler'
 
-	applicationFiles =
-	[
-		'index',
-		'userAccount',
-		'SessionManager',
-		'Menu',
-		'PathMap',
-		'MainSiteGenerator',
-		'static',
-		'SiteRequest',
-		'pastebin',
-		
-		'environment'
-	]
-
-	applicationFiles.each { |name| require name }
-end
-
+"""
 def createRequestManager
 	handlers =
 	[
@@ -51,9 +24,8 @@ def createRequestManager
 
 	requestManager = RequestManager.new SiteRequest
 	handlers.each do |arguments|
-		pathSymbol, handlerSymbol = arguments
+		pathSymbol, handler = arguments
 		path = PathMap.getPath pathSymbol
-		handler = method handlerSymbol
 		argumentCount = arguments.size > 2 ? arguments[2] : nil
 		requestHandler = RequestHandler.new(path, handler, argumentCount)
 		requestManager.addHandler requestHandler
@@ -63,18 +35,6 @@ def createRequestManager
 	requestManager.addHandler requestHandler
 	
 	return requestManager
-end
-
-def getDatabaseObject
-	database =
-	Sequel.connect(
-		adapter: DatabaseConfiguration::Adapter,
-		host: DatabaseConfiguration::Host,
-		user: DatabaseConfiguration::User,
-		password: DatabaseConfiguration::Password,
-		database: DatabaseConfiguration::Database
-	)
-	return database
 end
 
 def createMenu
@@ -100,21 +60,8 @@ def createMenu
 	
 	return menu
 end
+"""
 
-def getSiteGenerator(stylesheets = [], scripts = [])
-	stylesheets = ['base'] + stylesheets
-	scripts = ['hash'] + scripts
-	output = MainSiteGenerator.new
-	stylesheets.each { |path| output.addStylesheet(getStylesheet path) }
-	scripts.each { |script| output.addScript(getScript script) }
-	output
-end
-
-loadModules
-
-$sessionManager = SessionManager.new
-$requestManager = createRequestManager
-$generator = getSiteGenerator
-$pastebinGenerator = getSiteGenerator(['pastebin'], ['pastebin'])
-$database = getDatabaseObject
-$menu = createMenu
+mainSite = MainSite.new
+indexHandler = IndexHandler.new mainSite
+pastebinHandler = PastebinHandler.new mainSite

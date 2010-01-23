@@ -6,7 +6,6 @@ require 'processForm'
 require 'site/HTTPReply'
 require 'site/Cookie'
 require 'configuration/site'
-require 'configuration/table'
 require 'configuration/cookie'
 require 'site/EMailValidator'
 require 'visual/user'
@@ -41,7 +40,7 @@ def performLoginRequest(request)
 	
 	passwordHash = hashWithSalt password
 	
-	dataset = $dabtase[:site_user]
+	dataset = $database[:site_user]
 	result = dataset.where(name: user, password: passwordHash).first
 	if result == nil
 		return $generator.get visualLoginError, request
@@ -87,7 +86,7 @@ def performRegistrationRequest(request)
 	
 	return printErrorForm.call if errorOccured.call
 	
-	dataset = $dabtase[:site_user]
+	dataset = $database[:site_user]
 	
 	reply = nil
 	

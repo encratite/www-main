@@ -344,7 +344,7 @@ class VimSyntax
 		['racc', 'Racc input file'],
 		['radiance', 'Radiance Scene Description'],
 		['ratpoison', 'Ratpoison configuration/commands file'],
-		['rc', 'M$ Resource files (*.rc)'],
+		['rc', 'Microsoft Resource files (*.rc)'],
 		['rcs', 'RCS file'],
 		['rcslog', 'RCS log output'],
 		['readline', 'readline(3) configuration file'],
