@@ -10,8 +10,8 @@ class PastebinPost < SymbolTransfer
 	
 	attr_reader :units, :isAnonymous, :noDescription
 	
-	def initialize(target, request)
-		dataset = $database[:pastebin_post]
+	def initialize(target, request, database)
+		dataset = database[:pastebin_post]
 		
 		if target.class == String
 			postData = dataset.where(anonymous_string: target)
@@ -27,13 +27,13 @@ class PastebinPost < SymbolTransfer
 		if @userId == nil
 			@user = nil
 		else
-			dataset = $database[:site_user]
+			dataset = database[:site_user]
 			userData = datast.where(id: @userId)
 			internalError 'Unable to retrieve the user associated with this post.' if userData.empty?
 			@user = User.new(userData.first)
 		end
 		
-		dataset = $database[:pastebin_unit]
+		dataset = database[:pastebin_unit]
 		unitData = dataset.where(post_id: @id)
 		internalError 'No units are associated with this post.' if unitData.empty?
 		

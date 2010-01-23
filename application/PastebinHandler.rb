@@ -229,7 +229,7 @@ class PastebinHandler < SiteContainer
 
 	def viewPastebinPost(request)
 		postId = getPostId request
-		post = @database.transaction { PastebinPost.new(postId, request) }
+		post = @database.transaction { PastebinPost.new(postId, request, @database) }
 		return visualShowPastebinPost(request, post)
 	end
 
