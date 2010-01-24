@@ -23,6 +23,8 @@ require 'site/RequestHandler'
 require 'sequel'
 
 class MainSite
+	attr_accessor :requestManager
+	
 	def initialize
 		@database = getDatabaseObject
 		@menu = Menu.new

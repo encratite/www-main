@@ -1,3 +1,3 @@
 require 'application/main'
 
-run lambda { |environment| $requestManager.handleRequest environment }
+run lambda { |environment| $mainSite.requestManager.handleRequest environment }
