@@ -2,7 +2,6 @@ require 'UserForm'
 require 'User'
 require 'hash'
 require 'error'
-require 'processForm'
 require 'SiteContainer'
 
 require 'site/HTTPReply'

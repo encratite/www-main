@@ -1,16 +1,16 @@
-require 'index'
-require 'userAccount'
+require 'IndexHandler'
+require 'PastebinHandler'
+require 'UserHandler'
+
 require 'SessionManager'
 require 'Menu'
 require 'PathMap'
 require 'MainSiteGenerator'
 require 'static'
 require 'SiteRequest'
-require 'pastebin'
 require 'hash'
 require 'error'
 require 'SecuredFormWriter'
-require 'UserAccount'
 
 require 'environment'
 
@@ -25,9 +25,9 @@ require 'sequel'
 class MainSite
 	def initialize
 		@database = getDatabaseObject
-		@menu = createMenu
+		@menu = Menu.new
 		@sessionManager = SessionManager.new @database
-		@requestManager = RequestManager.new(lambda { |environment| SiteRequest.new(@sessionManager, environment) )
+		@requestManager = RequestManager.new(lambda { |environment| SiteRequest.new(@sessionManager, environment) } )
 		@generator = getSiteGenerator
 		@pastebinGenerator = getSiteGenerator(['pastebin'], ['pastebin'])
 		

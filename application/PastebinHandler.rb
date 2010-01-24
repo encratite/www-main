@@ -1,7 +1,6 @@
 require 'PathMap'
 require 'PastebinForm'
 require 'error'
-require 'processForm'
 require 'SyntaxHighlighting'
 require 'PastebinPost'
 require 'SiteContainer'

@@ -4,7 +4,7 @@ require 'visual/body'
 class MainSiteGenerator < SiteGenerator
 	def initialize(menu)
 		@menu = menu
-		super
+		super()
 	end
 	
 	def head(title, request)
