@@ -26,7 +26,7 @@ class MainSite
 		@database = getDatabaseObject
 		@menu = createMenu
 		@sessionManager = SessionManager.new @database
-		@requestManager = RequestManager.new SiteRequest
+		@requestManager = RequestManager.new(lambda { |environment| SiteRequest.new(@sessionManager, environment) )
 		@generator = getSiteGenerator
 		@pastebinGenerator = getSiteGenerator(['pastebin'], ['pastebin'])
 		

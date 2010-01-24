@@ -4,9 +4,9 @@ require 'SecuredFormWriter'
 class SiteRequest < HTTPRequest
 	attr_accessor :sessionUser
 	
-	def initialize(environment)
+	def initialize(sessionManager, environment)
 		super environment
-		@sessionUser = $sessionManager.getSessionUser self
+		@sessionUser = sessionManager.getSessionUser self
 	end
 	
 	def postIsSet(names)
