@@ -9,7 +9,7 @@ require 'SiteContainer'
 require 'configuration/pastebin'
 
 require 'visual/general'
-require 'visual/pastebin'
+require 'visual/VisualPastebinHandler'
 
 require 'site/RequestManager'
 require 'site/random'
@@ -24,6 +24,7 @@ class PastebinHandler < SiteContainer
 	
 	def installHandlers
 		@localPrefix = 'pastebin'
+		@visual = VisualPastebinHandler.new @pastebinGenerator
 		
 		installMenuHandler('Pastebin', [], :newPastebinPost)
 		installHandler(SubmitNewPost, :submitNewPastebinPost)
@@ -37,7 +38,7 @@ class PastebinHandler < SiteContainer
 	end
 
 	def newPastebinPost(request)
-		@pastebinGenerator.get([PathMap.getDescription(:Pastebin), visualPastebinForm(request)], request)
+		@pastebinGenerator.get([PathMap.getDescription(:Pastebin), @visual.pastebinForm(request)], request)
 	end
 
 	def floodCheck(request)
@@ -159,7 +160,7 @@ class PastebinHandler < SiteContainer
 			end
 			
 			if !errors.empty?
-				errorContent = visualPastebinForm(request, errors, postDescription, unitDescription, content, highlightingSelectionMode, lastSelection)
+				errorContent = @visual.pastebinForm(request, errors, postDescription, unitDescription, content, highlightingSelectionMode, lastSelection)
 				pastebinError(errorContent, request)
 			end
 
@@ -230,7 +231,7 @@ class PastebinHandler < SiteContainer
 	def viewPastebinPost(request)
 		postId = getPostId request
 		post = @database.transaction { PastebinPost.new(postId, request, @database) }
-		return visualShowPastebinPost(request, post)
+		return @visual.showPastebinPost(request, post)
 	end
 
 	def listPastebinPosts(request)
@@ -273,7 +274,7 @@ class PastebinHandler < SiteContainer
 			puts posts.sql
 			posts = posts.all
 			put posts.inspect
-			output = visualListPastebinPosts(request, posts)
+			output = @visual.listPastebinPosts(request, posts)
 			return @pastebinGenerator.get(output, request)
 		end
 	end

@@ -1,5 +1,5 @@
-def visualHead(request)
-	output = $menu.render request
+def visualHead(menu, request)
+	output = menu.render request
 	output += "<div id=\"siteContent\">\n"
 end
 

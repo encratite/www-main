@@ -10,6 +10,7 @@ require 'pastebin'
 require 'hash'
 require 'error'
 require 'SecuredFormWriter'
+require 'UserAccount'
 
 require 'environment'
 
@@ -48,7 +49,7 @@ class MainSite
 	def getSiteGenerator(stylesheets = [], scripts = [])
 		stylesheets = ['base'] + stylesheets
 		scripts = ['hash'] + scripts
-		output = MainSiteGenerator.new
+		output = MainSiteGenerator.new @menu
 		stylesheets.each { |path| output.addStylesheet(getStylesheet path) }
 		scripts.each { |script| output.addScript(getScript script) }
 		output
