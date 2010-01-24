@@ -15,13 +15,26 @@ require 'visual/user'
 require 'visual/general'
 
 class UserHandler < SiteContainer
+	Login = 'login'
+	Register = 'register'
+	Logout = 'logout'
+	SubmitLogin = 'submitLogin'
+	SubmitRegistration = 'submitRegistration'
+	
 	def installHandlers
-		@localPrefix = 'pastebin'
+		notLoggedIn = lambda { |request| request.sessionUser == nil }
 		
-		installMenuHandler('Pastebin', [], :newPastebinPost)
-		installHandler(SubmitNewPost, :submitNewPastebinPost)
-		installHandler(View, :viewPastebinPost, 1)
-		installHandler(List, :listPastebinPosts, 1)
+		installMenuHandler('Login', Login, :loginFormRequest, notLoggedIn)
+		installMenuHandler('Register', Register, :registerFormRequest, notLoggedIn)
+		
+		installHandler(SubmitLogin, :performLoginRequest)
+		installHandler(SubmitRegistration, :performRegistrationRequest)
+	end
+	
+	def addLogoutMenu
+		loggedIn = lambda { |request| request.sessionUser != nil }
+		
+		installMenuHandler('Logout', Logout, :logoutRequest, loggedIn)
 	end
 	
 	def sessionCheck(request, title, message)
