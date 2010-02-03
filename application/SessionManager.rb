@@ -13,7 +13,7 @@ class SessionManager
 			cookie = request.cookies[CookieConfiguration::Session]
 			return nil if cookie == nil
 			cleanSessions
-			result = @database[:login_session].filter(session_string: cookie, ip: request.address).join(getTableSymbol(:User), id: :user_id).first
+			result = @database[:login_session].filter(session_string: cookie, ip: request.address).join(:site_user, id: :user_id).first
 			return nil if result == nil
 			return User.new result
 		end
