@@ -36,7 +36,8 @@ class SiteContainer
 	end
 	
 	def installMenuHandler(description, path, handlerSymbol, condition = lambda { |request| true }, argumentCount = 0)
+		actualPath = getPathFromPrefixes(path)
 		installHandler(path, handlerSymbol, argumentCount)
-		@menu.add(description, path, condition)
+		@menu.add(description, actualPath, condition)
 	end
 end
