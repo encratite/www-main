@@ -1,4 +1,3 @@
-require 'PathMap'
 require 'PastebinForm'
 require 'error'
 require 'SyntaxHighlighting'
@@ -37,7 +36,7 @@ class PastebinHandler < SiteContainer
 	end
 
 	def newPastebinPost(request)
-		@pastebinGenerator.get([PathMap.getDescription(:Pastebin), @visual.pastebinForm(request)], request)
+		@pastebinGenerator.get(['Pastebin', @visual.pastebinForm(request)], request)
 	end
 
 	def floodCheck(request)
@@ -214,7 +213,7 @@ class PastebinHandler < SiteContainer
 			dataset = @database[:pastebin_unit]
 			dataset.insert newUnit
 			
-			postPath = "#{PathMap::PastebinView}/#{postId}"
+			postPath = "#{getPath View}/#{postId}"
 			return HTTPReply.localRefer(request, postPath)
 		end
 	end

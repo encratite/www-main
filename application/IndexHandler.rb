@@ -1,4 +1,3 @@
-require 'PathMap'
 require 'SiteContainer'
 
 require 'visual/index'

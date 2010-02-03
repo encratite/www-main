@@ -1,5 +1,4 @@
 require 'SecuredFormWriter'
-require 'PathMap'
 require 'UserForm'
 require 'site/HTML'
 require 'visual/general'

@@ -14,10 +14,20 @@ class SiteContainer
 		return input.class == Array ? input : [input]
 	end
 	
-	def installHandler(path, handlerSymbol, argumentCount = 0)
+	def getPathFromPrefixes(input)
 		separator = '/'
-		path = convertArray(@prefix) + convertArray(@localPrefix) + convertArray(path)
+		path = convertArray(@prefix) + convertArray(@localPrefix) + convertArray(input)
 		path = separator + path * separator
+		return path
+	end
+	
+	def getPath(symbol)
+		value = const_get(symbol)
+		return getPathFromPrefixes value
+	end
+	
+	def installHandler(path, handlerSymbol, argumentCount = 0)
+		path = getPathFromPrefixes(path)
 		
 		handler = lambda { |request| send(handlerSymbol, request) } if handlerSymbol.class == Symbol
 		

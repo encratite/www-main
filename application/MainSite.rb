@@ -4,7 +4,6 @@ require 'UserHandler'
 
 require 'SessionManager'
 require 'Menu'
-require 'PathMap'
 require 'MainSiteGenerator'
 require 'static'
 require 'SiteRequest'
