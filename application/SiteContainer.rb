@@ -21,9 +21,8 @@ class SiteContainer
 		return path
 	end
 	
-	def getPath(symbol)
-		value = const_get(symbol)
-		return getPathFromPrefixes value
+	def getPath(input)
+		return getPathFromPrefixes input
 	end
 	
 	def installHandler(path, handlerSymbol, argumentCount = 0)

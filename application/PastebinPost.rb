@@ -8,7 +8,7 @@ class PastebinPost < SymbolTransfer
 	AnonymousAuthor = 'Anonymous'
 	NoDescription = 'No description'
 	
-	attr_reader :units, :isAnonymous, :noDescription
+	attr_reader :userId, :user, :units, :author, :isAnonymous, :author, :bodyAuthor, :noDescription, :description, :bodyDescription
 	
 	def initialize(target, request, database)
 		dataset = database[:pastebin_post]
@@ -28,7 +28,7 @@ class PastebinPost < SymbolTransfer
 			@user = nil
 		else
 			dataset = database[:site_user]
-			userData = datast.where(id: @userId)
+			userData = dataset.where(id: @userId)
 			internalError 'Unable to retrieve the user associated with this post.' if userData.empty?
 			@user = User.new(userData.first)
 		end
