@@ -18,6 +18,7 @@ require 'site/input'
 class PastebinHandler < SiteContainer
 	SubmitNewPost = 'submitNewPost'
 	View = 'view'
+	ViewPrivate = 'viewPrivate'
 	List = 'list'
 	
 	def installHandlers
@@ -27,6 +28,7 @@ class PastebinHandler < SiteContainer
 		installMenuHandler('Pastebin', [], :newPastebinPost)
 		installHandler(SubmitNewPost, :submitNewPastebinPost)
 		installHandler(View, :viewPastebinPost, 1)
+		installHandler(ViewPrivate, :viewPrivatePastebinPost, 1)
 		installHandler(List, :listPastebinPosts, 1)
 	end
 	
@@ -53,30 +55,31 @@ class PastebinHandler < SiteContainer
 		end
 		return sessionString
 	end
+	
+	def debugPastebinPostSubmission(request)
+		actualData = serialiseFields(getFieldValues(request, PastebinForm::PostFields))
+		debugData = request.getPost(PastebinForm::Debug)
+		
+		if debugData == actualData
+			puts 'Data matches'
+			#pastebinError('Data matches.', request)
+		else
+			puts 'Data does not match!'
+			puts "Actual data:\n#{actualData}"
+			puts "Debug data:\n#{debugData}"
+			
+			data = ''
+			writer = HTMLWriter.new data
+			writer.p { 'Data does not match:' }
+			textAreaArguments = {cols: '50', rows: '30'}
+			writer.textArea('Actual data', 'test1', actualData, textAreaArguments)
+			writer.textArea('Debug data', 'test2', debugData, textAreaArguments)
+			#pastebinError(data, request)
+		end
+	end
 
 	def submitNewPastebinPost(request)
-
-		if PastebinForm::DebugMode
-			actualData = serialiseFields(getFieldValues(request, PastebinForm::PostFields))
-			debugData = request.getPost(PastebinForm::Debug)
-			
-			if debugData == actualData
-				puts 'Data matches'
-				#pastebinError('Data matches.', request)
-			else
-				puts 'Data does not match!'
-				puts "Actual data:\n#{actualData}"
-				puts "Debug data:\n#{debugData}"
-				
-				data = ''
-				writer = HTMLWriter.new data
-				writer.p { 'Data does not match:' }
-				textAreaArguments = {cols: '50', rows: '30'}
-				writer.textArea('Actual data', 'test1', actualData, textAreaArguments)
-				writer.textArea('Debug data', 'test2', debugData, textAreaArguments)
-				#pastebinError(data, request)
-			end
-		end
+		debugPastebinPostSubmission request if PastebinForm::DebugMode
 
 		author,
 			
@@ -230,6 +233,14 @@ class PastebinHandler < SiteContainer
 	def viewPastebinPost(request)
 		postId = getPostId request
 		post = @database.transaction { PastebinPost.new(postId, self, request, @database) }
+		return @visual.showPastebinPost(request, post)
+	end
+	
+	def viewPrivatePastebinPost(request)
+		arguments = request.arguments
+		argumentError if arguments.empty?
+		privateString = arguments[0]
+		post = @database.transaction { PastebinPost.new(privateString, self, request, @database) }
 		return @visual.showPastebinPost(request, post)
 	end
 
