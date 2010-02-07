@@ -84,7 +84,7 @@ class VisualPastebinHandler
 				authorName = request.cookies[CookieConfiguration::Author]
 				writer.text('Author (optional)', PastebinForm::Author, authorName, pasteFieldLength(:VimScriptLengthMaximum))
 			else
-				writer.p { "You are currently logged in as <b>#{request.sessionUser.name}</b>." }
+				writer.p { "You are currently logged in as <b>#{request.sessionUser.htmlName}</b>." }
 				writer.hidden(PastebinForm::Author, '')
 			end
 			
