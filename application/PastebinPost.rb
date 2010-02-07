@@ -10,7 +10,7 @@ class PastebinPost < SymbolTransfer
 	
 	attr_reader :userId, :user, :units, :author, :isAnonymous, :author, :bodyAuthor, :noDescription, :description, :bodyDescription
 	
-	def initialize(target, request, database)
+	def initialize(target, handler, request, database)
 		dataset = database[:pastebin_post]
 		
 		if target.class == String
@@ -19,7 +19,7 @@ class PastebinPost < SymbolTransfer
 			postData = dataset.where(id: target, anonymous_string: nil)
 		end
 		
-		pastebinError('You have specified an invalid post identifier.', request) if postData.empty?
+		handler.pastebinError('You have specified an invalid post identifier.', request) if postData.empty?
 		
 		postData = postData.first
 		transferSymbols postData

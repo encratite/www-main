@@ -48,9 +48,10 @@ class PastebinHandler < SiteContainer
 	def createAnonymousString(length)
 		dataset = @database[:pastebin_post]
 		while true
-			string = RandomString.get length
+			sessionString = RandomString.get length
 			break if dataset.where(anonymous_string: sessionString).count == 0
 		end
+		return sessionString
 	end
 
 	def submitNewPastebinPost(request)
@@ -228,7 +229,7 @@ class PastebinHandler < SiteContainer
 
 	def viewPastebinPost(request)
 		postId = getPostId request
-		post = @database.transaction { PastebinPost.new(postId, request, @database) }
+		post = @database.transaction { PastebinPost.new(postId, self, request, @database) }
 		return @visual.showPastebinPost(request, post)
 	end
 
