@@ -77,6 +77,49 @@ class PastebinHandler < SiteContainer
 			#pastebinError(data, request)
 		end
 	end
+	
+	def getStringLengthChecks(author, postDescription, unitDescription, content, expertHighlighting)
+		stringLengthChecks =
+		[
+			[author, 'name', PastebinConfiguration::AuthorLengthMaximum],
+			[postDescription, 'post description', PastebinConfiguration::PostDescriptionLengthMaximum],
+			[unitDescription, 'unit description', PastebinConfiguration::UnitDescriptionLengthMaximum],
+			[content, 'content', PastebinConfiguration::UnitSizeLimit],
+			[expertHighlighting, 'vim script name', PastebinConfiguration::VimScriptLengthMaximum],
+		]
+		
+		return stringLengthChecks
+	end
+	
+	def getValidValues(highlightingGroup, privatePost, expiration)
+		validValues =
+		[
+			[highlightingGroup, 'highlighting group', PastebinForm::HighlightingGroupIdentifiers],
+			[privatePost, 'privacy option', [0, 1]],
+			[expiration, 'expiration option', (0..(PastebinConfiguration::ExpirationOptions.size - 1))],
+		]
+		
+		return validValues
+	end
+	
+	def performErrorChecks(errors, request, stringLengthChecks, validValues)
+		isSpammer = floodCheck request
+		if isSpammer
+			errors << 'You have triggered the pastebin flood protection by posting too frequently so your request could not be processed.'
+		end
+		
+		errors << 'You have not specified any content for your post.' if content.empty?
+		
+		stringLengthChecks.each do |field, name, limit|
+			next if field.size <= limit
+			errors << "The #{name} you have specified is too long - the limit is #{limit}."
+		end
+		
+		validValues.each do |field, name, values|
+			next if values.include?(field)
+			errors << "The #{name} you have specified is invalid."
+		end
+	end
 
 	def submitNewPastebinPost(request)
 		debugPastebinPostSubmission request if PastebinForm::DebugMode
@@ -98,26 +141,14 @@ class PastebinHandler < SiteContainer
 		
 		content = processFormFields(request, PastebinForm::PostFields)
 		
-		stringLengthChecks =
-		[
-			[author, 'name', PastebinConfiguration::AuthorLengthMaximum],
-			[postDescription, 'post description', PastebinConfiguration::PostDescriptionLengthMaximum],
-			[unitDescription, 'unit description', PastebinConfiguration::UnitDescriptionLengthMaximum],
-			[content, 'content', PastebinConfiguration::UnitSizeLimit],
-			[expertHighlighting, 'vim script name', PastebinConfiguration::VimScriptLengthMaximum],
-		]
+		stringLengthChecks = getStringLengthChecks(author, postDescription, unitDescription, content, expertHighlighting)
 		
 		errors = []
 		
 		privatePost = privatePost.to_i
 		expiration = expiration.to_i
 		
-		validValues =
-		[
-			[highlightingGroup, 'highlighting group', PastebinForm::HighlightingGroupIdentifiers],
-			[privatePost, 'privacy option', [0, 1]],
-			[expiration, 'expiration option', (0..(PastebinConfiguration::ExpirationOptions.size - 1))],
-		]
+		validValues = getValidValues(highlightingGroup, privatePost, expiration)
 		
 		syntaxHighlightingFields =
 		[
@@ -127,22 +158,7 @@ class PastebinHandler < SiteContainer
 		]
 		
 		@database.transaction do
-			isSpammer = floodCheck request
-			if isSpammer
-				errors << 'You have triggered the pastebin flood protection by posting too frequently so your request could not be processed.'
-			end
-			
-			errors << 'You have not specified any content for your post.' if content.empty?
-			
-			stringLengthChecks.each do |field, name, limit|
-				next if field.size <= limit
-				errors << "The #{name} you have specified is too long - the limit is #{limit}."
-			end
-			
-			validValues.each do |field, name, values|
-				next if values.include?(field)
-				errors << "The #{name} you have specified is invalid."
-			end
+			performErrorChecks(errors, request, stringLengthChecks, validValues)
 			
 			useSyntaxHighlighting =
 				PastebinForm::HighlightingGroupIdentifiers.include?(highlightingGroup) &&
@@ -217,7 +233,8 @@ class PastebinHandler < SiteContainer
 			dataset = @database[:pastebin_unit]
 			dataset.insert newUnit
 			
-			postPath = "#{getPath View}/#{postId}"
+			path = anonymousString == nil ? View : ViewPrivate
+			postPath = "#{getPath path}/#{postId}"
 			return HTTPReply.localRefer(request, postPath)
 		end
 	end
