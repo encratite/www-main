@@ -102,7 +102,7 @@ class PastebinHandler < SiteContainer
 		return validValues
 	end
 	
-	def performErrorChecks(errors, request, stringLengthChecks, validValues)
+	def performErrorChecks(errors, request, stringLengthChecks, validValues, content)
 		isSpammer = floodCheck request
 		if isSpammer
 			errors << 'You have triggered the pastebin flood protection by posting too frequently so your request could not be processed.'
@@ -158,7 +158,7 @@ class PastebinHandler < SiteContainer
 		]
 		
 		@database.transaction do
-			performErrorChecks(errors, request, stringLengthChecks, validValues)
+			performErrorChecks(errors, request, stringLengthChecks, validValues, content)
 			
 			useSyntaxHighlighting =
 				PastebinForm::HighlightingGroupIdentifiers.include?(highlightingGroup) &&
@@ -233,8 +233,12 @@ class PastebinHandler < SiteContainer
 			dataset = @database[:pastebin_unit]
 			dataset.insert newUnit
 			
-			path = anonymousString == nil ? View : ViewPrivate
-			postPath = "#{getPath path}/#{postId}"
+			if anonymousString == nil
+				postPath = "#{getPath View}/#{postId}"
+			else
+				postPath = "#{getPath ViewPrivate}/#{anonymousString}"
+			end
+			
 			return HTTPReply.localRefer(request, postPath)
 		end
 	end
