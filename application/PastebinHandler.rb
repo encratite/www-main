@@ -29,7 +29,7 @@ class PastebinHandler < SiteContainer
 		installHandler(SubmitNewPost, :submitNewPastebinPost)
 		installHandler(View, :viewPastebinPost, 1)
 		installHandler(ViewPrivate, :viewPrivatePastebinPost, 1)
-		installHandler(List, :listPastebinPosts, 1)
+		installHandler(List, :listPastebinPosts, 0..1)
 	end
 	
 	def pastebinError(content, request)
@@ -304,9 +304,12 @@ class PastebinHandler < SiteContainer
 			
 			puts posts.sql
 			posts = posts.all
-			put posts.inspect
-			output = @visual.listPastebinPosts(request, posts)
+			puts posts.inspect
+			output = @visual.listPastebinPosts(request, posts, page + 1, pageCount)
 			return @pastebinGenerator.get(output, request)
 		end
+	end
+	
+	def hasWriteAccess(request, post)
 	end
 end

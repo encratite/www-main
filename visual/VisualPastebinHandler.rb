@@ -280,7 +280,7 @@ END
 		return @pastebinGenerator.get([title, output], request)
 	end
 
-	def listPastebinPosts(request, posts)
+	def listPastebinPosts(request, posts, page, pageCount)
 		output = ''
 		writer = HTMLWriter.new output
 		
@@ -293,9 +293,26 @@ END
 		
 		writer.table do
 			writer.tr do
-				
+				columns.each do |column|
+					writer.td { column }
+				end
+			end
+			posts.each do |post|
+				writer.tr do
+					writer.td { post.bodyDescription }
+					writer.td { post.bodyAuthor }
+					writer.td { post.lastModification }
+				end
 			end
 		end
+		
+		if page == 1
+			title = 'Most recent pastes'
+		else
+			title = "Viewing pasts - page #{page}/#{pageCount}"
+		end
+		
+		return [title, output]
 	end
 	
 	def pastebinNewPost
