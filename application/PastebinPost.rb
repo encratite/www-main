@@ -8,9 +8,11 @@ class PastebinPost < SymbolTransfer
 	AnonymousAuthor = 'Anonymous'
 	NoDescription = 'No description'
 	
-	attr_reader :userId, :user, :units, :author, :isAnonymous, :author, :bodyAuthor, :noDescription, :description, :bodyDescription
+	attr_reader :userId, :user, :units, :author, :isAnonymous, :author, :bodyAuthor, :noDescription, :description, :bodyDescription, :pasteType
 	
-	def initialize(target, handler, request, database)
+	attr_accessor :pasteTypes
+	
+	def queryInitialisation(target, handler, request, database)
 		dataset = database[:pastebin_post]
 		
 		if target.class == String
@@ -24,9 +26,9 @@ class PastebinPost < SymbolTransfer
 		postData = postData.first
 		transferSymbols postData
 		
-		if @userId == nil
-			@user = nil
-		else
+		initialiseMembers
+		
+		if @userId != nil
 			dataset = database[:site_user]
 			userData = dataset.where(id: @userId)
 			internalError 'Unable to retrieve the user associated with this post.' if userData.empty?
@@ -36,9 +38,15 @@ class PastebinPost < SymbolTransfer
 		dataset = database[:pastebin_unit]
 		unitData = dataset.where(post_id: @id)
 		internalError 'No units are associated with this post.' if unitData.empty?
-		
-		@units = []
 		unitData.each { |unit| @units << PastebinUnit.new(unit) }
+		
+		return nil
+	end
+	
+	def initialiseMembers
+		@user = nil
+		
+		@pasteTypes = []
 		
 		@author = @author || @user.name
 		@isAnonymous = @author.empty?
@@ -56,6 +64,10 @@ class PastebinPost < SymbolTransfer
 		else
 			@bodyDescription = @description
 		end
+		
+		@units = []
+		
+		return nil
 	end
 	
 	def markString(input)

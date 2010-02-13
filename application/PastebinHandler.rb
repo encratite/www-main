@@ -253,7 +253,11 @@ class PastebinHandler < SiteContainer
 
 	def viewPastebinPost(request)
 		postId = getPostId request
-		post = @database.transaction { PastebinPost.new(postId, self, request, @database) }
+		post = nil
+		@database.transaction do
+			post = PastebinPost.new
+			post.queryInitialisation(postId, self, request, @database)
+		end
 		return @visual.showPastebinPost(request, post)
 	end
 	
@@ -261,8 +265,32 @@ class PastebinHandler < SiteContainer
 		arguments = request.arguments
 		argumentError if arguments.empty?
 		privateString = arguments[0]
-		post = @database.transaction { PastebinPost.new(privateString, self, request, @database) }
+		post = nil
+		@database.transaction do
+			post = PastebinPost.new
+			post.queryInitialisation(privateString, self, request, @database)
+		end
 		return @visual.showPastebinPost(request, post)
+	end
+	
+	def parsePosts(posts)
+		output = []
+		lastId = nil
+		currentPost = nil
+		posts.each do |rawPost|
+			post = PastebinPost.new
+			post.transferSymbols rawPost
+			post.initialiseMembers
+			if post.pastebinPostId == lastId
+				currentPost.pasteTypes << post.pasteTypes
+			else
+				lastId = post.pastebinPostId
+				output << post
+				currentPost = post
+				post.pasteTypes = [post.pasteTypes]
+			end
+		end
+		return output
 	end
 
 	def listPastebinPosts(request)
@@ -305,7 +333,8 @@ class PastebinHandler < SiteContainer
 			puts posts.sql
 			posts = posts.all
 			puts posts.inspect
-			output = @visual.listPastebinPosts(request, posts, page + 1, pageCount)
+			parsedPosts = parsePosts(posts)
+			output = @visual.listPastebinPosts(request, parsedPosts, page + 1, pageCount)
 			return @pastebinGenerator.get(output, request)
 		end
 	end
