@@ -44,7 +44,9 @@ class PastebinPost < SymbolTransfer
 	end
 	
 	def initialiseMembers
-		@user = nil
+		if @userId == nil
+			@user = nil
+		end
 		
 		@pasteTypes = []
 		
