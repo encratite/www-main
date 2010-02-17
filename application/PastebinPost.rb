@@ -8,7 +8,7 @@ class PastebinPost < SymbolTransfer
 	AnonymousAuthor = 'Anonymous'
 	NoDescription = 'No description'
 	
-	attr_reader :userId, :user, :units, :author, :isAnonymous, :author, :bodyAuthor, :noDescription, :description, :bodyDescription, :pasteType
+	attr_reader :userId, :user, :units, :name, :isAnonymous, :author, :bodyAuthor, :noDescription, :description, :bodyDescription, :pasteType, :creation
 	
 	attr_accessor :pasteTypes
 	
@@ -50,7 +50,17 @@ class PastebinPost < SymbolTransfer
 		
 		@pasteTypes = []
 		
-		@author = @author || @user.name
+		puts "Output: #{@user.class}, #{@author.class}"
+		puts inspect
+		
+		if @author == nil
+			if @user != nil
+				@author = @user.name
+			elsif @name != nil
+				#name from the post listing joins
+				@author = @name
+			end
+		end
 		@isAnonymous = @author.empty?
 		if @isAnonymous
 			@author = AnonymousAuthor

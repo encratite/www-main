@@ -2,6 +2,7 @@ require 'PathMap'
 require 'PastebinForm'
 require 'SyntaxHighlighting'
 require 'SecuredFormWriter'
+require 'PastebinHandler'
 
 require 'site/JavaScript'
 
@@ -9,7 +10,8 @@ require 'configuration/cookie'
 require 'configuration/pastebin'
 
 class VisualPastebinHandler
-	def initialize(pastebinGenerator)
+	def initialize(pastebinHandler, pastebinGenerator)
+		@pastebinHandler = pastebinHandler
 		@pastebinGenerator = pastebinGenerator
 	end
 	
@@ -291,17 +293,22 @@ END
 			'Date',
 		]
 		
-		writer.table do
+		writer.table(class: 'postList') do
 			writer.tr do
 				columns.each do |column|
-					writer.td { column }
+					writer.th { column }
 				end
 			end
-			posts.each do |post|
+			posts.reverse_each do |post|
 				writer.tr do
-					writer.td { post.bodyDescription }
+					path = @pastebinHandler.getPath([PastebinHandler::View, post.pastebinPostId.to_s])
+					writer.td do
+						writer.a(href: path) do
+							post.bodyDescription
+						end
+					end
 					writer.td { post.bodyAuthor }
-					writer.td { post.lastModification }
+					writer.td { post.creation.to_s }
 				end
 			end
 		end

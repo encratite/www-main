@@ -23,7 +23,7 @@ class PastebinHandler < SiteContainer
 	
 	def installHandlers
 		@localPrefix = 'pastebin'
-		@visual = VisualPastebinHandler.new @pastebinGenerator
+		@visual = VisualPastebinHandler.new(self, @pastebinGenerator)
 		
 		installMenuHandler('Pastebin', [], :newPastebinPost)
 		installHandler(SubmitNewPost, :submitNewPastebinPost)
@@ -316,6 +316,7 @@ class PastebinHandler < SiteContainer
 			
 			posts = posts.select(
 				:pastebin_post__id.as(:pastebin_post_id), :pastebin_post__user_id, :pastebin_post__author, :pastebin_post__description, :pastebin_post__creation,
+				#:site_user__name.as(:user_name),
 				:site_user__name,
 			)
 			
@@ -330,10 +331,11 @@ class PastebinHandler < SiteContainer
 				:pastebin_unit__paste_type
 			)
 			
-			puts posts.sql
+			#puts posts.sql
 			posts = posts.all
-			puts posts.inspect
+			#posts.each { |post| puts "Post: #{post.inspect}" }
 			parsedPosts = parsePosts(posts)
+			#posts.each { |post| puts "Parsed post: #{post.inspect}" }
 			output = @visual.listPastebinPosts(request, parsedPosts, page + 1, pageCount)
 			return @pastebinGenerator.get(output, request)
 		end
