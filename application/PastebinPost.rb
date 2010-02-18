@@ -26,6 +26,8 @@ class PastebinPost < SymbolTransfer
 		postData = postData.first
 		transferSymbols postData
 		
+		puts "postData: #{postData.inspect}"
+		
 		initialiseMembers
 		
 		if @userId != nil
@@ -50,7 +52,6 @@ class PastebinPost < SymbolTransfer
 		
 		@pasteTypes = []
 		
-		puts "Output: #{@user.class}, #{@author.class}"
 		puts inspect
 		
 		if @author == nil

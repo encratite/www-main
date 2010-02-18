@@ -316,7 +316,7 @@ END
 		if page == 1
 			title = 'Most recent pastes'
 		else
-			title = "Viewing pasts - page #{page}/#{pageCount}"
+			title = "Viewing pastes - page #{page}/#{pageCount}"
 		end
 		
 		return [title, output]
