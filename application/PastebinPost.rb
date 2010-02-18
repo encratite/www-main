@@ -28,14 +28,14 @@ class PastebinPost < SymbolTransfer
 		
 		puts "postData: #{postData.inspect}"
 		
-		initialiseMembers
-		
 		if @userId != nil
 			dataset = database[:site_user]
 			userData = dataset.where(id: @userId)
 			internalError 'Unable to retrieve the user associated with this post.' if userData.empty?
 			@user = User.new(userData.first)
 		end
+		
+		initialiseMembers
 		
 		dataset = database[:pastebin_unit]
 		unitData = dataset.where(post_id: @id)
@@ -52,7 +52,7 @@ class PastebinPost < SymbolTransfer
 		
 		@pasteTypes = []
 		
-		puts inspect
+		#puts inspect
 		
 		if @author == nil
 			if @user != nil
