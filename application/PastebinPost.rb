@@ -26,8 +26,6 @@ class PastebinPost < SymbolTransfer
 		postData = postData.first
 		transferSymbols postData
 		
-		puts "postData: #{postData.inspect}"
-		
 		if @userId != nil
 			dataset = database[:site_user]
 			userData = dataset.where(id: @userId)
@@ -51,8 +49,6 @@ class PastebinPost < SymbolTransfer
 		end
 		
 		@pasteTypes = []
-		
-		#puts inspect
 		
 		if @author == nil
 			if @user != nil

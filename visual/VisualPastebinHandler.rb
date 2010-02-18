@@ -290,6 +290,7 @@ END
 		[
 			'Description',
 			'Author',
+			'Type',
 			'Date',
 		]
 		
@@ -308,6 +309,7 @@ END
 						end
 					end
 					writer.td { post.bodyAuthor }
+					writer.td { post.pasteTypes }
 					writer.td { post.creation.to_s }
 				end
 			end
