@@ -23,6 +23,9 @@ class PastebinConfiguration
 	DayHours = 24
 	WeekDays = 7
 	
+	ListDescriptionLengthMaximum = 64
+	ListAuthorLengthMaximum = 32
+	
 	ExpirationOptions =
 	[
 		['No expiration', 0],

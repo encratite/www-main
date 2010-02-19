@@ -281,7 +281,6 @@ class PastebinHandler < SiteContainer
 			post = PastebinPost.new
 			post.transferSymbols rawPost
 			post.initialiseMembers
-			#puts post.inspect
 			if post.pastebinPostId == lastId
 				currentPost.pasteTypes << post.pasteType
 			else
@@ -332,11 +331,8 @@ class PastebinHandler < SiteContainer
 				:pastebin_unit__paste_type
 			)
 			
-			#puts posts.sql
 			posts = posts.all
-			#posts.each { |post| puts "Post: #{post.inspect}" }
 			parsedPosts = parsePosts(posts)
-			parsedPosts.each { |post| puts "Parsed post: #{post.inspect}" }
 			output = @visual.listPastebinPosts(request, parsedPosts, page + 1, pageCount)
 			return @pastebinGenerator.get(output, request)
 		end

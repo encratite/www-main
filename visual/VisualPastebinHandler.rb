@@ -293,6 +293,13 @@ END
 		end
 		return output.join(', ')
 	end
+	
+	def trimString(input, limit)
+		return input if input.size <= limit
+		filler = '...'
+		output = input[0 .. (limit - filler.size - 1)] + filler
+		return output
+	end
 
 	def listPastebinPosts(request, posts, page, pageCount)
 		output = ''
@@ -313,15 +320,17 @@ END
 				end
 			end
 			posts.reverse_each do |post|
+				description = trimString(post.bodyDescription, PastebinConfiguration::ListDescriptionLengthMaximum)
+				author = trimString(post.bodyAuthor, PastebinConfiguration::ListAuthorLengthMaximum)
 				writer.tr do
 					path = @pastebinHandler.getPath([PastebinHandler::View, post.pastebinPostId.to_s])
 					writer.td do
 						writer.a(href: path) do
-							post.bodyDescription
+							description
 						end
 					end
 					typeString = getTypeString post
-					writer.td { post.bodyAuthor }
+					writer.td { author }
 					writer.td { typeString }
 					writer.td { post.creation.to_s }
 				end
