@@ -281,6 +281,18 @@ END
 		
 		return @pastebinGenerator.get([title, output], request)
 	end
+	
+	def getTypeString(post)
+		limit = 3
+		output = []
+		counter = 0
+		post.pasteTypes.each do |type|
+			limit += 1
+			break if counter == limit
+			output << SyntaxHighlighting.getScriptDescription(type)
+		end
+		return output.join(', ')
+	end
 
 	def listPastebinPosts(request, posts, page, pageCount)
 		output = ''
@@ -308,8 +320,9 @@ END
 							post.bodyDescription
 						end
 					end
+					typeString = getTypeString post
 					writer.td { post.bodyAuthor }
-					writer.td { post.pasteTypes }
+					writer.td { typeString }
 					writer.td { post.creation.to_s }
 				end
 			end

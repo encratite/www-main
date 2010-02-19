@@ -76,6 +76,7 @@ class SyntaxHighlighting
 	end
 	
 	def self.getScriptDescription(script)
+		return 'Plain text' if script == nil
 		AllScripts.each do |option|
 			return option.description if option.value == script
 		end
