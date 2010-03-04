@@ -16,6 +16,7 @@ class Menu
 	
 	def add(description, path, condition)
 		@items << MenuItem.new(description, path, condition)
+		return nil
 	end
 	
 	def render(request)
