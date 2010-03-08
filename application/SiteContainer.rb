@@ -25,7 +25,7 @@ class SiteContainer
 		return getPathFromPrefixes input
 	end
 	
-	def installHandler(path, handlerSymbol, argumentCount = 0)
+	def _installHandler(path, handlerSymbol, argumentCount = 0)
 		path = getPathFromPrefixes(path)
 		
 		handler = lambda { |request| send(handlerSymbol, request) } if handlerSymbol.class == Symbol
@@ -34,10 +34,16 @@ class SiteContainer
 		@requestManager.addHandler requestHandler
 	end
 	
-	def installMenuHandler(description, path, handlerSymbol, condition = lambda { |request| true }, argumentCount = 0)
+	def _installMenuHandler(description, path, handlerSymbol, condition = lambda { |request| true }, argumentCount = 0)
 		actualPath = getPathFromPrefixes(path)
 		installHandler(path, handlerSymbol, argumentCount)
 		@menu.add(description, actualPath, condition)
+		return nil
+	end
+	
+	def installHandler(handler)
+		@requestManager.addHandler requestHandler
+		return nil
 	end
 	
 	def processFormFields(request, names)
