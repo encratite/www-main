@@ -6,43 +6,11 @@ class SiteContainer
 			instance_variable_set(symbol, value)
 		end
 		
-		@localPrefix = []
 		installHandlers
 	end
 	
-	def convertArray(input)
-		return input.class == Array ? input : [input]
-	end
-	
-	def getPathFromPrefixes(input)
-		separator = '/'
-		path = convertArray(@prefix) + convertArray(@localPrefix) + convertArray(input)
-		path = separator + path * separator
-		return path
-	end
-	
-	def getPath(input)
-		return getPathFromPrefixes input
-	end
-	
-	def _installHandler(path, handlerSymbol, argumentCount = 0)
-		path = getPathFromPrefixes(path)
-		
-		handler = lambda { |request| send(handlerSymbol, request) } if handlerSymbol.class == Symbol
-		
-		requestHandler = RequestHandler.new(path, handler, argumentCount)
-		@requestManager.addHandler requestHandler
-	end
-	
-	def _installMenuHandler(description, path, handlerSymbol, condition = lambda { |request| true }, argumentCount = 0)
-		actualPath = getPathFromPrefixes(path)
-		installHandler(path, handlerSymbol, argumentCount)
-		@menu.add(description, actualPath, condition)
-		return nil
-	end
-	
 	def installHandler(handler)
-		@requestManager.addHandler requestHandler
+		@requestManager.addHandler handler
 		return nil
 	end
 	

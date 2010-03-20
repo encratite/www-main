@@ -6,8 +6,8 @@ class IndexHandler < SiteContainer
 	Description = 'Index'
 	
 	def installHandlers
-		indexHandler = RequestHandler.menu(nil, getFunction(:getIndex))
-		installMenuHandler(Description, [], :getIndex)
+		indexHandler = RequestHandler.menu(Description, nil, method(:getIndex))
+		installHandler(indexHandler)
 	end
 	
 	def getIndex(request)
