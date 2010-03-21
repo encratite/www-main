@@ -3,7 +3,7 @@ require 'visual/body'
 
 class MainSiteGenerator < SiteGenerator
 	def head(title, request)
-		return super(title) + visualHead(@requestManager, request)
+		return super(title) + visualHead(request)
 	end
 	
 	def foot

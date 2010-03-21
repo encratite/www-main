@@ -1,6 +1,6 @@
 require 'site/HTMLWriter'
 
-def renderMenu(items, request)
+def renderMenu(request)
 	output = ''
 	writer = HTMLWriter.new output
 	writer.ul(id: 'menu') do
