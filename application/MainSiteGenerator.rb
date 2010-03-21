@@ -2,13 +2,8 @@ require 'site/SiteGenerator'
 require 'visual/body'
 
 class MainSiteGenerator < SiteGenerator
-	def initialize(menu)
-		@menu = menu
-		super()
-	end
-	
 	def head(title, request)
-		return super(title) + visualHead(@menu, request)
+		return super(title) + visualHead(@requestManager, request)
 	end
 	
 	def foot

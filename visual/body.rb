@@ -1,5 +1,8 @@
-def visualHead(menu, request)
-	output = menu.render request
+require 'visual/menu'
+
+def visualHead(requestManager, request)
+	#output = menu.render request
+	output = '[menu here]<br/>'
 	output += "<div id=\"siteContent\">\n"
 end
 

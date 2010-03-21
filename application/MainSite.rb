@@ -3,7 +3,6 @@ require 'PastebinHandler'
 require 'UserHandler'
 
 require 'SessionManager'
-require 'Menu'
 require 'MainSiteGenerator'
 require 'static'
 require 'SiteRequest'
@@ -26,7 +25,6 @@ class MainSite
 	
 	def initialize
 		@database = getDatabaseObject
-		@menu = Menu.new
 		@sessionManager = SessionManager.new @database
 		@requestManager = RequestManager.new(lambda { |environment| SiteRequest.new(@sessionManager, environment) } )
 		@generator = getSiteGenerator
@@ -50,9 +48,9 @@ class MainSite
 	def getSiteGenerator(stylesheets = [], scripts = [])
 		stylesheets = ['base'] + stylesheets
 		scripts = ['hash'] + scripts
-		output = MainSiteGenerator.new @menu
+		output = MainSiteGenerator.new @requestManager
 		stylesheets.each { |path| output.addStylesheet(getStylesheet path) }
 		scripts.each { |script| output.addScript(getScript script) }
-		output
+		return output
 	end
 end
