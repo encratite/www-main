@@ -1,8 +1,7 @@
-require 'visual/menu'
+require 'visual/MenuRenderer'
 
 def visualHead(requestManager, request)
-	#output = menu.render request
-	output = '[menu here]<br/>'
+	output = MenuRenderer.renderMenu request
 	output += "<div id=\"siteContent\">\n"
 end
 

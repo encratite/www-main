@@ -1,16 +1,24 @@
 require 'site/HTMLWriter'
 
-def renderMenu(request)
-	output = ''
-	writer = HTMLWriter.new output
-	writer.ul(id: 'menu') do
-		items.each do |item|
-			if item.condition.(request)
-				writer.li do
-					writer.a(href: item.path) { item.description }
+class MenuRenderer
+	def self.convertPath(input)
+		separator = '/'
+		return separator + input.join(separator)
+	end
+
+	def self.renderMenu(request)
+		menuStructure = request.manager.getMenu
+		output = ''
+		writer = HTMLWriter.new output
+		writer.ul(id: 'menu') do
+			menuStructure.each do |item|
+				if item.condition.(request)
+					writer.li do
+						writer.a(href: convertPath(item.path)) { item.description }
+					end
 				end
 			end
 		end
+		return output
 	end
-	return output
 end
