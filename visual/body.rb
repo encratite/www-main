@@ -1,6 +1,6 @@
 require 'visual/MenuRenderer'
 
-def visualHead(requestManager, request)
+def visualHead(request)
 	output = MenuRenderer.renderMenu request
 	output += "<div id=\"siteContent\">\n"
 end
