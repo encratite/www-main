@@ -6,9 +6,9 @@ class SiteContainer
 			instance_variable_set(symbol, value)
 		end
 		
-		installHandlers
-		
 		@site = site
+		
+		installHandlers
 	end
 	
 	def installHandler(handler)

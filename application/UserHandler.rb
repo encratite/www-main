@@ -7,6 +7,7 @@ require 'SiteContainer'
 require 'site/HTTPReply'
 require 'site/Cookie'
 require 'site/EMailValidator'
+require 'site/RequestHandler'
 
 require 'configuration/site'
 require 'configuration/cookie'
@@ -24,11 +25,21 @@ class UserHandler < SiteContainer
 	def installHandlers
 		notLoggedIn = lambda { |request| request.sessionUser == nil }
 		
-		installMenuHandler('Login', Login, :loginFormRequest, notLoggedIn)
-		installMenuHandler('Register', Register, :registerFormRequest, notLoggedIn)
+		loginHandler = RequestHandler.menu('Login', Login, method(:loginFormRequest), RequestHandler.NoArguments, notLoggedIn)
+		registerHandler = RequestHandler.menu('Register', Register, method(:registerFormRequest), RequestHandler.NoArguments, notLoggedIn)
 		
-		installHandler(SubmitLogin, :performLoginRequest)
-		installHandler(SubmitRegistration, :performRegistrationRequest)
+		submitLoginHandler = RequestHandler.handler(SubmitLogin, method(:performLoginRequest))
+		submitRegistrationHandler = RequestHandler.handler(SubmitRegistration, method(:performRegistrationRequest))
+		
+		handlers =
+		[
+			loginHandler,
+			registerHandler,
+			submitLoginHandler,
+			submitRegistrationhandler
+		]
+		
+		handlers.each { |handler| @site.mainHandler.add handler }
 	end
 	
 	def addLogoutMenu
