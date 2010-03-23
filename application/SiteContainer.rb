@@ -7,6 +7,8 @@ class SiteContainer
 		end
 		
 		installHandlers
+		
+		@site = site
 	end
 	
 	def installHandler(handler)

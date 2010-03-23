@@ -21,7 +21,7 @@ require 'site/RequestHandler'
 require 'sequel'
 
 class MainSite
-	attr_accessor :requestManager
+	attr_accessor :requestManager, :mainHandler
 	
 	def initialize
 		@database = getDatabaseObject
