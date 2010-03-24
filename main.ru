@@ -9,10 +9,10 @@ require 'PastebinHandler'
 mainSite = MainSite.new
 
 indexHandler = IndexHandler.new mainSite
-#userHandler = UserHandler.new mainSite
+userHandler = UserHandler.new mainSite
 #pastebinHandler = PastebinHandler.new mainSite
 
-#userHandler.addLogoutMenu
+userHandler.addLogoutMenu
 
 handler = lambda do |environment|
 	mainSite.requestManager.handleRequest(environment)

@@ -25,8 +25,8 @@ class UserHandler < SiteContainer
 	def installHandlers
 		notLoggedIn = lambda { |request| request.sessionUser == nil }
 		
-		loginHandler = RequestHandler.menu('Login', Login, method(:loginFormRequest), RequestHandler.NoArguments, notLoggedIn)
-		registerHandler = RequestHandler.menu('Register', Register, method(:registerFormRequest), RequestHandler.NoArguments, notLoggedIn)
+		loginHandler = RequestHandler.menu('Login', Login, method(:loginFormRequest), nil, notLoggedIn)
+		registerHandler = RequestHandler.menu('Register', Register, method(:registerFormRequest), nil, notLoggedIn)
 		
 		submitLoginHandler = RequestHandler.handler(SubmitLogin, method(:performLoginRequest))
 		submitRegistrationHandler = RequestHandler.handler(SubmitRegistration, method(:performRegistrationRequest))
@@ -36,7 +36,7 @@ class UserHandler < SiteContainer
 			loginHandler,
 			registerHandler,
 			submitLoginHandler,
-			submitRegistrationhandler
+			submitRegistrationHandler
 		]
 		
 		handlers.each { |handler| @site.mainHandler.add handler }
@@ -45,7 +45,8 @@ class UserHandler < SiteContainer
 	def addLogoutMenu
 		loggedIn = lambda { |request| request.sessionUser != nil }
 		
-		installMenuHandler('Logout', Logout, :logoutRequest, loggedIn)
+		logoutHandler = RequestHandler.menu('Logout', Logout, method(:logoutRequest), nil, loggedIn)
+		@site.mainHandler.add logoutHandler
 	end
 	
 	def sessionCheck(request, title, message)
