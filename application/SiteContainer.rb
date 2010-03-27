@@ -16,6 +16,10 @@ class SiteContainer
 		return nil
 	end
 	
+	def addMainHandler(handler)
+		@site.mainHandler.add handler
+	end
+	
 	def processFormFields(request, names)
 		randomString = request.getPost(SecuredFormWriter::RandomString)
 		formHash = request.getPost(SecuredFormWriter::HashField)

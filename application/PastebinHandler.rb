@@ -16,20 +16,28 @@ require 'site/HTTPReply'
 require 'site/input'
 
 class PastebinHandler < SiteContainer
+	Pastebin = 'pastebin'
 	SubmitNewPost = 'submitNewPost'
 	View = 'view'
 	ViewPrivate = 'viewPrivate'
 	List = 'list'
 	
 	def installHandlers
-		@localPrefix = 'pastebin'
 		@visual = VisualPastebinHandler.new(self, @pastebinGenerator)
 		
-		installMenuHandler('Pastebin', [], :newPastebinPost)
-		installHandler(SubmitNewPost, :submitNewPastebinPost)
-		installHandler(View, :viewPastebinPost, 1)
-		installHandler(ViewPrivate, :viewPrivatePastebinPost, 1)
-		installHandler(List, :listPastebinPosts, 0..1)
+		pastebinHandler = RequestHandler.menu('Pastebin', Pastebin, method(:newPastebinPost))
+		addMainHandler pastebinHandler
+		
+		RequestHandler.newBufferedObjectsGroup
+		
+		RequestHandler.menu('Create new post', nil, method(:newPastebinPost))
+		RequestHandler.menu('View posts', List, method(:listPastebinPosts), 0..1)
+		
+		RequestHandler.handler(SubmitNewPost, :submitNewPastebinPost)
+		RequestHandler.handler(View, :viewPastebinPost, 1)
+		RequestHandler.handler(ViewPrivate, :viewPrivatePastebinPost, 1)
+		
+		RequestHandler.getBufferedObjects.each { |handler| pastebinHandler.add(handler) }
 	end
 	
 	def pastebinError(content, request)

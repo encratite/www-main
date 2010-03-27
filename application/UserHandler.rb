@@ -25,21 +25,13 @@ class UserHandler < SiteContainer
 	def installHandlers
 		notLoggedIn = lambda { |request| request.sessionUser == nil }
 		
-		loginHandler = RequestHandler.menu('Login', Login, method(:loginFormRequest), nil, notLoggedIn)
-		registerHandler = RequestHandler.menu('Register', Register, method(:registerFormRequest), nil, notLoggedIn)
+		RequestHandler.menu('Login', Login, method(:loginFormRequest), nil, notLoggedIn)
+		RequestHandler.menu('Register', Register, method(:registerFormRequest), nil, notLoggedIn)
 		
-		submitLoginHandler = RequestHandler.handler(SubmitLogin, method(:performLoginRequest))
-		submitRegistrationHandler = RequestHandler.handler(SubmitRegistration, method(:performRegistrationRequest))
+		RequestHandler.handler(SubmitLogin, method(:performLoginRequest))
+		RequestHandler.handler(SubmitRegistration, method(:performRegistrationRequest))
 		
-		handlers =
-		[
-			loginHandler,
-			registerHandler,
-			submitLoginHandler,
-			submitRegistrationHandler
-		]
-		
-		handlers.each { |handler| @site.mainHandler.add handler }
+		RequestHandler.getBufferedObjects.each { |handler| addMainHandler handler }
 	end
 	
 	def addLogoutMenu
