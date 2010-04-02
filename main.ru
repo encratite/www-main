@@ -10,7 +10,7 @@ mainSite = MainSite.new
 
 indexHandler = IndexHandler.new mainSite
 userHandler = UserHandler.new mainSite
-#pastebinHandler = PastebinHandler.new mainSite
+pastebinHandler = PastebinHandler.new mainSite
 
 userHandler.addLogoutMenu
 
