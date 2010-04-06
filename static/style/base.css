@@ -152,31 +152,38 @@ ul.formLabel li
 	margin: 2em 4em 2em 4em;
 }
 
-#menu
+.menu
 {
-	background-color: #000;
 	padding: 0.2em 0 0.2em 4em;
 	margin: 0 0 1em 0;
 	min-width: 62em;
 }
 
-#menu li
+.menu li
 {
 	font-weight: bold;
 	display: inline;
 	padding-right: 2em;
 }
 
-#menu a
+.menu a
 {
 	text-decoration: none;
 	color: #fff;
 	background: none;
 }
 
-#menu a:hover
+.menu a:hover
 {
 	color: #aaa;
 }
 
+#menu1
+{
+	background-color: #000;
+}
 
+#menu2
+{
+	background-color: #404040;
+}

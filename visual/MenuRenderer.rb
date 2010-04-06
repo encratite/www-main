@@ -12,7 +12,7 @@ class MenuRenderer
 		writer = HTMLWriter.new output
 		level = 1
 		menu.each do |menuLevel|
-			writer.ul(id: "menu#{level}") do
+			writer.ul(class: 'menu', id: "menu#{level}") do
 				menuLevel.each do |item|
 					if item.condition.(request)
 						writer.li do
