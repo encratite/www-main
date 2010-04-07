@@ -11,6 +11,7 @@ class IndexHandler < SiteContainer
 		mainHandler.add(indexHandler)
 		installHandler(mainHandler)
 		@site.mainHandler = mainHandler
+		RequestHandler.newBufferedObjectsGroup
 	end
 	
 	def getIndex(request)
