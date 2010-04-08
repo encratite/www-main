@@ -1,4 +1,3 @@
-require 'PathMap'
 require 'PastebinForm'
 require 'SyntaxHighlighting'
 require 'SecuredFormWriter'
@@ -9,12 +8,7 @@ require 'site/JavaScript'
 require 'configuration/cookie'
 require 'configuration/pastebin'
 
-class VisualPastebinHandler
-	def initialize(pastebinHandler, pastebinGenerator)
-		@pastebinHandler = pastebinHandler
-		@pastebinGenerator = pastebinGenerator
-	end
-	
+class PastebinHandler
 	def pasteFieldLength(symbol)
 		return {maxlength: PastebinConfiguration.const_get(symbol)}
 	end
@@ -53,7 +47,7 @@ class VisualPastebinHandler
 		
 		lastSelection = request.cookies[CookieConfiguration::VimScript] if lastSelection == nil
 		
-		writer.securedForm(PathMap::PastebinSubmitNewPost, request) do
+		writer.securedForm(@submitNewPastebinPostHandler.getPath, request) do
 		
 			radioCounter = 0
 			
@@ -323,7 +317,7 @@ END
 				description = trimString(post.bodyDescription, PastebinConfiguration::ListDescriptionLengthMaximum)
 				author = trimString(post.bodyAuthor, PastebinConfiguration::ListAuthorLengthMaximum)
 				writer.tr do
-					path = @pastebinHandler.getPath([PastebinHandler::View, post.pastebinPostId.to_s])
+					path = @viewPastebinPost.getPath post.pastebinPostId.to_s
 					writer.td do
 						writer.a(href: path) do
 							description

@@ -31,11 +31,7 @@ class UserHandler < SiteContainer
 		RequestHandler.handler(SubmitLogin, method(:performLoginRequest))
 		RequestHandler.handler(SubmitRegistration, method(:performRegistrationRequest))
 		
-		puts 'Adding buffered'
-		
 		RequestHandler.getBufferedObjects.each { |handler| addMainHandler handler }
-		
-		puts 'End of buffered'
 	end
 	
 	def addLogoutMenu

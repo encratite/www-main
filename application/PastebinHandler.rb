@@ -23,8 +23,6 @@ class PastebinHandler < SiteContainer
 	List = 'list'
 	
 	def installHandlers
-		@visual = VisualPastebinHandler.new(self, @pastebinGenerator)
-		
 		pastebinHandler = RequestHandler.menu('Pastebin', Pastebin, method(:newPastebinPost))
 		addMainHandler pastebinHandler
 		
@@ -33,9 +31,9 @@ class PastebinHandler < SiteContainer
 		RequestHandler.menu('Create new post', nil, method(:newPastebinPost))
 		RequestHandler.menu('View posts', List, method(:listPastebinPosts), 0..1)
 		
-		RequestHandler.handler(SubmitNewPost, :submitNewPastebinPost)
-		RequestHandler.handler(View, :viewPastebinPost, 1)
-		RequestHandler.handler(ViewPrivate, :viewPrivatePastebinPost, 1)
+		@submitNewPastebinPostHandler = RequestHandler.handler(SubmitNewPost, method(:submitNewPastebinPost))
+		@viewPastebinPost = RequestHandler.handler(View, method(:viewPastebinPost), 1)
+		@viewPrivatePastebinPost = RequestHandler.handler(ViewPrivate, method(:viewPrivatePastebinPost), 1)
 		
 		RequestHandler.getBufferedObjects.each { |handler| pastebinHandler.add(handler) }
 	end
@@ -46,7 +44,7 @@ class PastebinHandler < SiteContainer
 	end
 
 	def newPastebinPost(request)
-		@pastebinGenerator.get(['Pastebin', @visual.pastebinForm(request)], request)
+		@pastebinGenerator.get(['Pastebin', pastebinForm(request)], request)
 	end
 
 	def floodCheck(request)
@@ -186,7 +184,7 @@ class PastebinHandler < SiteContainer
 			end
 			
 			if !errors.empty?
-				errorContent = @visual.pastebinForm(request, errors, postDescription, unitDescription, content, highlightingSelectionMode, lastSelection)
+				errorContent = pastebinForm(request, errors, postDescription, unitDescription, content, highlightingSelectionMode, lastSelection)
 				pastebinError(errorContent, request)
 			end
 
@@ -242,9 +240,9 @@ class PastebinHandler < SiteContainer
 			dataset.insert newUnit
 			
 			if anonymousString == nil
-				postPath = "#{getPath View}/#{postId}"
+				postPath = @viewPastebinPost.getPath postId
 			else
-				postPath = "#{getPath ViewPrivate}/#{anonymousString}"
+				postPath = @viewPrivatePastebinPost anonymousString
 			end
 			
 			return HTTPReply.localRefer(request, postPath)
@@ -266,7 +264,7 @@ class PastebinHandler < SiteContainer
 			post = PastebinPost.new
 			post.queryInitialisation(postId, self, request, @database)
 		end
-		return @visual.showPastebinPost(request, post)
+		return showPastebinPost(request, post)
 	end
 	
 	def viewPrivatePastebinPost(request)
@@ -278,7 +276,7 @@ class PastebinHandler < SiteContainer
 			post = PastebinPost.new
 			post.queryInitialisation(privateString, self, request, @database)
 		end
-		return @visual.showPastebinPost(request, post)
+		return showPastebinPost(request, post)
 	end
 	
 	def parsePosts(posts)
@@ -341,7 +339,7 @@ class PastebinHandler < SiteContainer
 			
 			posts = posts.all
 			parsedPosts = parsePosts(posts)
-			output = @visual.listPastebinPosts(request, parsedPosts, page + 1, pageCount)
+			output = listPastebinPosts(request, parsedPosts, page + 1, pageCount)
 			return @pastebinGenerator.get(output, request)
 		end
 	end
