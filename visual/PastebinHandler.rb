@@ -2,13 +2,14 @@ require 'PastebinForm'
 require 'SyntaxHighlighting'
 require 'SecuredFormWriter'
 require 'PastebinHandler'
+require 'SiteContainer'
 
 require 'site/JavaScript'
 
 require 'configuration/cookie'
 require 'configuration/pastebin'
 
-class PastebinHandler
+class PastebinHandler < SiteContainer
 	def pasteFieldLength(symbol)
 		return {maxlength: PastebinConfiguration.const_get(symbol)}
 	end

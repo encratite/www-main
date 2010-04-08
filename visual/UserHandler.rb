@@ -1,10 +1,14 @@
 require 'SecuredFormWriter'
 require 'UserForm'
+require 'SiteContainer'
+
 require 'site/HTML'
+
 require 'visual/general'
+
 require 'configuration/site'
 
-class UserHandler
+class UserHandler < SiteContainer
 	def accountExplanation
 		output =
 <<END

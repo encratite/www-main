@@ -7,7 +7,7 @@ require 'SiteContainer'
 require 'configuration/pastebin'
 
 require 'visual/general'
-require 'visual/VisualPastebinHandler'
+require 'visual/PastebinHandler'
 
 require 'site/RequestManager'
 require 'site/random'
@@ -240,9 +240,9 @@ class PastebinHandler < SiteContainer
 			dataset.insert newUnit
 			
 			if anonymousString == nil
-				postPath = @viewPastebinPost.getPath postId
+				postPath = @viewPastebinPost.getPath(postId)
 			else
-				postPath = @viewPrivatePastebinPost anonymousString
+				postPath = @viewPrivatePastebinPost.getPath(anonymousString)
 			end
 			
 			return HTTPReply.localRefer(request, postPath)
