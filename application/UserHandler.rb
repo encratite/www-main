@@ -12,7 +12,7 @@ require 'site/RequestHandler'
 require 'configuration/site'
 require 'configuration/cookie'
 
-require 'visual/user'
+require 'visual/UserHandler'
 require 'visual/general'
 
 class UserHandler < SiteContainer
