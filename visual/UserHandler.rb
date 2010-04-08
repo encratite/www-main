@@ -27,13 +27,13 @@ END
 		end
 		
 		writer.p class: 'indent' do
-			path = PathMap.getPath :Register
+			path = @registerFormRequestHandler.getPath
 			writer.a href: path do 'Register a new account' end
 		end
 		
 		writer.p { 'Specify your username and your password in the following writer and submit the data in order to log into your account.' }
 
-		writer.securedForm(PathMap::SubmitLogin, request) do
+		writer.securedForm(@performLoginRequestHandler.getPath, request) do
 			writer.text('User name', UserForm::User, nil, getFieldLength(:UserNameLengthMaximum))
 			writer.password('Password', UserForm::Password, nil, getFieldLength(:PasswordLengthMaximum))
 			writer.secureSubmit
@@ -67,7 +67,7 @@ END
 			end
 		end
 		
-		writer.securedForm(PathMap::SubmitRegistration, request) do
+		writer.securedForm(@performRegistrationRequestHandler.getPath, request) do
 			writer.text('User name', UserForm::User, user, getFieldLength(:UserNameLengthMaximum))
 			writer.password('Password', UserForm::Password, nil, getFieldLength(:PasswordLengthMaximum))
 			writer.password('Type your password again', UserForm::PasswordAgain, nil, getFieldLength(:PasswordLengthMaximum))

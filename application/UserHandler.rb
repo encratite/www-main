@@ -26,10 +26,10 @@ class UserHandler < SiteContainer
 		notLoggedIn = lambda { |request| request.sessionUser == nil }
 		
 		RequestHandler.menu('Login', Login, method(:loginFormRequest), nil, notLoggedIn)
-		RequestHandler.menu('Register', Register, method(:registerFormRequest), nil, notLoggedIn)
+		@registerFormRequestHandler = RequestHandler.menu('Register', Register, method(:registerFormRequest), nil, notLoggedIn)
 		
-		RequestHandler.handler(SubmitLogin, method(:performLoginRequest))
-		RequestHandler.handler(SubmitRegistration, method(:performRegistrationRequest))
+		@performLoginRequestHandler = RequestHandler.handler(SubmitLogin, method(:performLoginRequest))
+		@performRegistrationRequestHandler = RequestHandler.handler(SubmitRegistration, method(:performRegistrationRequest))
 		
 		RequestHandler.getBufferedObjects.each { |handler| addMainHandler handler }
 	end
