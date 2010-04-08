@@ -6,11 +6,8 @@ class IndexHandler < SiteContainer
 	Description = 'Index'
 	
 	def installHandlers
-		mainHandler = RequestHandler.new(@prefix)
 		indexHandler = RequestHandler.menu(Description, nil, method(:getIndex))
-		mainHandler.add(indexHandler)
-		installHandler(mainHandler)
-		@site.mainHandler = mainHandler
+		@mainHandler.add(indexHandler)
 		RequestHandler.newBufferedObjectsGroup
 	end
 	

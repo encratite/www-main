@@ -1,10 +1,5 @@
-require 'IndexHandler'
-require 'PastebinHandler'
-require 'UserHandler'
-
 require 'SessionManager'
 require 'MainSiteGenerator'
-require 'static'
 require 'SiteRequest'
 require 'hash'
 require 'error'
@@ -12,13 +7,14 @@ require 'SecuredFormWriter'
 
 require 'environment'
 
+require 'sequel'
+
 require 'configuration/database'
+require 'configuration/site'
 
 require 'site/RequestManager'
 require 'site/SiteGenerator'
 require 'site/RequestHandler'
-
-require 'sequel'
 
 class MainSite
 	attr_accessor :requestManager, :mainHandler
@@ -26,11 +22,13 @@ class MainSite
 	def initialize
 		@database = getDatabaseObject
 		@sessionManager = SessionManager.new @database
+		
 		@requestManager = RequestManager.new(lambda { |environment| SiteRequest.new(@sessionManager, environment) } )
+		@mainHandler = RequestHandler.new('main')
+		@requestManager.addHandler @mainHandler
+		
 		@generator = getSiteGenerator
 		@pastebinGenerator = getSiteGenerator(['pastebin'], ['pastebin'])
-		
-		@prefix = 'main'
 	end
 	
 	def getDatabaseObject
@@ -52,5 +50,21 @@ class MainSite
 		stylesheets.each { |path| output.addStylesheet(getStylesheet path) }
 		scripts.each { |script| output.addScript(getScript script) }
 		return output
+	end
+	
+	def getStaticPath(base, file)
+		return @mainHandler.getPath(SiteConfiguration::StaticDirectory, base, file)
+	end
+
+	def getStylesheet(name)
+		getStaticPath(SiteConfiguration::StylesheetDirectory, name + '.css')
+	end
+
+	def getImage(file)
+		getStaticPath(SiteConfiguration::ImageDirectory, file)
+	end
+
+	def getScript(name)
+		getStaticPath(SiteConfiguration::ScriptDirectory, name + '.js')
 	end
 end

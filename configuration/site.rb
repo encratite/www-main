@@ -1,7 +1,5 @@
 class SiteConfiguration
-	SitePrefix = '/main/'
-	StaticPath = SitePrefix + 'static/'
-	
+	StaticDirectory = 'static'
 	StylesheetDirectory = 'style'
 	ImageDirectory = 'image'
 	ScriptDirectory = 'script'

@@ -29,7 +29,7 @@ class PastebinHandler < SiteContainer
 		RequestHandler.newBufferedObjectsGroup
 		
 		RequestHandler.menu('Create new post', nil, method(:newPastebinPost))
-		RequestHandler.menu('View posts', List, method(:listPastebinPosts), 0..1)
+		RequestHandler.menu('View posts', List, method(:viewPastebinPosts), 0..1)
 		
 		@submitNewPastebinPostHandler = RequestHandler.handler(SubmitNewPost, method(:submitNewPastebinPost))
 		@viewPastebinPost = RequestHandler.handler(View, method(:viewPastebinPost), 1)
@@ -299,7 +299,7 @@ class PastebinHandler < SiteContainer
 		return output
 	end
 
-	def listPastebinPosts(request)
+	def viewPastebinPosts(request)
 		arguments = request.arguments
 		argumentError if arguments.size > 1
 		if arguments.empty?
