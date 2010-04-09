@@ -100,6 +100,8 @@ div.unitContainer
 	margin-top: 1em;
 	position: absolute;
 	white-space: nowrap;
+	display: inline-block;
+	padding: 0 2em 2em 0;
 }
 
 ul.contentList
