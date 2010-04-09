@@ -192,6 +192,7 @@ END
 			
 			unitFields.concat [
 				['Type', type],
+				['Size', getSizeString(unit.content.size)]
 			]
 			
 			if unit.timeAdded != post.creation
