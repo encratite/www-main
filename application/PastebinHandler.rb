@@ -289,6 +289,7 @@ class PastebinHandler < SiteContainer
 			post.initialiseMembers
 			if post.pastebinPostId == lastId
 				currentPost.pasteTypes << post.pasteType
+				currentPost.contentSize += post.contentSize
 			else
 				lastId = post.pastebinPostId
 				output << post
@@ -334,7 +335,8 @@ class PastebinHandler < SiteContainer
 			posts = posts.select(
 				:user_post__pastebin_post_id, :user_post__user_id, :user_post__author, :user_post__description, :user_post__creation,
 				:user_post__name,
-				:pastebin_unit__paste_type
+				:pastebin_unit__paste_type,
+				'length(pastebin_unit.content)'.lit.as(:content_size)
 			)
 			
 			posts = posts.all

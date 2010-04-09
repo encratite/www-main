@@ -5,6 +5,7 @@ require 'PastebinHandler'
 require 'SiteContainer'
 
 require 'site/JavaScript'
+require 'site/string'
 
 require 'configuration/cookie'
 require 'configuration/pastebin'
@@ -305,6 +306,7 @@ END
 			'Description',
 			'Author',
 			'Type',
+			'Size',
 			'Date',
 		]
 		
@@ -324,10 +326,18 @@ END
 							description
 						end
 					end
+					
 					typeString = getTypeString post
-					writer.td { author }
-					writer.td { typeString }
-					writer.td { post.creation.to_s }
+					sizeString = getSizeString post.contentSize
+					
+					[
+						author,
+						typeString,
+						sizeString,
+						post.creation.to_s
+					].each do |column|
+						writer.td { column }
+					end
 				end
 			end
 		end
