@@ -245,8 +245,7 @@ END
 	end
 
 	def showPastebinPost(request, post)
-		output = ''
-		writer = HTMLWriter.new output
+		writer = HTMLWriter.new
 
 		fields =
 		[
@@ -257,10 +256,9 @@ END
 		
 		permission = hasWriteAccess(request, post)
 		if permission
-			link = ''
-			linkWriter = HTMLWriter.new link
+			linkWriter = HTMLWriter.new
 			linkWriter.a(href: @deletePostHandler.getPath(post.id.to_s)) { 'Delete post' }
-			fields << ['Actions', link]
+			fields << ['Actions', linkWriter.output]
 		end
 		
 		getModificationFields(fields, post)
@@ -284,7 +282,7 @@ END
 		
 		title = "#{getDescription(post)} - Pastebin"
 		
-		return @pastebinGenerator.get([title, output], request)
+		return @pastebinGenerator.get([title, writer.output], request)
 	end
 	
 	def getTypeString(post)
@@ -307,8 +305,7 @@ END
 	end
 
 	def listPastebinPosts(request, posts, page, pageCount)
-		output = ''
-		writer = HTMLWriter.new output
+		writer = HTMLWriter.new
 		
 		columns =
 		[
@@ -357,9 +354,13 @@ END
 			title = "Viewing pastes - page #{page}/#{pageCount}"
 		end
 		
-		return [title, output]
+		return [title, writer.output]
 	end
 	
-	def pastebinNewPost
+	def confirmPostDeletion
+		title = 'Post deleted'
+		writer = HTMLWriter.new
+		writer.p { 'Your post, the units associated with it and all the replies to it have been removed.' }
+		return [title, writer.output]
 	end
 end

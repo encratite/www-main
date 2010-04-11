@@ -76,13 +76,12 @@ class PastebinHandler < SiteContainer
 			puts "Actual data:\n#{actualData}"
 			puts "Debug data:\n#{debugData}"
 			
-			data = ''
-			writer = HTMLWriter.new data
+			writer = HTMLWriter.new
 			writer.p { 'Data does not match:' }
 			textAreaArguments = {cols: '50', rows: '30'}
 			writer.textArea('Actual data', 'test1', actualData, textAreaArguments)
 			writer.textArea('Debug data', 'test2', debugData, textAreaArguments)
-			#pastebinError(data, request)
+			#pastebinError(writer.output, request)
 		end
 	end
 	
@@ -264,7 +263,7 @@ class PastebinHandler < SiteContainer
 		post = nil
 		@database.transaction do
 			post = PastebinPost.new
-			post.queryInitialisation(postId, self, request, @database)
+			post.showPostQueryInitialisation(postId, self, request, @database)
 		end
 		return showPastebinPost(request, post)
 	end
@@ -276,7 +275,7 @@ class PastebinHandler < SiteContainer
 		post = nil
 		@database.transaction do
 			post = PastebinPost.new
-			post.queryInitialisation(privateString, self, request, @database)
+			post.showPostQueryInitialisation(privateString, self, request, @database)
 		end
 		return showPastebinPost(request, post)
 	end
@@ -350,17 +349,34 @@ class PastebinHandler < SiteContainer
 	
 	def hasWriteAccess(request, post)
 		if post.userId == nil
-			puts "#{request.address.inspect}, #{post.ip.inspect}"
+			#puts "#{request.address.inspect}, #{post.ip.inspect}"
 			return request.address == post.ip
 		else
-			puts "#{post.userId.inspect}, #{request.sessionUser != nil ? request.sessionUser.id.inspect : 'request.sessionUser == nil'}"
+			#puts "#{post.userId.inspect}, #{request.sessionUser != nil ? request.sessionUser.id.inspect : 'request.sessionUser == nil'}"
 			return request.sessionUser != nil && post.userId == request.sessionUser.id
 		end
+	end
+	
+	def deletePostTree(id)
+		posts = @database[:pastebin_post]
+		replies = posts.where(reply_to: id)
+		replies.each { |reply| deletePostTree reply.id }
+		units = @database[:pastebin_unit]
+		units.where(post_id: id).delete
+		posts.where(id: id).delete
 	end
 	
 	def deletePost(request)
 		arguments = request.arguments
 		argumentError if arguments.size != 1
-		internalError 'Feature not implemented.'
+		postId = getPostId request
+		SiteContainer.raiseError(permissionError, request) if !PastebinHandler.hasWriteAccess(request, post)
+		database.transaction do
+			post = PastebinPost.new
+			post.deletePostQueryInitialisation(postId, request, @database)
+			raiseError(permissionError, request) if !hasWriteAccess(request, post)
+			deletePostTree postId
+		end
+		return confirmPostDeletion
 	end
 end

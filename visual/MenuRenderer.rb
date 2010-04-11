@@ -5,8 +5,7 @@ class MenuRenderer
 
 	def self.renderMenu(request)
 		menu = request.handler.getMenu
-		output = ''
-		writer = HTMLWriter.new output
+		writer = HTMLWriter.new
 		level = 1
 		menu.each do |menuLevel|
 			writer.ul(class: 'menu', id: "menu#{level}") do
@@ -20,6 +19,6 @@ class MenuRenderer
 			end
 			level += 1
 		end
-		return output
+		return writer.output
 	end
 end

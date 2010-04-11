@@ -25,3 +25,7 @@ end
 def argumentError
 	plainError 'You have specified invalid arguments.'
 end
+
+def permissionError
+	['Permission error', visualError('You do not have permission to perform this action.')]
+end

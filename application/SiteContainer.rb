@@ -31,11 +31,12 @@ class SiteContainer
 		
 		input = randomString + addressHash
 		hash = fnv1a(input)
-		if hash != formHash
-			#debugging
-			#raise RequestManager::Exception.new(@generator.get(hashError, request))
-		end
+		raiseError(hashError, request) if hash != formHash
 		
 		return fields
+	end
+	
+	def raiseError(error, request)
+		raise RequestManager::Exception.new(@generator.get(error, request))
 	end
 end

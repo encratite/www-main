@@ -1,4 +1,5 @@
 require 'User'
+require 'PastebinHandler'
 require 'error'
 
 require 'site/HTMLWriter'
@@ -12,7 +13,14 @@ class PastebinPost < SymbolTransfer
 	
 	attr_accessor :pasteTypes
 	
-	def queryInitialisation(target, handler, request, database)
+	def deletePostQueryInitialisation(id, request, database)
+		dataset = database[:pastebin_post]
+		postData = dataset.where(id: id).select(:user_id, :ip)
+		argumentError if postData.empty?
+		transferSymbols postData
+	end
+	
+	def showPostQueryInitialisation(target, handler, request, database)
 		dataset = database[:pastebin_post]
 		
 		if target.class == String
@@ -80,10 +88,9 @@ class PastebinPost < SymbolTransfer
 	end
 	
 	def markString(input)
-		output = ''
-		writer = HTMLWriter.new output
+		writer = HTMLWriter.new
 		writer.i { input }
-		return output
+		return writer.output
 	end
 end
 
