@@ -49,7 +49,7 @@ class PastebinHandler < SiteContainer
 		
 		lastSelection = request.cookies[CookieConfiguration::VimScript] if lastSelection == nil
 		
-		writer.securedForm(@submitNewPastebinPostHandler.getPath, request) do
+		writer.securedForm(@submitNewPostHandler.getPath, request) do
 		
 			radioCounter = 0
 			
@@ -255,6 +255,14 @@ END
 			['Time created', post.creation]
 		]
 		
+		permission = hasWriteAccess(request, post)
+		if permission
+			link = ''
+			linkWriter = HTMLWriter.new link
+			linkWriter.a(href: @deletePostHandler.getPath(post.id.to_s)) { 'Delete post' }
+			fields << ['Actions', link]
+		end
+		
 		getModificationFields(fields, post)
 		
 		if post.expiration != nil
@@ -321,7 +329,7 @@ END
 				description = trimString(post.bodyDescription, PastebinConfiguration::ListDescriptionLengthMaximum)
 				author = trimString(post.bodyAuthor, PastebinConfiguration::ListAuthorLengthMaximum)
 				writer.tr do
-					path = @viewPastebinPost.getPath post.pastebinPostId.to_s
+					path = @viewPostHandler.getPath post.pastebinPostId.to_s
 					writer.td do
 						writer.a(href: path) do
 							description

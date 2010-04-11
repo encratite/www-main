@@ -21,19 +21,21 @@ class PastebinHandler < SiteContainer
 	View = 'view'
 	ViewPrivate = 'viewPrivate'
 	List = 'list'
+	DeletePost = 'delete'
 	
 	def installHandlers
-		pastebinHandler = RequestHandler.menu('Pastebin', Pastebin, method(:newPastebinPost))
+		pastebinHandler = RequestHandler.menu('Pastebin', Pastebin, method(:newPost))
 		addMainHandler pastebinHandler
 		
 		RequestHandler.newBufferedObjectsGroup
 		
-		RequestHandler.menu('Create new post', nil, method(:newPastebinPost))
-		RequestHandler.menu('View posts', List, method(:viewPastebinPosts), 0..1)
+		RequestHandler.menu('Create new post', nil, method(:newPost))
+		RequestHandler.menu('View posts', List, method(:viewPosts), 0..1)
 		
-		@submitNewPastebinPostHandler = RequestHandler.handler(SubmitNewPost, method(:submitNewPastebinPost))
-		@viewPastebinPost = RequestHandler.handler(View, method(:viewPastebinPost), 1)
-		@viewPrivatePastebinPost = RequestHandler.handler(ViewPrivate, method(:viewPrivatePastebinPost), 1)
+		@submitNewPostHandler = RequestHandler.handler(SubmitNewPost, method(:submitNewPost))
+		@viewPostHandler = RequestHandler.handler(View, method(:viewPost), 1)
+		@viewPrivatePostHandler = RequestHandler.handler(ViewPrivate, method(:viewPrivatePost), 1)
+		@deletePostHandler = RequestHandler.handler(DeletePost, method(:deletePost), 1)
 		
 		RequestHandler.getBufferedObjects.each { |handler| pastebinHandler.add(handler) }
 	end
@@ -43,7 +45,7 @@ class PastebinHandler < SiteContainer
 		raise RequestManager::Exception.new(@pastebinGenerator.get(data, request))
 	end
 
-	def newPastebinPost(request)
+	def newPost(request)
 		@pastebinGenerator.get(['Pastebin', pastebinForm(request)], request)
 	end
 
@@ -62,7 +64,7 @@ class PastebinHandler < SiteContainer
 		return sessionString
 	end
 	
-	def debugPastebinPostSubmission(request)
+	def debugPostSubmission(request)
 		actualData = serialiseFields(getFieldValues(request, PastebinForm::PostFields))
 		debugData = request.getPost(PastebinForm::Debug)
 		
@@ -127,8 +129,8 @@ class PastebinHandler < SiteContainer
 		end
 	end
 
-	def submitNewPastebinPost(request)
-		debugPastebinPostSubmission request if PastebinForm::DebugMode
+	def submitNewPost(request)
+		debugPostSubmission request if PastebinForm::DebugMode
 
 		author,
 			
@@ -240,9 +242,9 @@ class PastebinHandler < SiteContainer
 			dataset.insert newUnit
 			
 			if anonymousString == nil
-				postPath = @viewPastebinPost.getPath(postId)
+				postPath = @viewPostHandler.getPath(postId)
 			else
-				postPath = @viewPrivatePastebinPost.getPath(anonymousString)
+				postPath = @viewPrivatePostHandler.getPath(anonymousString)
 			end
 			
 			return HTTPReply.localRefer(request, postPath)
@@ -257,7 +259,7 @@ class PastebinHandler < SiteContainer
 		return postId
 	end
 
-	def viewPastebinPost(request)
+	def viewPost(request)
 		postId = getPostId request
 		post = nil
 		@database.transaction do
@@ -267,7 +269,7 @@ class PastebinHandler < SiteContainer
 		return showPastebinPost(request, post)
 	end
 	
-	def viewPrivatePastebinPost(request)
+	def viewPrivatePost(request)
 		arguments = request.arguments
 		argumentError if arguments.empty?
 		privateString = arguments[0]
@@ -300,7 +302,7 @@ class PastebinHandler < SiteContainer
 		return output
 	end
 
-	def viewPastebinPosts(request)
+	def viewPosts(request)
 		arguments = request.arguments
 		argumentError if arguments.size > 1
 		if arguments.empty?
@@ -341,11 +343,25 @@ class PastebinHandler < SiteContainer
 			
 			posts = posts.all
 			parsedPosts = parsePosts(posts)
+			parsedPosts.each do |post|
+				puts post.userId.inspect
+			end
 			output = listPastebinPosts(request, parsedPosts, page + 1, pageCount)
 			return @pastebinGenerator.get(output, request)
 		end
 	end
 	
 	def hasWriteAccess(request, post)
+		if post.userId == nil
+			return request.address == post.ip
+		else
+			return request.sessionUser != nil && post.userId == request.sessionUser.id
+		end
+	end
+	
+	def deletePost(request)
+		arguments = request.arguments
+		argumentError if arguments.size != 1
+		internalError 'Feature not implemented.'
 	end
 end
