@@ -5,8 +5,6 @@ require 'hash'
 require 'error'
 require 'SecuredFormWriter'
 
-require 'environment'
-
 require 'sequel'
 
 require 'configuration/database'
