@@ -343,9 +343,6 @@ class PastebinHandler < SiteContainer
 			
 			posts = posts.all
 			parsedPosts = parsePosts(posts)
-			parsedPosts.each do |post|
-				puts post.userId.inspect
-			end
 			output = listPastebinPosts(request, parsedPosts, page + 1, pageCount)
 			return @pastebinGenerator.get(output, request)
 		end
@@ -353,8 +350,10 @@ class PastebinHandler < SiteContainer
 	
 	def hasWriteAccess(request, post)
 		if post.userId == nil
+			puts "#{request.address.inspect}, #{post.ip.inspect}"
 			return request.address == post.ip
 		else
+			puts "#{post.userId.inspect}, #{request.sessionUser != nil ? request.sessionUser.id.inspect : 'request.sessionUser == nil'}"
 			return request.sessionUser != nil && post.userId == request.sessionUser.id
 		end
 	end

@@ -32,7 +32,8 @@ class SiteContainer
 		input = randomString + addressHash
 		hash = fnv1a(input)
 		if hash != formHash
-			raise RequestManager::Exception.new(@generator.get(hashError, request))
+			#debugging
+			#raise RequestManager::Exception.new(@generator.get(hashError, request))
 		end
 		
 		return fields

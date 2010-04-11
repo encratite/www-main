@@ -5,14 +5,17 @@ require 'MainSite'
 require 'IndexHandler'
 require 'UserHandler'
 require 'PastebinHandler'
+require 'EnvironmentHandler'
 
 mainSite = MainSite.new
 
-indexHandler = IndexHandler.new mainSite
+IndexHandler.new mainSite
 userHandler = UserHandler.new mainSite
-pastebinHandler = PastebinHandler.new mainSite
+PastebinHandler.new mainSite
 
 userHandler.addLogoutMenu
+
+EnvironmentHandler.new mainSite
 
 handler = lambda do |environment|
 	mainSite.requestManager.handleRequest(environment)
