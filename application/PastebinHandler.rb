@@ -370,13 +370,12 @@ class PastebinHandler < SiteContainer
 		arguments = request.arguments
 		argumentError if arguments.size != 1
 		postId = getPostId request
-		SiteContainer.raiseError(permissionError, request) if !PastebinHandler.hasWriteAccess(request, post)
-		database.transaction do
-			post = PastebinPost.new
+		post = PastebinPost.new
+		@database.transaction do
 			post.deletePostQueryInitialisation(postId, request, @database)
 			raiseError(permissionError, request) if !hasWriteAccess(request, post)
 			deletePostTree postId
 		end
-		return confirmPostDeletion
+		return confirmPostDeletion(post, request)
 	end
 end

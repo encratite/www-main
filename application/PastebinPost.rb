@@ -15,9 +15,10 @@ class PastebinPost < SymbolTransfer
 	
 	def deletePostQueryInitialisation(id, request, database)
 		dataset = database[:pastebin_post]
-		postData = dataset.where(id: id).select(:user_id, :ip)
+		postData = dataset.where(id: id).select(:user_id, :ip, :description)
 		argumentError if postData.empty?
-		transferSymbols postData
+		transferSymbols postData.first
+		initialiseMembers false
 	end
 	
 	def showPostQueryInitialisation(target, handler, request, database)
@@ -51,27 +52,29 @@ class PastebinPost < SymbolTransfer
 		return nil
 	end
 	
-	def initialiseMembers
-		if @userId == nil
-			@user = nil
-		end
-		
-		@pasteTypes = []
-		
-		if @author == nil
-			if @user != nil
-				@author = @user.name
-			elsif @name != nil
-				#name from the post listing joins
-				@author = @name
+	def initialiseMembers(fullMode = true)
+		if fullMode
+			if @userId == nil
+				@user = nil
 			end
-		end
-		@isAnonymous = @author.empty?
-		if @isAnonymous
-			@author = AnonymousAuthor
-			@bodyAuthor = markString @author
-		else
-			@bodyAuthor = @author
+			
+			@pasteTypes = []
+			
+			if @author == nil
+				if @user != nil
+					@author = @user.name
+				elsif @name != nil
+					#name from the post listing joins
+					@author = @name
+				end
+			end
+			@isAnonymous = @author.empty?
+			if @isAnonymous
+				@author = AnonymousAuthor
+				@bodyAuthor = markString @author
+			else
+				@bodyAuthor = @author
+			end
 		end
 		
 		@noDescription = @description.empty?

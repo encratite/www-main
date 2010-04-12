@@ -357,10 +357,14 @@ END
 		return [title, writer.output]
 	end
 	
-	def confirmPostDeletion
+	def confirmPostDeletion(post, request)
 		title = 'Post deleted'
 		writer = HTMLWriter.new
-		writer.p { 'Your post, the units associated with it and all the replies to it have been removed.' }
-		return [title, writer.output]
+		writer.p do
+			writer.write 'Your post '
+			writer.b { "\"#{post.bodyDescription}\"" }
+			writer.write ' and all the replies to it have been removed.'
+		end
+		return @pastebinGenerator.get([title, writer.output], request)
 	end
 end
