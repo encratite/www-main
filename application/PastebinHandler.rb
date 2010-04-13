@@ -22,6 +22,7 @@ class PastebinHandler < SiteContainer
 	ViewPrivate = 'viewPrivate'
 	List = 'list'
 	DeletePost = 'delete'
+	DeleteUnit = 'deleteUnit'
 	
 	def installHandlers
 		pastebinHandler = RequestHandler.menu('Pastebin', Pastebin, method(:newPost))
@@ -36,6 +37,7 @@ class PastebinHandler < SiteContainer
 		@viewPostHandler = RequestHandler.handler(View, method(:viewPost), 1)
 		@viewPrivatePostHandler = RequestHandler.handler(ViewPrivate, method(:viewPrivatePost), 1)
 		@deletePostHandler = RequestHandler.handler(DeletePost, method(:deletePost), 1)
+		@deleteUnitHandler = RequestHandler.handler(DeleteUnit, method(:deleteUnit), 1)
 		
 		RequestHandler.getBufferedObjects.each { |handler| pastebinHandler.add(handler) }
 	end
@@ -252,7 +254,6 @@ class PastebinHandler < SiteContainer
 
 	def getPostId(request)
 		arguments = request.arguments
-		argumentError if arguments.empty?
 		postId = readId arguments[0]
 		argumentError if postId == nil
 		return postId
@@ -269,9 +270,7 @@ class PastebinHandler < SiteContainer
 	end
 	
 	def viewPrivatePost(request)
-		arguments = request.arguments
-		argumentError if arguments.empty?
-		privateString = arguments[0]
+		privateString = request.arguments[0]
 		post = nil
 		@database.transaction do
 			post = PastebinPost.new
@@ -303,7 +302,6 @@ class PastebinHandler < SiteContainer
 
 	def viewPosts(request)
 		arguments = request.arguments
-		argumentError if arguments.size > 1
 		if arguments.empty?
 			page = 0
 		else
@@ -367,8 +365,6 @@ class PastebinHandler < SiteContainer
 	end
 	
 	def deletePost(request)
-		arguments = request.arguments
-		argumentError if arguments.size != 1
 		postId = getPostId request
 		post = PastebinPost.new
 		@database.transaction do
@@ -377,5 +373,12 @@ class PastebinHandler < SiteContainer
 			deletePostTree postId
 		end
 		return confirmPostDeletion(post, request)
+	end
+	
+	def deleteUnit(request)
+		postId = getPostId request
+		post = PastebinPost.new
+		@database.transaction do
+		end
 	end
 end
