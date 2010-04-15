@@ -13,12 +13,28 @@ class PastebinPost < SymbolTransfer
 	
 	attr_accessor :pasteTypes
 	
-	def deletePostQueryInitialisation(id, request, database)
+	
+	def simpleInitialisation(id, database)
 		dataset = database[:pastebin_post]
 		postData = dataset.where(id: id).select(:user_id, :ip, :description)
 		argumentError if postData.empty?
 		transferSymbols postData.first
 		initialiseMembers false
+		return nil
+	end
+	
+	def deletePostQueryInitialisation(id, database)
+		simpleInitialisation(id, database)
+		return nil
+	end
+	
+	def deleteUnitQueryInitialisation(id, database)
+		units = database[:pastebin_unit]
+		unitData = dataset.where(id: id).select(:post_id.as(:postId))
+		argumentError if unitData.empty?
+		postId = unitData.postId
+		simpleInitialisation(postId, database)
+		return postId
 	end
 	
 	def showPostQueryInitialisation(target, handler, request, database)

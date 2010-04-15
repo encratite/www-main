@@ -252,15 +252,15 @@ class PastebinHandler < SiteContainer
 		end
 	end
 
-	def getPostId(request)
+	def getRequestId(request)
 		arguments = request.arguments
-		postId = readId arguments[0]
-		argumentError if postId == nil
-		return postId
+		id = readId arguments[0]
+		argumentError if id == nil
+		return id
 	end
 
 	def viewPost(request)
-		postId = getPostId request
+		postId = getRequestId request
 		post = nil
 		@database.transaction do
 			post = PastebinPost.new
@@ -365,10 +365,10 @@ class PastebinHandler < SiteContainer
 	end
 	
 	def deletePost(request)
-		postId = getPostId request
+		postId = getRequestId request
 		post = PastebinPost.new
 		@database.transaction do
-			post.deletePostQueryInitialisation(postId, request, @database)
+			post.deletePostQueryInitialisation(postId, @database)
 			raiseError(permissionError, request) if !hasWriteAccess(request, post)
 			deletePostTree postId
 		end
@@ -376,9 +376,18 @@ class PastebinHandler < SiteContainer
 	end
 	
 	def deleteUnit(request)
-		postId = getPostId request
+		unitId = getRequestId request
 		post = PastebinPost.new
+		deletedPost = nil
 		@database.transaction do
+			postId = post.deleteUnitQueryInitialisation(unitId, @database)
+			raiseError(permissionError, request) if !hasWriteAccess(request, post)
+			units = database[:pastebin_unit]
+			units.where(id: unitId).delete
+			unitCount = units.where(post_id: postId).count
+			deletedPost = unitCount == 0
+			deletePostTree postId if deletedPost
 		end
+		#continue
 	end
 end
