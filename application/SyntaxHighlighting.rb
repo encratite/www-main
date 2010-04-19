@@ -1,7 +1,8 @@
 require 'SecuredFormWriter'
 require 'error'
 
-require 'configuration/VimSyntax'
+require 'configuration/loader'
+requireConfiguration 'VimSyntax'
 
 require 'site/HTML'
 require 'site/string'

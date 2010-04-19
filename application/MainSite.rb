@@ -7,8 +7,9 @@ require 'SecuredFormWriter'
 
 require 'sequel'
 
-require 'configuration/database'
-require 'configuration/site'
+require 'configuration/loader'
+requireConfiguration 'database'
+requireConfiguration 'site'
 
 require 'site/RequestManager'
 require 'site/SiteGenerator'

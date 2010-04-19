@@ -9,8 +9,9 @@ require 'site/Cookie'
 require 'site/EMailValidator'
 require 'site/RequestHandler'
 
-require 'configuration/site'
-require 'configuration/cookie'
+require 'configuration/loader'
+requireConfiguration 'site'
+requireConfiguration 'cookie'
 
 require 'visual/UserHandler'
 require 'visual/general'

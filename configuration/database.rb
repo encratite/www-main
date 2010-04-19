@@ -2,10 +2,10 @@ class DatabaseConfiguration
 	Adapter = 'postgres'
 	Host = '127.0.0.1'
 	
-	User = 'void'
-	Password = 'HMoUYJSGpIfvIfw'
+	User = 'user'
+	Password = 'password'
 	
-	Database = 'main_site'
+	Database = 'database'
 	
-	PasswordSalt = 'GjrklklWX4Hc0sWASB0uWpO5nOc3fAxP'
+	PasswordSalt = 'salt'
 end

@@ -7,8 +7,9 @@ require 'SiteContainer'
 require 'site/JavaScript'
 require 'site/string'
 
-require 'configuration/cookie'
-require 'configuration/pastebin'
+require 'configuration/loader'
+requireConfiguration 'cookie'
+requireConfiguration 'pastebin'
 
 class PastebinHandler < SiteContainer
 	def pasteFieldLength(symbol)

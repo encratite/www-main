@@ -6,7 +6,8 @@ require 'site/HTML'
 
 require 'visual/general'
 
-require 'configuration/site'
+require 'configuration/loader'
+requireConfiguration 'site'
 
 class UserHandler < SiteContainer
 	def accountExplanation

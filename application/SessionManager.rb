@@ -1,6 +1,9 @@
 require 'site/random'
-require 'configuration/site'
-require 'configuration/cookie'
+
+require 'configuration/loader'
+requireConfiguration 'site'
+requireConfiguration 'cookie'
+
 require 'User'
 
 class SessionManager

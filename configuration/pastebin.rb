@@ -1,4 +1,6 @@
-require 'configuration/site'
+require 'configuration/loader'
+requireConfiguration 'site'
+
 require 'site/environment'
 
 class PastebinConfiguration

@@ -4,7 +4,8 @@ require 'SyntaxHighlighting'
 require 'PastebinPost'
 require 'SiteContainer'
 
-require 'configuration/pastebin'
+require 'configuration/loader'
+requireConfiguration 'pastebin'
 
 require 'visual/general'
 require 'visual/PastebinHandler'

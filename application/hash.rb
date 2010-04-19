@@ -1,4 +1,6 @@
-require 'configuration/database'
+require 'configuration/loader'
+requireConfiguration 'database'
+
 require 'digest/sha2'
 require 'sequel'
 require 'error'
