@@ -374,4 +374,20 @@ END
 		end
 		return @pastebinGenerator.get([title, writer.output], request)
 	end
+	
+	def confirmUnitDeletion(post, request, deletedPost)
+		writer = HTMLWriter.new
+		title = nil
+		writer.p do
+			if deletedPost
+				title = 'Post deleted'
+				writer.write 'Your post '
+				writer.b { "\"#{post.bodyDescription}\"" }
+				writer.write ' and all the replies to it have been removed because you deleted the only unit it contained.'
+			else
+				title = 'Unit deleted'
+			end
+		end
+		return @pastebinGenerator.get([title, writer.output], request)
+	end
 end

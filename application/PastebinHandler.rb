@@ -24,6 +24,7 @@ class PastebinHandler < SiteContainer
 	List = 'list'
 	DeletePost = 'delete'
 	DeleteUnit = 'deleteUnit'
+	Edit = 'edit'
 	
 	def installHandlers
 		pastebinHandler = RequestHandler.menu('Pastebin', Pastebin, method(:newPost))
@@ -39,6 +40,7 @@ class PastebinHandler < SiteContainer
 		@viewPrivatePostHandler = RequestHandler.handler(ViewPrivate, method(:viewPrivatePost), 1)
 		@deletePostHandler = RequestHandler.handler(DeletePost, method(:deletePost), 1)
 		@deleteUnitHandler = RequestHandler.handler(DeleteUnit, method(:deleteUnit), 1)
+		@editHandler = RequestHandler.handler(edit, method(:edit), 1)
 		
 		RequestHandler.getBufferedObjects.each { |handler| pastebinHandler.add(handler) }
 	end
@@ -389,6 +391,9 @@ class PastebinHandler < SiteContainer
 			deletedPost = unitCount == 0
 			deletePostTree postId if deletedPost
 		end
-		#continue
+		return confirmUnitDeletion(post, request, deletedPost)
+	end
+	
+	def edit(request)
 	end
 end

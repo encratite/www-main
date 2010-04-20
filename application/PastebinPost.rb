@@ -1,6 +1,7 @@
 require 'User'
 require 'PastebinHandler'
 require 'error'
+require 'string'
 
 require 'site/HTMLWriter'
 require 'site/SymbolTransfer'
@@ -13,6 +14,7 @@ class PastebinPost < SymbolTransfer
 	
 	attr_accessor :pasteTypes
 	
+	attr_reader :unitToDelete
 	
 	def simpleInitialisation(id, database)
 		dataset = database[:pastebin_post]
@@ -30,8 +32,9 @@ class PastebinPost < SymbolTransfer
 	
 	def deleteUnitQueryInitialisation(id, database)
 		units = database[:pastebin_unit]
-		unitData = dataset.where(id: id).select(:post_id.as(:postId))
+		unitData = dataset.where(id: id).select(:post_id, :description, :post_type)
 		argumentError if unitData.empty?
+		unitToDelete = PastebinUnit.new(unitData.first)
 		postId = unitData.postId
 		simpleInitialisation(postId, database)
 		return postId
@@ -105,16 +108,5 @@ class PastebinPost < SymbolTransfer
 		
 		return nil
 	end
-	
-	def markString(input)
-		writer = HTMLWriter.new
-		writer.i { input }
-		return writer.output
-	end
 end
 
-class PastebinUnit < SymbolTransfer
-	def initialize(input)
-		transferSymbols(input, {}, [:highlightingStyle, :highlightedContent])
-	end
-end
