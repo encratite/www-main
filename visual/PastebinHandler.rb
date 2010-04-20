@@ -176,7 +176,7 @@ END
 		return post.bodyDescription
 	end
 
-	def processPastebinUnit(writer, post)
+	def processPastebinUnits(writer, post, permission)
 		unitOffset = 1
 		post.units.each do |unit|
 			type =
@@ -198,6 +198,12 @@ END
 			
 			if unit.timeAdded != post.creation
 				unitFields << ['Time added', unit.timeAdded]
+			end
+			
+			if permission
+				linkWriter = HTMLWriter.new
+				linkWriter.a(href: @deleteUnitHandler.getPath(post.id.to_s)) { 'Delete unit' }
+				fields << ['Actions', linkWriter.output]
 			end
 			
 			getModificationFields(unitFields, unit)
@@ -279,7 +285,7 @@ END
 			end
 		end
 		
-		processPastebinUnit(writer, post)
+		processPastebinUnits(writer, post, permission)
 		
 		title = "#{getDescription(post)} - Pastebin"
 		
