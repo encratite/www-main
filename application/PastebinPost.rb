@@ -10,11 +10,9 @@ class PastebinPost < SymbolTransfer
 	AnonymousAuthor = 'Anonymous'
 	NoDescription = 'No description'
 	
-	attr_reader :userId, :user, :units, :name, :isAnonymous, :author, :bodyAuthor, :noDescription, :description, :bodyDescription, :pasteType, :creation, :contentSize, :ip
+	attr_reader :userId, :user, :units, :name, :isAnonymous, :author, :bodyAuthor, :noDescription, :description, :bodyDescription, :pasteType, :creation, :contentSize, :ip, :unitToDelete
 	
 	attr_accessor :pasteTypes
-	
-	attr_reader :unitToDelete
 	
 	def simpleInitialisation(id, database)
 		dataset = database[:pastebin_post]

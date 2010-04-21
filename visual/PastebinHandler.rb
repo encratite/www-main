@@ -375,7 +375,7 @@ END
 		title = nil
 		writer.p do
 			if unit.noDescription
-				writer.write "Your unnamed #{unit.bodyDescription} unit has been deleted."
+				writer.write "Your #{unit.bodyDescription} unit has been deleted."
 			else
 				writer.write "Your unit "
 				writer.b { "\"#{unit.bodyDescription}\"" }
@@ -384,8 +384,12 @@ END
 			
 			if deletedPost
 				title = 'Post deleted'
-				writer.write 'The post '
-				writer.b { "\"#{post.bodyDescription}\"" }
+				if post.noDescription
+					writer.write 'Your post '
+				else
+					writer.write 'The post '
+					writer.b { "\"#{post.bodyDescription}\"" }
+				end
 				writer.write ' and all the replies to it have been removed because you deleted the only unit it contained.'
 			else
 				title = 'Unit deleted'
