@@ -1,5 +1,4 @@
 require 'PastebinForm'
-require 'SyntaxHighlighting'
 require 'SecuredFormWriter'
 require 'PastebinHandler'
 require 'SiteContainer'
@@ -179,11 +178,6 @@ END
 	def processPastebinUnits(writer, post, permission)
 		unitOffset = 1
 		post.units.each do |unit|
-			type =
-				unit.pasteType == nil ?
-					'Plain text' :
-					SyntaxHighlighting::getScriptDescription(unit.pasteType)
-			
 			unitFields =
 			[
 				['Unit', "#{unitOffset}/#{post.units.size}"],
@@ -192,7 +186,7 @@ END
 			unitFields << ['Description',  unit.description] if !unit.description.empty?
 			
 			unitFields.concat [
-				['Type', type],
+				['Type', unit.bodyPasteType],
 				['Size', getSizeString(unit.content.size)]
 			]
 			
@@ -376,12 +370,21 @@ END
 	end
 	
 	def confirmUnitDeletion(post, request, deletedPost)
+		unit = post.unitToDelete
 		writer = HTMLWriter.new
 		title = nil
 		writer.p do
+			if unit.noDescription
+				writer.write "Your unnamed #{unit.bodyDescription} unit has been deleted."
+			else
+				writer.write "Your unit "
+				writer.b { "\"#{unit.bodyDescription}\"" }
+				writer.write 'has been deleted.'
+			end
+			
 			if deletedPost
 				title = 'Post deleted'
-				writer.write 'Your post '
+				writer.write 'The post '
 				writer.b { "\"#{post.bodyDescription}\"" }
 				writer.write ' and all the replies to it have been removed because you deleted the only unit it contained.'
 			else

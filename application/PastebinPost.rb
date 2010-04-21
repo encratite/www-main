@@ -88,21 +88,11 @@ class PastebinPost < SymbolTransfer
 				end
 			end
 			@isAnonymous = @author.empty?
-			if @isAnonymous
-				@author = AnonymousAuthor
-				@bodyAuthor = markString @author
-			else
-				@bodyAuthor = @author
-			end
+			processDescription(@isAnonymous, @author, @bodyAuthor, AnonymousAuthor)
 		end
 		
 		@noDescription = @description.empty?
-		if @noDescription
-			@description = NoDescription
-			@bodyDescription = markString @description
-		else
-			@bodyDescription = @description
-		end
+		processDescription(@noDescription, @description, @bodyDescription, NoDescription)
 		
 		@units = []
 		
