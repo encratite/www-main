@@ -40,7 +40,7 @@ class PastebinHandler < SiteContainer
 		@viewPrivatePostHandler = RequestHandler.handler(ViewPrivate, method(:viewPrivatePost), 1)
 		@deletePostHandler = RequestHandler.handler(DeletePost, method(:deletePost), 1)
 		@deleteUnitHandler = RequestHandler.handler(DeleteUnit, method(:deleteUnit), 1)
-		@editHandler = RequestHandler.handler(edit, method(:edit), 1)
+		@editHandler = RequestHandler.handler(Edit, method(:edit), 1)
 		
 		RequestHandler.getBufferedObjects.each { |handler| pastebinHandler.add(handler) }
 	end

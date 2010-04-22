@@ -197,7 +197,7 @@ END
 			if permission
 				linkWriter = HTMLWriter.new
 				linkWriter.a(href: @deleteUnitHandler.getPath(post.id.to_s)) { 'Delete unit' }
-				fields << ['Actions', linkWriter.output]
+				unitFields << ['Actions', linkWriter.output]
 			end
 			
 			getModificationFields(unitFields, unit)

@@ -1,5 +1,6 @@
 require 'User'
 require 'PastebinHandler'
+require 'PastebinUnit'
 require 'error'
 require 'string'
 
@@ -13,6 +14,11 @@ class PastebinPost < SymbolTransfer
 	attr_reader :userId, :user, :units, :name, :isAnonymous, :author, :bodyAuthor, :noDescription, :description, :bodyDescription, :pasteType, :creation, :contentSize, :ip, :unitToDelete
 	
 	attr_accessor :pasteTypes
+	
+	def initialize
+		@bodyAuthor = ''
+		@bodyDescription = ''
+	end
 	
 	def simpleInitialisation(id, database)
 		dataset = database[:pastebin_post]

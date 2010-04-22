@@ -129,7 +129,7 @@ class UserHandler < SiteContainer
 			passwordHash = hashWithSalt password
 			userId = dataset.insert(name: user, password: passwordHash, email: email)
 			sessionString = @sessionManager.createSession(userId, request.address)
-			sessionCookie = Cookie.new(CookieConfiguration::Session, sessionString, SiteConfiguration::SitePrefix)
+			sessionCookie = Cookie.new(CookieConfiguration::Session, sessionString, @site.mainHandler.getPath)
 			sessionCookie.expirationDays SiteConfiguration::SessionDurationInDays
 			output = visualRegistrationSuccess user
 			

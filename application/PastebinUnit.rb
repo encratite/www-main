@@ -16,6 +16,7 @@ class PastebinUnit < SymbolTransfer
 				'Plain text' :
 				SyntaxHighlighting::getScriptDescription(@pasteType)
 		@noDescription = @description.empty?
+		@bodyDescription = ''
 		processDescription(@noDescription, @description, @bodyDescription, @bodyPasteType)
 	end
 end
