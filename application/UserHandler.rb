@@ -80,7 +80,7 @@ class UserHandler < SiteContainer
 			request.sessionUser = user
 			
 			sessionString = @sessionManager.createSession(user.id, request.address)
-			sessionCookie = Cookie.new(CookieConfiguration::Session, sessionString, SiteConfiguration::SitePrefix)
+			sessionCookie = Cookie.new(CookieConfiguration::Session, sessionString, @site.mainHandler.getPath)
 			sessionCookie.expirationDays SiteConfiguration::SessionDurationInDays
 			
 			fullContent = @generator.get visualLoginSuccess(user), request
@@ -162,7 +162,7 @@ class UserHandler < SiteContainer
 		
 		fullContent = @generator.get visualLogout, request
 		reply = HTTPReply.new fullContent
-		reply.deleteCookie(CookieConfiguration::Session, SiteConfiguration::SitePrefix)
+		reply.deleteCookie(CookieConfiguration::Session, @site.mainHandler.getPath)
 		reply
 	end
 end

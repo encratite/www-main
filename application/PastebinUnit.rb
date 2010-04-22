@@ -7,7 +7,7 @@ class PastebinUnit < SymbolTransfer
 
 	UnnamedUnit = 'Unnamed unit'
 
-	attr_reader :bodyDescription, :bodyPasteType
+	attr_reader :bodyDescription, :bodyPasteType, :noDescription
 	
 	def initialize(input)
 		transferSymbols(input, {}, [:highlightingStyle, :highlightedContent])

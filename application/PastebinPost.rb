@@ -36,10 +36,10 @@ class PastebinPost < SymbolTransfer
 	
 	def deleteUnitQueryInitialisation(id, database)
 		units = database[:pastebin_unit]
-		unitData = dataset.where(id: id).select(:post_id, :description, :post_type)
+		unitData = units.where(id: id).select(:post_id, :description, :paste_type)
 		argumentError if unitData.empty?
-		unitToDelete = PastebinUnit.new(unitData.first)
-		postId = unitData.postId
+		@unitToDelete = PastebinUnit.new(unitData.first)
+		postId = @unitToDelete.postId
 		simpleInitialisation(postId, database)
 		return postId
 	end

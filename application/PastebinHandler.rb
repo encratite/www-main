@@ -385,7 +385,7 @@ class PastebinHandler < SiteContainer
 		@database.transaction do
 			postId = post.deleteUnitQueryInitialisation(unitId, @database)
 			raiseError(permissionError, request) if !hasWriteAccess(request, post)
-			units = database[:pastebin_unit]
+			units = @database[:pastebin_unit]
 			units.where(id: unitId).delete
 			unitCount = units.where(post_id: postId).count
 			deletedPost = unitCount == 0
