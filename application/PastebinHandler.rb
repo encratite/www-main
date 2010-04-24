@@ -255,8 +255,22 @@ class PastebinHandler < SiteContainer
 			reply = HTTPReply.localRefer(request, postPath)
 			
 			if useSyntaxHighlighting
-				cookie = @site.createCookie(CookieConfiguration::VimScript, syntaxHighlighting)
-				reply.addCookie cookie
+				[
+					[:PastebinMode, highlightingSelectionMode.to_s],
+					[:VimScript, syntaxHighlighting]
+				].each do |symbol, value|
+					name = CookieConfiguration.const_get(symbol)
+					cookie = @site.getCookie(name, value)
+					reply.addCookie(cookie)
+				end
+			else
+				[
+					:PastebinMode,
+					:VimScript
+				].each do |symbol|
+					name = CookieConfiguration.const_get(symbol)
+					reply.deleteCookie(name)
+				end
 			end
 			
 			return reply

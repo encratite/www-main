@@ -51,7 +51,7 @@ class MainSite
 		return output
 	end
 	
-	def createCookie(name, value)
+	def getCookie(name, value)
 		sessionCookie = Cookie.new(name, value, mainHandler.getPath)
 		sessionCookie.expirationDays SiteConfiguration::CookieDurationInDays
 		return sessionCookie

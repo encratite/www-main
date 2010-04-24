@@ -38,7 +38,7 @@ class UserHandler < SiteContainer
 	def addLogoutMenu
 		loggedIn = lambda { |request| request.sessionUser != nil }
 		
-		logoutHandler = RequestHandler.menu('Logout', Logout, method(:logoutRequest), nil, loggedIn)
+		logoutHandler = RequestHandler.menu('Log out', Logout, method(:logoutRequest), nil, loggedIn)
 		@site.mainHandler.add logoutHandler
 	end
 	
@@ -97,7 +97,7 @@ class UserHandler < SiteContainer
 	
 	def getSessionCookie(userId, request)
 		sessionString = @sessionManager.createSession(userId, request.address)
-		sessionCookie = @site.createCookie(CookieConfiguration::Session, sessionString)
+		sessionCookie = @site.getCookie(CookieConfiguration::Session, sessionString)
 		return sessionCookie
 	end
 
@@ -167,6 +167,6 @@ class UserHandler < SiteContainer
 		fullContent = @generator.get visualLogout, request
 		reply = HTTPReply.new fullContent
 		reply.deleteCookie(CookieConfiguration::Session, @site.mainHandler.getPath)
-		reply
+		return reply
 	end
 end

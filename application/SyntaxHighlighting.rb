@@ -29,12 +29,18 @@ class SyntaxHighlighting
 	
 	def self.getSelectionList(isCommon, selection)
 		source = isCommon ? CommonScripts : AllScripts
-		source.map do |option|
-			return option if option.type != selection
-			output = option.clone
-			output.selected = true
-			output
+		return source if selection == nil
+		output = []
+		source.each do |option|
+			if option.value != selection
+				output << option
+				next
+			end
+			newOption = option.clone
+			newOption.selected = true
+			output << newOption
 		end
+		return output
 	end
 	
 	def self.highlight(script, input)
@@ -48,7 +54,7 @@ class SyntaxHighlighting
 		
 		flags = ['f', 'n', 'X', 'e', 's']
 		
-		cFlags =
+		vimCommands =
 		[
 			"set filetype=#{script}\"",
 			'set background=light',
@@ -64,10 +70,11 @@ class SyntaxHighlighting
 		flags = flags.map { |flag| "-#{flag}" }
 		flags = flags.join ' '
 		
-		cFlags = cFlags.map { |cFlag| "-c \"#{cFlag}\"" }
-		cFlags = cFlags.join ' '
+		vimCommands = vimCommands.map { |cFlag| "-c \"#{cFlag}\"" }
+		vimCommands = vimCommands.join ' '
 		
-		`#{PastebinConfiguration::VimPath} #{flags} #{cFlags} #{inputFile.path}`
+		output = system "#{PastebinConfiguration::VimPath} #{flags} #{vimCommands} #{inputFile.path}"
+		plainError 'A vim error occured' if !output
 		
 		markup = outputFile.open.read
 		
