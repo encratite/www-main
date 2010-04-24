@@ -184,11 +184,8 @@ END
 			]
 			
 			unitFields << ['Description',  unit.description] if !unit.description.empty?
-			
-			unitFields.concat [
-				['Type', unit.bodyPasteType],
-				['Size', getSizeString(unit.content.size)]
-			]
+			unitFields << ['Type', unit.bodyPasteType] if !unit.noDescription
+			unitFields << ['Size', getSizeString(unit.content.size)]
 			
 			if unit.timeAdded != post.creation
 				unitFields << ['Time added', unit.timeAdded]

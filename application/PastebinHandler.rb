@@ -269,7 +269,7 @@ class PastebinHandler < SiteContainer
 					:VimScript
 				].each do |symbol|
 					name = CookieConfiguration.const_get(symbol)
-					reply.deleteCookie(name)
+					reply.deleteCookie(name, @site.mainHandler.getPath)
 				end
 			end
 			

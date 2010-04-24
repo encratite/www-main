@@ -73,8 +73,9 @@ class SyntaxHighlighting
 		vimCommands = vimCommands.map { |cFlag| "-c \"#{cFlag}\"" }
 		vimCommands = vimCommands.join ' '
 		
-		output = system "#{PastebinConfiguration::VimPath} #{flags} #{vimCommands} #{inputFile.path}"
-		plainError 'A vim error occured' if !output
+		#output = system "#{PastebinConfiguration::VimPath} #{flags} #{vimCommands} #{inputFile.path}"
+		#plainError 'A vim error occured' if !output
+		`#{PastebinConfiguration::VimPath} #{flags} #{vimCommands} #{inputFile.path}`
 		
 		markup = outputFile.open.read
 		
