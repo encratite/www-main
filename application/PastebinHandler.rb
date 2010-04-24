@@ -6,6 +6,7 @@ require 'SiteContainer'
 
 require 'configuration/loader'
 requireConfiguration 'pastebin'
+requireConfiguration 'cookie'
 
 require 'visual/general'
 require 'visual/PastebinHandler'
@@ -251,7 +252,14 @@ class PastebinHandler < SiteContainer
 				postPath = @viewPrivatePostHandler.getPath(anonymousString)
 			end
 			
-			return HTTPReply.localRefer(request, postPath)
+			reply = HTTPReply.localRefer(request, postPath)
+			
+			if useSyntaxHighlighting
+				cookie = @site.createCookie(CookieConfiguration::VimScript, syntaxHighlighting)
+				reply.addCookie cookie
+			end
+			
+			return reply
 		end
 	end
 

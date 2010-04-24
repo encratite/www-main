@@ -11,5 +11,5 @@ class SiteConfiguration
 	EmailLengthMaximum = 1024
 	
 	SessionStringLength = 128
-	SessionDurationInDays = 30
+	CookieDurationInDays = 30
 end

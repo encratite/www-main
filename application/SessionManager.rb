@@ -23,7 +23,7 @@ class SessionManager
 	end
 	
 	def cleanSessions
-		@database.run "delete from login_session where session_begin + interval '#{SiteConfiguration::SessionDurationInDays} days' < now()"
+		@database.run "delete from login_session where session_begin + interval '#{SiteConfiguration::CookieDurationInDays} days' < now()"
 	end
 	
 	def generateSessionString

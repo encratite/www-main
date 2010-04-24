@@ -377,15 +377,15 @@ END
 			if unit.noDescription
 				writer.write "Your #{unit.bodyDescription} unit has been deleted."
 			else
-				writer.write "Your unit "
+				writer.write 'Your unit '
 				writer.b { "\"#{unit.bodyDescription}\"" }
-				writer.write 'has been deleted.'
+				writer.write ' has been deleted.'
 			end
 			
 			if deletedPost
 				title = 'Post deleted'
 				if post.noDescription
-					writer.write 'Your post '
+					writer.write ' Your post '
 				else
 					writer.write 'The post '
 					writer.b { "\"#{post.bodyDescription}\"" }

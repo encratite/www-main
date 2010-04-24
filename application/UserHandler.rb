@@ -78,10 +78,8 @@ class UserHandler < SiteContainer
 		else
 			user = User.new result
 			request.sessionUser = user
-			
-			sessionString = @sessionManager.createSession(user.id, request.address)
-			sessionCookie = Cookie.new(CookieConfiguration::Session, sessionString, @site.mainHandler.getPath)
-			sessionCookie.expirationDays SiteConfiguration::SessionDurationInDays
+		
+			sessionCookie = getSessionCookie(user.id, request)
 			
 			fullContent = @generator.get visualLoginSuccess(user), request
 			
@@ -95,6 +93,12 @@ class UserHandler < SiteContainer
 		content = registrationCheck request
 		return content if content != nil
 		@generator.get(visualRegisterForm(request), request)
+	end
+	
+	def getSessionCookie(userId, request)
+		sessionString = @sessionManager.createSession(userId, request.address)
+		sessionCookie = @site.createCookie(CookieConfiguration::Session, sessionString)
+		return sessionCookie
 	end
 
 	def performRegistrationRequest(request)
@@ -130,7 +134,7 @@ class UserHandler < SiteContainer
 			userId = dataset.insert(name: user, password: passwordHash, email: email)
 			sessionString = @sessionManager.createSession(userId, request.address)
 			sessionCookie = Cookie.new(CookieConfiguration::Session, sessionString, @site.mainHandler.getPath)
-			sessionCookie.expirationDays SiteConfiguration::SessionDurationInDays
+			sessionCookie.expirationDays SiteConfiguration::CookieDurationInDays
 			output = visualRegistrationSuccess user
 			
 			newUser = User.new

@@ -51,6 +51,12 @@ class MainSite
 		return output
 	end
 	
+	def createCookie(name, value)
+		sessionCookie = Cookie.new(name, value, mainHandler.getPath)
+		sessionCookie.expirationDays SiteConfiguration::CookieDurationInDays
+		return sessionCookie
+	end
+	
 	def getStaticPath(base, file)
 		return @mainHandler.getPath(SiteConfiguration::StaticDirectory, base, file)
 	end
