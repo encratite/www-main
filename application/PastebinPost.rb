@@ -11,7 +11,7 @@ class PastebinPost < SymbolTransfer
 	AnonymousAuthor = 'Anonymous'
 	NoDescription = 'No description'
 	
-	attr_reader :userId, :user, :units, :name, :isAnonymous, :author, :bodyAuthor, :noDescription, :description, :bodyDescription, :pasteType, :creation, :contentSize, :ip, :unitToDelete
+	attr_reader :userId, :user, :units, :name, :isAnonymous, :author, :bodyAuthor, :noDescription, :description, :bodyDescription, :pasteType, :creation, :contentSize, :ip, :activeUnit
 	
 	attr_accessor :pasteTypes
 	
@@ -34,14 +34,22 @@ class PastebinPost < SymbolTransfer
 		return nil
 	end
 	
-	def deleteUnitQueryInitialisation(id, database)
+	def unitInitialisation(unitId, database, fields)
 		units = database[:pastebin_unit]
-		unitData = units.where(id: id).select(:post_id, :description, :paste_type)
+		unitData = units.where(id: unitId).select(*fields)
 		argumentError if unitData.empty?
-		@unitToDelete = PastebinUnit.new(unitData.first)
-		postId = @unitToDelete.postId
+		@activeUnit = PastebinUnit.new(unitData.first)
+		postId = @activeUnit.postId
 		simpleInitialisation(postId, database)
 		return postId
+	end
+	
+	def deleteUnitQueryInitialisation(unitId, database)
+		return unitInitialisation(unitId, [:post_id, :description, :paste_type])
+	end
+	
+	def editUnitQueryInitialisation(unitId, database)
+		return unitInitialisation(unitId, [:post_id, :description, :content, :paste_type])
 	end
 	
 	def showPostQueryInitialisation(target, handler, request, database)

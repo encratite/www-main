@@ -367,7 +367,7 @@ END
 	end
 	
 	def confirmUnitDeletion(post, request, deletedPost)
-		unit = post.unitToDelete
+		unit = post.activeUnit
 		writer = HTMLWriter.new
 		title = nil
 		writer.p do
