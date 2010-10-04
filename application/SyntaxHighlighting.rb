@@ -56,14 +56,14 @@ class SyntaxHighlighting
 		
 		vimCommands =
 		[
-			"set filetype=#{script}\"",
+			"set filetype=#{script}",
 			'set background=light',
 			#'colorscheme navajo',
 			'set wrap linebreak textwidth=0',
 			'syntax on',
 			'let html_use_css=1',
 			'run syntax/2html.vim',
-			"wq! \"#{outputFile.path}\"",
+			"wq! #{outputFile.path}",
 			'q',
 		]
 		
@@ -75,7 +75,10 @@ class SyntaxHighlighting
 		
 		#output = system "#{PastebinConfiguration::VimPath} #{flags} #{vimCommands} #{inputFile.path}"
 		#plainError 'A vim error occured' if !output
-		`#{PastebinConfiguration::VimPath} #{flags} #{vimCommands} #{inputFile.path}`
+		line = "#{PastebinConfiguration::VimPath} #{flags} #{vimCommands} #{inputFile.path}"
+		puts line
+		`#{line}`
+		puts "Done."
 		
 		markup = outputFile.open.read
 		
