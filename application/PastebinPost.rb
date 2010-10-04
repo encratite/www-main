@@ -4,8 +4,8 @@ require 'PastebinUnit'
 require 'error'
 require 'string'
 
-require 'site/HTMLWriter'
-require 'site/SymbolTransfer'
+require 'www-library/HTMLWriter'
+require 'www-library/SymbolTransfer'
 
 class PastebinPost < SymbolTransfer
 	AnonymousAuthor = 'Anonymous'

@@ -1,7 +1,7 @@
 require 'hash'
 
-require 'site/HTMLWriter'
-require 'site/random'
+require 'www-library/HTMLWriter'
+require 'www-library/random'
 
 class SecuredFormWriter < HTMLWriter
 	RandomString = 'security1'

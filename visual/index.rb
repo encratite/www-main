@@ -1,4 +1,4 @@
-require 'site/HTMLWriter'
+require 'www-library/HTMLWriter'
 
 def visualIndex()
 	writer = HTMLWriter.new

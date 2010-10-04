@@ -1,4 +1,4 @@
-require 'site/SiteGenerator'
+require 'www-library/SiteGenerator'
 require 'visual/body'
 
 class MainSiteGenerator < SiteGenerator

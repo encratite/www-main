@@ -1,5 +1,5 @@
-require 'site/HTML'
-require 'site/SymbolTransfer'
+require 'www-library/HTML'
+require 'www-library/SymbolTransfer'
 
 class User < SymbolTransfer
 	attr_accessor :htmlName

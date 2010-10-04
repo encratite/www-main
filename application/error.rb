@@ -1,5 +1,5 @@
-require 'site/MIMEType'
-require 'site/RequestManager'
+require 'www-library/MIMEType'
+require 'www-library/RequestManager'
 require 'visual/general'
 
 def plainError(message)

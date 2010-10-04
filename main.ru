@@ -1,4 +1,4 @@
-$:.concat ['..', 'application']
+$:.concat ['.', 'application']
 
 require 'MainSite'
 

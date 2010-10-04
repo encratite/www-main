@@ -1,4 +1,4 @@
-require 'site/HTTPRequest'
+require 'www-library/HTTPRequest'
 require 'SecuredFormWriter'
 
 class SiteRequest < HTTPRequest

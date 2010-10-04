@@ -1,6 +1,6 @@
 require 'SiteContainer'
 
-require 'site/MIMEType'
+require 'www-library/MIMEType'
 
 class EnvironmentHandler < SiteContainer
 	def installHandlers

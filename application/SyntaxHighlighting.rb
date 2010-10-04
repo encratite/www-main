@@ -4,8 +4,8 @@ require 'error'
 require 'configuration/loader'
 requireConfiguration 'VimSyntax'
 
-require 'site/HTML'
-require 'site/string'
+require 'www-library/HTML'
+require 'www-library/string'
 
 class SyntaxHighlighting
 	def self.generateList(isCommon)

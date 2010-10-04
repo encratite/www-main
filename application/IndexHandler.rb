@@ -1,5 +1,5 @@
 require 'SiteContainer'
-require 'site/RequestHandler'
+require 'www-library/RequestHandler'
 require 'visual/index'
 
 class IndexHandler < SiteContainer

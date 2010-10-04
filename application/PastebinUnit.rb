@@ -1,7 +1,7 @@
 require 'string'
 require 'SyntaxHighlighting'
 
-require 'site/SymbolTransfer'
+require 'www-library/SymbolTransfer'
 
 class PastebinUnit < SymbolTransfer
 

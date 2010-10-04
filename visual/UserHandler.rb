@@ -2,7 +2,7 @@ require 'SecuredFormWriter'
 require 'UserForm'
 require 'SiteContainer'
 
-require 'site/HTML'
+require 'www-library/HTML'
 
 require 'visual/general'
 

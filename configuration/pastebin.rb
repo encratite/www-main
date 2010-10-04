@@ -1,7 +1,7 @@
 require 'configuration/loader'
 requireConfiguration 'site'
 
-require 'site/environment'
+require 'www-library/environment'
 
 class PastebinConfiguration
 	PostsPerPage = 100

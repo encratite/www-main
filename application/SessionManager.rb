@@ -1,4 +1,4 @@
-require 'site/random'
+require 'www-library/random'
 
 require 'configuration/loader'
 requireConfiguration 'site'

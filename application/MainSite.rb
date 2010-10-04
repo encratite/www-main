@@ -11,9 +11,9 @@ require 'configuration/loader'
 requireConfiguration 'database'
 requireConfiguration 'site'
 
-require 'site/RequestManager'
-require 'site/SiteGenerator'
-require 'site/RequestHandler'
+require 'www-library/RequestManager'
+require 'www-library/SiteGenerator'
+require 'www-library/RequestHandler'
 
 class MainSite
 	attr_accessor :requestManager, :mainHandler

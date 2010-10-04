@@ -11,11 +11,11 @@ requireConfiguration 'cookie'
 require 'visual/general'
 require 'visual/PastebinHandler'
 
-require 'site/RequestManager'
-require 'site/random'
-require 'site/input'
-require 'site/HTTPReply'
-require 'site/input'
+require 'www-library/RequestManager'
+require 'www-library/random'
+require 'www-library/input'
+require 'www-library/HTTPReply'
+require 'www-library/input'
 
 class PastebinHandler < SiteContainer
 	Pastebin = 'pastebin'

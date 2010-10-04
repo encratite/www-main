@@ -3,8 +3,8 @@ require 'SecuredFormWriter'
 require 'PastebinHandler'
 require 'SiteContainer'
 
-require 'site/JavaScript'
-require 'site/string'
+require 'www-library/JavaScript'
+require 'www-library/string'
 
 require 'configuration/loader'
 requireConfiguration 'cookie'

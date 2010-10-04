@@ -1,5 +1,5 @@
-require 'site/HTMLWriter'
-require 'site/string'
+require 'www-library/HTMLWriter'
+require 'www-library/string'
 
 class MenuRenderer
 
