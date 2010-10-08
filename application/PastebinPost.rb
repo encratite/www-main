@@ -39,6 +39,7 @@ class PastebinPost < SymbolTransfer
 		unitData = units.where(id: unitId).select(*fields)
 		argumentError if unitData.empty?
 		@activeUnit = PastebinUnit.new(unitData.first)
+		@activeUnit.id = unitId
 		postId = @activeUnit.postId
 		simpleInitialisation(postId, database)
 		return postId
@@ -78,6 +79,7 @@ class PastebinPost < SymbolTransfer
 		dataset = database[:pastebin_unit]
 		unitData = dataset.where(post_id: @id)
 		internalError 'No units are associated with this post.' if unitData.empty?
+		#unit ID will be transferred from the select * query
 		unitData.each { |unit| @units << PastebinUnit.new(unit) }
 		
 		return nil

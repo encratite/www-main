@@ -76,9 +76,7 @@ class SyntaxHighlighting
 		#output = system "#{PastebinConfiguration::VimPath} #{flags} #{vimCommands} #{inputFile.path}"
 		#plainError 'A vim error occured' if !output
 		line = "#{PastebinConfiguration::VimPath} #{flags} #{vimCommands} #{inputFile.path}"
-		puts line
 		`#{line}`
-		puts "Done."
 		
 		markup = outputFile.open.read
 		

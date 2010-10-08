@@ -11,19 +11,23 @@ requireConfiguration 'cookie'
 requireConfiguration 'pastebin'
 
 class PastebinHandler < SiteContainer
+	HighlightingGroups =
+	[
+		'Use no syntax highlighting (plain text)',
+		"Common programming languages (#{SyntaxHighlighting::CommonScripts.size} available)",
+		"All syntax highlighting types (#{SyntaxHighlighting::AllScripts.size} available)",
+		'Expert mode (manually specify the name of a vim script)'
+	]
+	
+	PlainTextHighlightingIndex = 0
+	AllSyntaxHighlightingTypesIndex = 2
+	
 	def pasteFieldLength(symbol)
 		return {maxlength: PastebinConfiguration.const_get(symbol)}
 	end
 
-	def pastebinForm(request, errors = nil, postDescription = nil, unitDescription = nil, content = nil, highlightingSelectionMode = nil, lastSelection = nil)
-		highlightingGroups =
-		[
-			'Use no syntax highlighting (plain text)',
-			"Common programming languages (#{SyntaxHighlighting::CommonScripts.size} available)",
-			"All syntax highlighting types (#{SyntaxHighlighting::AllScripts.size} available)",
-			'Expert mode (manually specify the name of a vim script)'
-		]
-		
+	def pastebinForm(request, errors = nil, postDescription = nil, unitDescription = nil, content = nil, highlightingSelectionMode = nil, lastSelection = nil, editUnitId = nil)
+		editing = editUnitId != nil
 		output = ''
 		writer = SecuredFormWriter.new(output, request)
 		
@@ -43,13 +47,15 @@ class PastebinHandler < SiteContainer
 				highlightingSelectionMode = highlightingSelectionMode.to_i
 				highlightingSelectionMode = 0 if \
 					highlightingSelectionMode < 0 || \
-					highlightingSelectionMode >= highlightingGroups.size
+					highlightingSelectionMode >= HighlightingGroups.size
 			end
 		end
 		
 		lastSelection = request.cookies[CookieConfiguration::VimScript] if lastSelection == nil
 		
-		writer.securedForm(@submitNewPostHandler.getPath, request) do
+		handler = editing ? @submitUnitModification : @submitNewPostHandler
+		
+		writer.securedForm(handler.getPath, request) do
 		
 			radioCounter = 0
 			
@@ -57,7 +63,7 @@ class PastebinHandler < SiteContainer
 				checked = radioCounter == highlightingSelectionMode
 				arguments = {onclick: "highlightingMode(#{radioCounter});", id: "radio#{radioCounter}"}
 				
-				writer.radio(highlightingGroups[radioCounter], PastebinForm::HighlightingGroup, PastebinForm::HighlightingGroupIdentifiers[radioCounter], checked, arguments)
+				writer.radio(HighlightingGroups[radioCounter], PastebinForm::HighlightingGroup, PastebinForm::HighlightingGroupIdentifiers[radioCounter], checked, arguments)
 				
 				radioCounter += 1
 			end
@@ -147,7 +153,12 @@ class PastebinHandler < SiteContainer
 			
 			writer.textArea('Debug', PastebinForm::Debug) if PastebinForm::DebugMode
 			
-			writer.secureSubmit
+			if editing
+				writer.hidden(PastebinForm::EditUnitId, editUnitId)
+				writer.secureSubmit('Edit')
+			else
+				writer.secureSubmit
+			end
 		end
 		
 		output.concat writeJavaScript(<<END
@@ -192,9 +203,20 @@ END
 			end
 			
 			if permission
-				linkWriter = HTMLWriter.new
-				linkWriter.a(href: @deleteUnitHandler.getPath(unit.id.to_s)) { 'Delete unit' }
-				unitFields << ['Actions', linkWriter.output]
+				unitActions =
+				[
+					[@editUnitHandler, 'Edit'],
+					[@deleteUnitHandler, 'Delete'],
+				]
+				idString = unit.id.to_s
+				actions = []
+				unitActions.each do |handler, description|
+					linkWriter = HTMLWriter.new
+					linkWriter.a(href: handler.getPath(idString)) { description }
+					actions << lingWriter.output
+				end
+				actionsString = actions.join(', ')
+				unitFields << ['Actions', actionsString]
 			end
 			
 			getModificationFields(unitFields, unit)
@@ -393,5 +415,24 @@ END
 			end
 		end
 		return @pastebinGenerator.get([title, writer.output], request)
+	end
+	
+	def editUnitForm(post, request)
+		errors = nil
+		postDescription = post.bodyDescription
+		unit = post.activeUnit
+		unitDescription = unit.bodyDescription
+		content = unit.content
+		editUnitId = unit.id
+		if unit.pasteType == nil
+			#it's plain text
+			highlightingSelectionMode = PlainTextHighlightingIndex
+			lastSelection = nil
+		else
+			highlightingSelectionMode = AllSyntaxHighlightingTypesIndex
+			lastSelection = unit.pasteType
+		end
+		body = pastebinForm(request, errors, postDescription, unitDescription, content, highlightingSelectionMode, lastSelection, editUnitId)
+		@pastebinGenerator.get([title, body], request)
 	end
 end

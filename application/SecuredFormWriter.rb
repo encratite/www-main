@@ -21,8 +21,8 @@ class SecuredFormWriter < HTMLWriter
 		end
 	end
 	
-	def secureSubmit
+	def secureSubmit(description = 'Submit', arguments = {})
 		securedField
-		submit
+		submit(description, arguments)
 	end
 end

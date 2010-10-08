@@ -15,6 +15,8 @@ class PastebinForm
 	
 	Content = 'content'
 	
+	EditUnitId = 'unit'
+	
 	NoHighlighting = 'none'
 	
 	HighlightingGroupIdentifiers =
@@ -28,7 +30,7 @@ class PastebinForm
 	PrivatePost = 'privatePost'
 	Expiration = 'expiration'
 	
-	PostFields =
+	NewSubmissionPostFields =
 	[
 		Author,
 		
@@ -47,4 +49,6 @@ class PastebinForm
 		
 		Content,
 	]
+	
+	EditPostFields = NewSubmissionPostFields + [EditUnitId]
 end

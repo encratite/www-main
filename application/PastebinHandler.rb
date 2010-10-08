@@ -26,6 +26,7 @@ class PastebinHandler < SiteContainer
 	DeletePost = 'delete'
 	DeleteUnit = 'deleteUnit'
 	EditUnit = 'edit'
+	SubmitUnitModification = 'submitModification'
 	
 	def installHandlers
 		pastebinHandler = RequestHandler.menu('Pastebin', Pastebin, method(:newPost))
@@ -41,7 +42,8 @@ class PastebinHandler < SiteContainer
 		@viewPrivatePostHandler = RequestHandler.handler(ViewPrivate, method(:viewPrivatePost), 1)
 		@deletePostHandler = RequestHandler.handler(DeletePost, method(:deletePost), 1)
 		@deleteUnitHandler = RequestHandler.handler(DeleteUnit, method(:deleteUnit), 1)
-		@editHandler = RequestHandler.handler(EditUnit, method(:editUnit), 1)
+		@editUnitHandler = RequestHandler.handler(EditUnit, method(:editUnit), 1)
+		@submitUnitModification = RequestHandler.handler(SubmitUnitModification, method(:submitUnitModification))
 		
 		RequestHandler.getBufferedObjects.each { |handler| pastebinHandler.add(handler) }
 	end
@@ -71,7 +73,7 @@ class PastebinHandler < SiteContainer
 	end
 	
 	def debugPostSubmission(request)
-		actualData = serialiseFields(getFieldValues(request, PastebinForm::PostFields))
+		actualData = serialiseFields(getFieldValues(request, PastebinForm::NewSubmissionPostFields))
 		debugData = request.getPost(PastebinForm::Debug)
 		
 		if debugData == actualData
@@ -152,7 +154,7 @@ class PastebinHandler < SiteContainer
 		
 		unitDescription,
 		
-		content = processFormFields(request, PastebinForm::PostFields)
+		content = processFormFields(request, PastebinForm::NewSubmissionPostFields)
 		
 		stringLengthChecks = getStringLengthChecks(author, postDescription, unitDescription, content, expertHighlighting)
 		
@@ -422,6 +424,13 @@ class PastebinHandler < SiteContainer
 		@database.transaction do
 			post.editUnitQueryInitialisation(unitId, @database)
 			raiseError(permissionError, request) if !hasWriteAccess(request, post)
+			#Yet to be written.
+			raise 'This function has not been implemented yet.'
 		end
+	end
+	
+	def submitUnitModification(request)
+		#Yet to be written.
+		raise 'This function has not been implemented yet.'
 	end
 end
