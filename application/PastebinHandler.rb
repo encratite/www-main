@@ -29,12 +29,12 @@ class PastebinHandler < SiteContainer
 	SubmitUnitModification = 'submitModification'
 	
 	def installHandlers
-		pastebinHandler = RequestHandler.menu('Pastebin', Pastebin, method(:newPost))
+		pastebinHandler = RequestHandler.menu('Pastebin', Pastebin, method(:postData))
 		addMainHandler pastebinHandler
 		
 		RequestHandler.newBufferedObjectsGroup
 		
-		RequestHandler.menu('Create new post', nil, method(:newPost))
+		RequestHandler.menu('Create new post', nil, method(:postData))
 		RequestHandler.menu('View posts', List, method(:viewPosts), 0..1)
 		
 		@submitNewPostHandler = RequestHandler.handler(SubmitNewPost, method(:submitNewPost))
@@ -53,7 +53,7 @@ class PastebinHandler < SiteContainer
 		raise RequestManager::Exception.new(@pastebinGenerator.get(data, request))
 	end
 
-	def newPost(request)
+	def postData(request)
 		@pastebinGenerator.get(['Pastebin', pastebinForm(request)], request)
 	end
 
@@ -135,9 +135,16 @@ class PastebinHandler < SiteContainer
 			errors << "The #{name} you have specified is invalid."
 		end
 	end
-
+	
 	def submitNewPost(request)
+		return processNewPostOrModification(request, false)
+	end
+
+	def processNewPostOrModification(request, editing)
 		debugPostSubmission request if PastebinForm::DebugMode
+		
+		source =  editing ? PastebinForm::EditPostFields : PastebinForm::NewSubmissionPostFields
+		input = processFormFields(request, source)
 
 		author,
 			
@@ -154,7 +161,7 @@ class PastebinHandler < SiteContainer
 		
 		unitDescription,
 		
-		content = processFormFields(request, PastebinForm::NewSubmissionPostFields)
+		content = input
 		
 		stringLengthChecks = getStringLengthChecks(author, postDescription, unitDescription, content, expertHighlighting)
 		
@@ -192,8 +199,33 @@ class PastebinHandler < SiteContainer
 				end
 			end
 			
+			posts = @database[:pastebin_post]
+			units = @database[:pastebin_unit]
+			
+			if editing
+				#check if the unit ID is valid and determine the post associated with it
+				#right now the ID of the unit to be edited is the last field - could be changed by PastebinForm though, so watch out
+				editUnitId = input[-1].to_i
+				"""
+				postIdSymbol = :post_id
+				rows = units.where(id: editUnitId).select(postIdSymbol).all
+				if rows.empty?
+					errors << 'You have specified an invalid unit ID.'
+				else
+					editPostId = rows.first[postIdSymbol]
+				end
+				"""
+				editPost = PastebinPost.new
+				editPost.editPermissionQueryInitialisation(editUnitId, @database)
+				writePermissionCheck(request, post)
+			end
+			
 			if !errors.empty?
-				errorContent = pastebinForm(request, errors, postDescription, unitDescription, content, highlightingSelectionMode, lastSelection)
+				#an error occured - break out of this function by raising an exception
+				#display a pastebin form with properly filled in fields (even while editing) and the error messages
+				editUnitId = nil if !editing
+				errorContent = pastebinForm(request, errors, postDescription, unitDescription, content, highlightingSelectionMode, lastSelection, editUnitId)
+				#this raises an exception
 				pastebinError(errorContent, request)
 			end
 
@@ -205,7 +237,7 @@ class PastebinHandler < SiteContainer
 			anonymousString = privatePost == 1 ? createAnonymousString(PastebinConfiguration::AnonymousStringLength) : nil
 			postReply = nil
 
-			newPost =
+			postData =
 			{
 				user_id: postUser,
 				
@@ -221,8 +253,12 @@ class PastebinHandler < SiteContainer
 				reply_to: postReply
 			}
 
-			dataset = @database[:pastebin_post]
-			postId = dataset.insert newPost
+			if editing
+				postId = editPost.id
+				posts.where(id: postId).update(postData)
+			else
+				postId = posts.insert(postData)
+			end
 			
 			isPlain = highlightingGroup == PastebinForm::NoHighlighting
 			if isPlain
@@ -233,7 +269,7 @@ class PastebinHandler < SiteContainer
 				pasteType = syntaxHighlighting
 			end
 			
-			newUnit =
+			unitData =
 			{
 				post_id: postId,
 				
@@ -245,8 +281,11 @@ class PastebinHandler < SiteContainer
 				paste_type: pasteType
 			}
 			
-			dataset = @database[:pastebin_unit]
-			dataset.insert newUnit
+			if editing
+				units.where(id: editUnitId).update(unitData)
+			else
+				units.insert(unitData)
+			end
 			
 			if anonymousString == nil
 				postPath = @viewPostHandler.getPath(postId)
@@ -396,7 +435,7 @@ class PastebinHandler < SiteContainer
 		post = PastebinPost.new
 		@database.transaction do
 			post.deletePostQueryInitialisation(postId, @database)
-			raiseError(permissionError, request) if !hasWriteAccess(request, post)
+			writePermissionCheck(request, post)
 			deletePostTree postId
 		end
 		return confirmPostDeletion(post, request)
@@ -408,7 +447,7 @@ class PastebinHandler < SiteContainer
 		deletedPost = nil
 		@database.transaction do
 			postId = post.deleteUnitQueryInitialisation(unitId, @database)
-			raiseError(permissionError, request) if !hasWriteAccess(request, post)
+			writePermissionCheck(request, post)
 			units = @database[:pastebin_unit]
 			units.where(id: unitId).delete
 			unitCount = units.where(post_id: postId).count
@@ -423,14 +462,16 @@ class PastebinHandler < SiteContainer
 		post = PastebinPost.new
 		@database.transaction do
 			post.editUnitQueryInitialisation(unitId, @database)
-			raiseError(permissionError, request) if !hasWriteAccess(request, post)
-			#Yet to be written.
-			raise 'This function has not been implemented yet.'
+			writePermissionCheck(request, post)
+			return editUnitForm(post, request)
 		end
 	end
 	
+	def writePermissionCheck(request, post)
+		raiseError(permissionError, request) if !hasWriteAccess(request, post)
+	end
+	
 	def submitUnitModification(request)
-		#Yet to be written.
-		raise 'This function has not been implemented yet.'
+		return processNewPostOrModification(request, true)
 	end
 end

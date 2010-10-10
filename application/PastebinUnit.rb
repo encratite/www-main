@@ -12,14 +12,16 @@ class PastebinUnit < SymbolTransfer
 	#this field is only set by editUnitQueryInitialisation when a unit is being edited
 	attr_reader :content
 	
-	def initialize(input)
+	def initialize(input, fullUnitInitialisation = true)
 		transferSymbols(input, {}, [:highlightingStyle, :highlightedContent])
-		@bodyPasteType =
-			@pasteType == nil ?
-				'Plain text' :
-				SyntaxHighlighting::getScriptDescription(@pasteType)
-		@noDescription = @description.empty?
-		@bodyDescription = ''
-		processDescription(@noDescription, @description, @bodyDescription, @bodyPasteType)
+		if fullUnitInitialisation
+			@bodyPasteType =
+				@pasteType == nil ?
+					'Plain text' :
+					SyntaxHighlighting::getScriptDescription(@pasteType)
+			@noDescription = @description.empty?
+			@bodyDescription = ''
+			processDescription(@noDescription, @description, @bodyDescription, @bodyPasteType)
+		end
 	end
 end

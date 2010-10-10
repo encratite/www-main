@@ -11,7 +11,7 @@ class PastebinPost < SymbolTransfer
 	AnonymousAuthor = 'Anonymous'
 	NoDescription = 'No description'
 	
-	attr_reader :userId, :user, :units, :name, :isAnonymous, :author, :bodyAuthor, :noDescription, :description, :bodyDescription, :pasteType, :creation, :contentSize, :ip, :activeUnit
+	attr_reader :id, :userId, :user, :units, :name, :isAnonymous, :author, :bodyAuthor, :noDescription, :description, :bodyDescription, :pasteType, :creation, :contentSize, :ip, :activeUnit
 	
 	attr_accessor :pasteTypes
 	
@@ -21,8 +21,9 @@ class PastebinPost < SymbolTransfer
 	end
 	
 	def simpleInitialisation(id, database)
-		dataset = database[:pastebin_post]
-		postData = dataset.where(id: id).select(:user_id, :ip, :description)
+		@id = id
+		posts = database[:pastebin_post]
+		postData = posts.where(id: id).select(:user_id, :ip, :description)
 		argumentError if postData.empty?
 		transferSymbols postData.first
 		initialiseMembers false
@@ -34,11 +35,11 @@ class PastebinPost < SymbolTransfer
 		return nil
 	end
 	
-	def unitInitialisation(unitId, database, fields)
+	def unitInitialisation(unitId, database, fields, fullUnitInitialisation = true)
 		units = database[:pastebin_unit]
 		unitData = units.where(id: unitId).select(*fields)
 		argumentError if unitData.empty?
-		@activeUnit = PastebinUnit.new(unitData.first)
+		@activeUnit = PastebinUnit.new(unitData.first, fullUnitInitialisation)
 		@activeUnit.id = unitId
 		postId = @activeUnit.postId
 		simpleInitialisation(postId, database)
@@ -51,6 +52,10 @@ class PastebinPost < SymbolTransfer
 	
 	def editUnitQueryInitialisation(unitId, database)
 		return unitInitialisation(unitId, [:post_id, :description, :content, :paste_type])
+	end
+	
+	def editPermissionQueryInitialisation(unitId, database)
+		return unitInitialisation(unitId, [:post_id], false)
 	end
 	
 	def showPostQueryInitialisation(target, handler, request, database)

@@ -433,6 +433,6 @@ END
 			lastSelection = unit.pasteType
 		end
 		body = pastebinForm(request, errors, postDescription, unitDescription, content, highlightingSelectionMode, lastSelection, editUnitId)
-		@pastebinGenerator.get([title, body], request)
+		return @pastebinGenerator.get([title, body], request)
 	end
 end
