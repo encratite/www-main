@@ -63,11 +63,11 @@ class PastebinHandler < SiteContainer
 		return count > PastebinConfiguration::PastesPerInterval
 	end
 
-	def createAnonymousString(length)
+	def createPrivateString(length)
 		dataset = @database[:pastebin_post]
 		while true
 			sessionString = RandomString.get length
-			break if dataset.where(anonymous_string: sessionString).count == 0
+			break if dataset.where(private_string: sessionString).count == 0
 		end
 		return sessionString
 	end
@@ -202,29 +202,24 @@ class PastebinHandler < SiteContainer
 			posts = @database[:pastebin_post]
 			units = @database[:pastebin_unit]
 			
+			isPrivatePost = nil
+			expirationIndex = nil
+			
 			if editing
 				#check if the unit ID is valid and determine the post associated with it
 				#right now the ID of the unit to be edited is the last field - could be changed by PastebinForm though, so watch out
 				editUnitId = input[-1].to_i
-				"""
-				postIdSymbol = :post_id
-				rows = units.where(id: editUnitId).select(postIdSymbol).all
-				if rows.empty?
-					errors << 'You have specified an invalid unit ID.'
-				else
-					editPostId = rows.first[postIdSymbol]
-				end
-				"""
 				editPost = PastebinPost.new
 				editPost.editPermissionQueryInitialisation(editUnitId, @database)
 				writePermissionCheck(request, post)
+			else
+				editUnitId = nil
 			end
 			
 			if !errors.empty?
 				#an error occured - break out of this function by raising an exception
 				#display a pastebin form with properly filled in fields (even while editing) and the error messages
-				editUnitId = nil if !editing
-				errorContent = pastebinForm(request, errors, postDescription, unitDescription, content, highlightingSelectionMode, lastSelection, editUnitId)
+				errorContent = pastebinForm(request, errors, postDescription, unitDescription, content, highlightingSelectionMode, lastSelection, isPrivatePost, expirationIndex, editUnitId)
 				#this raises an exception
 				pastebinError(errorContent, request)
 			end
@@ -234,7 +229,6 @@ class PastebinHandler < SiteContainer
 			postUser = isLoggedIn ? request.sessionUser.id : nil
 			postAuthor = !isLoggedIn ? author : nil
 			postExpiration = expiration == 0 ? nil : (:NOW.sql_function + "#{PastebinConfiguration::ExpirationOptions[expiration][1]} second")
-			anonymousString = privatePost == 1 ? createAnonymousString(PastebinConfiguration::AnonymousStringLength) : nil
 			postReply = nil
 
 			postData =
@@ -247,16 +241,30 @@ class PastebinHandler < SiteContainer
 				description: postDescription,
 				
 				expiration: postExpiration,
+				expiration_index: expirationIndex,
 				
-				anonymous_string: anonymousString,
-				
-				reply_to: postReply
+				reply_to: postReply,
 			}
+			
+			isPrivate = privatePost == 1
+			privateString = isPrivate ? createPrivateString(PastebinConfiguration::PrivateStringLength) : nil
+			
+			now = Time.now.utc
 
 			if editing
+				if !(editPost.isPrivate && isPrivate)
+					#there are basically 4 cases to cover - just exclude the one where no new private string must be generated and written to the post
+					#unnecessarily writing a null is not a big deal anyways
+					postData[:private_string] = privateString
+				end
+				#increase the modification counter
+				postData[:modification_counter] = editPost.modificationCounter + 1
+				postData[:last_modification] = now
 				postId = editPost.id
 				posts.where(id: postId).update(postData)
 			else
+				postData[:private_string] = privateString
+				postData[:creation] = now
 				postId = posts.insert(postData)
 			end
 			
@@ -282,15 +290,19 @@ class PastebinHandler < SiteContainer
 			}
 			
 			if editing
+				#increase the modification counter for the unit, too
+				unitData[:modification_counter] = editPost.activeUnit.modificationCounter + 1
+				unitData[:last_modification] = now
 				units.where(id: editUnitId).update(unitData)
 			else
+				unitData[:time_added] = now
 				units.insert(unitData)
 			end
 			
-			if anonymousString == nil
+			if privateString == nil
 				postPath = @viewPostHandler.getPath(postId)
 			else
-				postPath = @viewPrivatePostHandler.getPath(anonymousString)
+				postPath = @viewPrivatePostHandler.getPath(privateString)
 			end
 			
 			reply = HTTPReply.localRefer(request, postPath)
@@ -377,14 +389,14 @@ class PastebinHandler < SiteContainer
 		@database.transaction do
 			dataset = @database[:pastebin_post]
 			postsPerPage = PastebinConfiguration::PostsPerPage
-			posts = dataset.where(anonymous_string: nil, reply_to: nil)
+			posts = dataset.where(private_string: nil, reply_to: nil)
 			count = posts.count
 			pageCount = count == 0 ? 1 : (Float(count) / postsPerPage).ceil
 			pastebinError('Invalid page specified.', request) if page >= pageCount
 			offset = [count - (page + 1) * postsPerPage, 0].max
 			
 			posts = posts.left_outer_join(:site_user, :id => :user_id)
-			posts = posts.filter(pastebin_post__anonymous_string: nil, pastebin_post__reply_to: nil)
+			posts = posts.filter(pastebin_post__private_string: nil, pastebin_post__reply_to: nil)
 			
 			posts = posts.select(
 				:pastebin_post__id.as(:pastebin_post_id), :pastebin_post__user_id, :pastebin_post__author, :pastebin_post__description, :pastebin_post__creation,

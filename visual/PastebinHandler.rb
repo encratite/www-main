@@ -26,7 +26,7 @@ class PastebinHandler < SiteContainer
 		return {maxlength: PastebinConfiguration.const_get(symbol)}
 	end
 
-	def pastebinForm(request, errors = nil, postDescription = nil, unitDescription = nil, content = nil, highlightingSelectionMode = nil, lastSelection = nil, editUnitId = nil)
+	def pastebinForm(request, errors = nil, postDescription = nil, unitDescription = nil, content = nil, highlightingSelectionMode = nil, lastSelection = nil, isPrivatePost = nil, expirationIndex = nil, editUnitId = nil)
 		editing = editUnitId != nil
 		output = ''
 		writer = SecuredFormWriter.new(output, request)
@@ -112,28 +112,34 @@ class PastebinHandler < SiteContainer
 				end
 			end
 			
-			usePrivate = request.cookies[CookieConfiguration::Private] == '1'
+			if isPrivatePost == nil
+				isPrivatePost = request.cookies[CookieConfiguration::Private] == '1'
+			end
 			
 			privacyOptions =
 			[
-				SelectOption.new('Public post', '0', !usePrivate),
-				SelectOption.new('Private post', '1', usePrivate)
+				SelectOption.new('Public post', '0', !isPrivatePost),
+				SelectOption.new('Private post', '1', isPrivatePost)
 			]
 			
 			writer.select(PastebinForm::PrivatePost,  privacyOptions, {label: 'Privacy options'})
 			
 			firstOffset = 0
 			
-			cookie = request.cookies[CookieConfiguration::Expiration]
-			
-			if cookie != nil
-				begin
-					expirationIndex = Integer cookie
-				rescue ArgumentError
+			if expirationIndex == nil
+				expirationIndex = firstOffset
+			else
+				cookie = request.cookies[CookieConfiguration::Expiration]
+				
+				if cookie != nil
+					begin
+						expirationIndex = Integer cookie
+					rescue ArgumentError
+						expirationIndex = firstOffset
+					end
+				else
 					expirationIndex = firstOffset
 				end
-			else
-				expirationIndex = firstOffset
 			end
 			
 			optionCount = PastebinConfiguration::ExpirationOptions.size
@@ -192,11 +198,10 @@ END
 			unitFields =
 			[
 				['Unit', "#{unitOffset}/#{post.units.size}"],
+				['Description',  unit.bodyDescription],
+				['Type', unit.bodyPasteType],
+				['Size', getSizeString(unit.content.size)],
 			]
-			
-			unitFields << ['Description',  unit.description] if !unit.description.empty?
-			unitFields << ['Type', unit.bodyPasteType] if !unit.noDescription
-			unitFields << ['Size', getSizeString(unit.content.size)]
 			
 			if unit.timeAdded != post.creation
 				unitFields << ['Time added', unit.timeAdded]
@@ -213,7 +218,7 @@ END
 				unitActions.each do |handler, description|
 					linkWriter = HTMLWriter.new
 					linkWriter.a(href: handler.getPath(idString)) { description }
-					actions << lingWriter.output
+					actions << linkWriter.output
 				end
 				actionsString = actions.join(', ')
 				unitFields << ['Actions', actionsString]
@@ -417,11 +422,15 @@ END
 		return @pastebinGenerator.get([title, writer.output], request)
 	end
 	
+	def getDescriptionField(object)
+		return object.noDescription ? '' : object.description
+	end
+	
 	def editUnitForm(post, request)
 		errors = nil
-		postDescription = post.bodyDescription
+		postDescription = getDescriptionField post
 		unit = post.activeUnit
-		unitDescription = unit.bodyDescription
+		unitDescription = getDescriptionField unit
 		content = unit.content
 		editUnitId = unit.id
 		if unit.pasteType == nil
@@ -433,6 +442,7 @@ END
 			lastSelection = unit.pasteType
 		end
 		body = pastebinForm(request, errors, postDescription, unitDescription, content, highlightingSelectionMode, lastSelection, editUnitId)
+		title = 'Editing post'
 		return @pastebinGenerator.get([title, body], request)
 	end
 end

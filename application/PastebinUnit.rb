@@ -7,7 +7,7 @@ class PastebinUnit < SymbolTransfer
 
 	UnnamedUnit = 'Unnamed unit'
 
-	attr_reader :id, :bodyDescription, :bodyPasteType, :noDescription, :pasteType
+	attr_reader :bodyDescription, :bodyPasteType, :noDescription, :pasteType, :modificationCounter
 	
 	#this field is only set by editUnitQueryInitialisation when a unit is being edited
 	attr_reader :content
@@ -21,7 +21,7 @@ class PastebinUnit < SymbolTransfer
 					SyntaxHighlighting::getScriptDescription(@pasteType)
 			@noDescription = @description.empty?
 			@bodyDescription = ''
-			processDescription(@noDescription, @description, @bodyDescription, @bodyPasteType)
+			processDescription(@noDescription, @description, @bodyDescription, UnnamedUnit)
 		end
 	end
 end

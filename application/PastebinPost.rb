@@ -11,9 +11,9 @@ class PastebinPost < SymbolTransfer
 	AnonymousAuthor = 'Anonymous'
 	NoDescription = 'No description'
 	
-	attr_reader :id, :userId, :user, :units, :name, :isAnonymous, :author, :bodyAuthor, :noDescription, :description, :bodyDescription, :pasteType, :creation, :contentSize, :ip, :activeUnit
+	attr_reader :id, :userId, :user, :units, :name, :isAnonymous, :author, :bodyAuthor, :noDescription, :description, :bodyDescription, :pasteType, :creation, :contentSize, :ip, :activeUnit, :modificationCounter, :expiration, :expirationIndex
 	
-	attr_accessor :pasteTypes
+	attr_accessor :pasteTypes, :isPrivate
 	
 	def initialize
 		@bodyAuthor = ''
@@ -23,7 +23,9 @@ class PastebinPost < SymbolTransfer
 	def simpleInitialisation(id, database)
 		@id = id
 		posts = database[:pastebin_post]
-		postData = posts.where(id: id).select(:user_id, :ip, :description)
+		#just select all the fields for now, it's too much of a mess otherwise
+		#the data per row are rather small anyways, the actual problem is the content within the units
+		postData = posts.where(id: id)
 		argumentError if postData.empty?
 		transferSymbols postData.first
 		initialiseMembers false
@@ -37,34 +39,37 @@ class PastebinPost < SymbolTransfer
 	
 	def unitInitialisation(unitId, database, fields, fullUnitInitialisation = true)
 		units = database[:pastebin_unit]
-		unitData = units.where(id: unitId).select(*fields)
-		argumentError if unitData.empty?
-		@activeUnit = PastebinUnit.new(unitData.first, fullUnitInitialisation)
-		@activeUnit.id = unitId
+		row = units.where(id: unitId).select(*fields)
+		argumentError if row.empty?
+		unitData = row.first
+		unitData[:id] = unitId
+		@activeUnit = PastebinUnit.new(unitData, fullUnitInitialisation)
 		postId = @activeUnit.postId
 		simpleInitialisation(postId, database)
 		return postId
 	end
 	
 	def deleteUnitQueryInitialisation(unitId, database)
-		return unitInitialisation(unitId, [:post_id, :description, :paste_type])
+		return unitInitialisation(unitId, database, [:post_id, :description, :paste_type])
 	end
 	
 	def editUnitQueryInitialisation(unitId, database)
-		return unitInitialisation(unitId, [:post_id, :description, :content, :paste_type])
+		return unitInitialisation(unitId, database, [:post_id, :description, :content, :paste_type])
 	end
 	
 	def editPermissionQueryInitialisation(unitId, database)
-		return unitInitialisation(unitId, [:post_id], false)
+		output = unitInitialisation(unitId, database, [:post_id, :modification_counter], false)
+		@isPrivate = @privateString != nil
+		return output
 	end
 	
 	def showPostQueryInitialisation(target, handler, request, database)
 		dataset = database[:pastebin_post]
 		
 		if target.class == String
-			postData = dataset.where(anonymous_string: target)
+			postData = dataset.where(private_string: target)
 		else
-			postData = dataset.where(id: target, anonymous_string: nil)
+			postData = dataset.where(id: target, private_string: nil)
 		end
 		
 		handler.pastebinError('You have specified an invalid post identifier.', request) if postData.empty?

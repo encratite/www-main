@@ -12,16 +12,19 @@ create table pastebin_post
 
 	description text not null,
 	
-	creation timestamp not null default now(),
+	creation timestamp not null,
 	last_modification timestamp default null,
+	modification_counter integer not null default 0,
 	
 	--The expiration date is null when no expiration has been specified
 	expiration timestamp,
 	
-	modification_counter integer not null default 0,
+	--This index into an array in the Ruby code specifies the expiration option which was used when the post was created originally
+	--It is used when the post is edited
+	expiration_index int not null,
 	
-	--Contains the anonymous string for the URL for private pastebin entries - it is null for public posts
-	anonymous_string text,
+	--Contains the private string for the URL for private pastebin entries - it is null for public posts
+	private_string text,
 	
 	--null if this is a new thread
 	reply_to integer references pastebin_post(id)
@@ -43,7 +46,7 @@ create table pastebin_unit
 	
 	paste_type text,
 	
-	time_added timestamp not null default now(),
+	time_added timestamp not null,
 	last_modification timestamp default null,
 	
 	modification_counter integer not null default 0
