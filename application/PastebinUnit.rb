@@ -3,7 +3,7 @@ require 'SyntaxHighlighting'
 
 require 'www-library/SymbolTransfer'
 
-class PastebinUnit < SymbolTransfer
+class PastebinUnit < WWWLib::SymbolTransfer
 
 	UnnamedUnit = 'Unnamed unit'
 

@@ -12,7 +12,6 @@ requireConfiguration 'database'
 requireConfiguration 'site'
 
 require 'www-library/RequestManager'
-require 'www-library/SiteGenerator'
 require 'www-library/RequestHandler'
 
 class MainSite
@@ -22,8 +21,8 @@ class MainSite
 		@database = getDatabaseObject
 		@sessionManager = SessionManager.new @database
 		
-		@requestManager = RequestManager.new(lambda { |environment| SiteRequest.new(@sessionManager, environment) } )
-		@mainHandler = RequestHandler.new('main')
+		@requestManager = WWWLib::RequestManager.new(lambda { |environment| SiteRequest.new(@sessionManager, environment) } )
+		@mainHandler = WWWLib::RequestHandler.new('main')
 		@requestManager.addHandler @mainHandler
 		
 		@generator = getSiteGenerator

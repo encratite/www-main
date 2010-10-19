@@ -26,19 +26,19 @@ class UserHandler < SiteContainer
 	def installHandlers
 		notLoggedIn = lambda { |request| request.sessionUser == nil }
 		
-		RequestHandler.menu('Login', Login, method(:loginFormRequest), nil, notLoggedIn)
-		@registerFormRequestHandler = RequestHandler.menu('Register', Register, method(:registerFormRequest), nil, notLoggedIn)
+		WWWLib::RequestHandler.menu('Login', Login, method(:loginFormRequest), nil, notLoggedIn)
+		@registerFormRequestHandler = WWWLib::RequestHandler.menu('Register', Register, method(:registerFormRequest), nil, notLoggedIn)
 		
-		@performLoginRequestHandler = RequestHandler.handler(SubmitLogin, method(:performLoginRequest))
-		@performRegistrationRequestHandler = RequestHandler.handler(SubmitRegistration, method(:performRegistrationRequest))
+		@performLoginRequestHandler = WWWLib::RequestHandler.handler(SubmitLogin, method(:performLoginRequest))
+		@performRegistrationRequestHandler = WWWLib::RequestHandler.handler(SubmitRegistration, method(:performRegistrationRequest))
 		
-		RequestHandler.getBufferedObjects.each { |handler| addMainHandler handler }
+		WWWLib::RequestHandler.getBufferedObjects.each { |handler| addMainHandler handler }
 	end
 	
 	def addLogoutMenu
 		loggedIn = lambda { |request| request.sessionUser != nil }
 		
-		logoutHandler = RequestHandler.menu('Log out', Logout, method(:logoutRequest), nil, loggedIn)
+		logoutHandler = WWWLib::RequestHandler.menu('Log out', Logout, method(:logoutRequest), nil, loggedIn)
 		@site.mainHandler.add logoutHandler
 	end
 	
@@ -81,10 +81,10 @@ class UserHandler < SiteContainer
 		
 			sessionCookie = getSessionCookie(user.id, request)
 			
-			fullContent = @generator.get visualLoginSuccess(user), request
+			fullContent = @generator.get(visualLoginSuccess(user), request)
 			
-			reply = HTTPReply.new fullContent
-			reply.addCookie sessionCookie
+			reply = WWWLib::HTTPReply.new(fullContent)
+			reply.addCookie(sessionCookie)
 			return reply
 		end
 	end
@@ -117,7 +117,7 @@ class UserHandler < SiteContainer
 		error.call 'Your user name is too long.' if user.size > SiteConfiguration::UserNameLengthMaximum
 		error.call 'Your passwords do not match.' if password != passwordAgain
 		error.call 'Your password is too long.' if password.size > SiteConfiguration::PasswordLengthMaximum
-		error.call 'The email address you have specified is invalid.' if !email.empty? && !EMailValidator.isValidEmailAddress(email)
+		error.call 'The email address you have specified is invalid.' if !email.empty? && !WWWLib::EMailValidator.isValidEmailAddress(email)
 		
 		return printErrorForm.call if errorOccured.call
 		
@@ -133,7 +133,7 @@ class UserHandler < SiteContainer
 			passwordHash = hashWithSalt password
 			userId = dataset.insert(name: user, password: passwordHash, email: email)
 			sessionString = @sessionManager.createSession(userId, request.address)
-			sessionCookie = Cookie.new(CookieConfiguration::Session, sessionString, @site.mainHandler.getPath)
+			sessionCookie = WWWLib::Cookie.new(CookieConfiguration::Session, sessionString, @site.mainHandler.getPath)
 			sessionCookie.expirationDays SiteConfiguration::CookieDurationInDays
 			output = visualRegistrationSuccess user
 			
@@ -142,8 +142,8 @@ class UserHandler < SiteContainer
 			
 			request.sessionUser = newUser
 			
-			fullContent = @generator.get output, request
-			reply = HTTPReply.new fullContent
+			fullContent = @generator.get(output, request)
+			reply = WWWLib::HTTPReply.new(fullContent)
 			reply.addCookie sessionCookie
 		end
 		

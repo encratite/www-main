@@ -4,10 +4,9 @@ require 'PastebinUnit'
 require 'error'
 require 'string'
 
-require 'www-library/HTMLWriter'
 require 'www-library/SymbolTransfer'
 
-class PastebinPost < SymbolTransfer
+class PastebinPost < WWWLib::SymbolTransfer
 	AnonymousAuthor = 'Anonymous'
 	NoDescription = 'No description'
 	

@@ -15,7 +15,6 @@ require 'www-library/RequestManager'
 require 'www-library/random'
 require 'www-library/input'
 require 'www-library/HTTPReply'
-require 'www-library/input'
 
 class PastebinHandler < SiteContainer
 	Pastebin = 'pastebin'
@@ -29,28 +28,28 @@ class PastebinHandler < SiteContainer
 	SubmitUnitModification = 'submitModification'
 	
 	def installHandlers
-		pastebinHandler = RequestHandler.menu('Pastebin', Pastebin, method(:postData))
+		pastebinHandler = WWWLib::RequestHandler.menu('Pastebin', Pastebin, method(:postData))
 		addMainHandler pastebinHandler
 		
-		RequestHandler.newBufferedObjectsGroup
+		WWWLib::RequestHandler.newBufferedObjectsGroup
 		
-		RequestHandler.menu('Create new post', nil, method(:postData))
-		RequestHandler.menu('View posts', List, method(:viewPosts), 0..1)
+		WWWLib::RequestHandler.menu('Create new post', nil, method(:postData))
+		WWWLib::RequestHandler.menu('View posts', List, method(:viewPosts), 0..1)
 		
-		@submitNewPostHandler = RequestHandler.handler(SubmitNewPost, method(:submitNewPost))
-		@viewPostHandler = RequestHandler.handler(View, method(:viewPost), 1)
-		@viewPrivatePostHandler = RequestHandler.handler(ViewPrivate, method(:viewPrivatePost), 1)
-		@deletePostHandler = RequestHandler.handler(DeletePost, method(:deletePost), 1)
-		@deleteUnitHandler = RequestHandler.handler(DeleteUnit, method(:deleteUnit), 1)
-		@editUnitHandler = RequestHandler.handler(EditUnit, method(:editUnit), 1)
-		@submitUnitModification = RequestHandler.handler(SubmitUnitModification, method(:submitUnitModification))
+		@submitNewPostHandler = WWWLib::RequestHandler.handler(SubmitNewPost, method(:submitNewPost))
+		@viewPostHandler = WWWLib::RequestHandler.handler(View, method(:viewPost), 1)
+		@viewPrivatePostHandler = WWWLib::RequestHandler.handler(ViewPrivate, method(:viewPrivatePost), 1)
+		@deletePostHandler = WWWLib::RequestHandler.handler(DeletePost, method(:deletePost), 1)
+		@deleteUnitHandler = WWWLib::RequestHandler.handler(DeleteUnit, method(:deleteUnit), 1)
+		@editUnitHandler = WWWLib::RequestHandler.handler(EditUnit, method(:editUnit), 1)
+		@submitUnitModification = WWWLib::RequestHandler.handler(SubmitUnitModification, method(:submitUnitModification))
 		
-		RequestHandler.getBufferedObjects.each { |handler| pastebinHandler.add(handler) }
+		WWWLib::RequestHandler.getBufferedObjects.each { |handler| pastebinHandler.add(handler) }
 	end
 	
 	def pastebinError(content, request)
 		data = ['Pastebin error', content]
-		raise RequestManager::Exception.new(@pastebinGenerator.get(data, request))
+		raise WWWLib::RequestManager::Exception.new(@pastebinGenerator.get(data, request))
 	end
 
 	def postData(request)
@@ -66,7 +65,7 @@ class PastebinHandler < SiteContainer
 	def createPrivateString(length)
 		dataset = @database[:pastebin_post]
 		while true
-			sessionString = RandomString.get length
+			sessionString = WWWLib::RandomString.get length
 			break if dataset.where(private_string: sessionString).count == 0
 		end
 		return sessionString
@@ -203,7 +202,7 @@ class PastebinHandler < SiteContainer
 			units = @database[:pastebin_unit]
 			
 			isPrivatePost = nil
-			expirationIndex = nil
+			expirationIndex = expiration
 			
 			if editing
 				#check if the unit ID is valid and determine the post associated with it
@@ -223,12 +222,15 @@ class PastebinHandler < SiteContainer
 				#this raises an exception
 				pastebinError(errorContent, request)
 			end
+			
+			now = Time.now.utc
 
 			isLoggedIn = request.sessionUser != nil
 			
 			postUser = isLoggedIn ? request.sessionUser.id : nil
 			postAuthor = !isLoggedIn ? author : nil
-			postExpiration = expiration == 0 ? nil : (:NOW.sql_function + "#{PastebinConfiguration::ExpirationOptions[expiration][1]} second")
+			expirationTime = now + PastebinConfiguration::ExpirationOptions[expiration][1]
+			postExpiration = expiration == 0 ? nil : expirationTime
 			postReply = nil
 
 			postData =
@@ -248,8 +250,6 @@ class PastebinHandler < SiteContainer
 			
 			isPrivate = privatePost == 1
 			privateString = isPrivate ? createPrivateString(PastebinConfiguration::PrivateStringLength) : nil
-			
-			now = Time.now.utc
 
 			if editing
 				if !(editPost.isPrivate && isPrivate)
@@ -305,7 +305,7 @@ class PastebinHandler < SiteContainer
 				postPath = @viewPrivatePostHandler.getPath(privateString)
 			end
 			
-			reply = HTTPReply.localRefer(request, postPath)
+			reply = WWWLib::HTTPReply.localRefer(request, postPath)
 			
 			if useSyntaxHighlighting
 				[
@@ -332,7 +332,7 @@ class PastebinHandler < SiteContainer
 
 	def getRequestId(request)
 		arguments = request.arguments
-		id = readId arguments[0]
+		id = WWWLib::readId(arguments[0])
 		argumentError if id == nil
 		return id
 	end
@@ -383,7 +383,7 @@ class PastebinHandler < SiteContainer
 		if arguments.empty?
 			page = 0
 		else
-			page = readId(arguments[0]) - 1
+			page = WWWLib::readId(arguments[0]) - 1
 		end
 		
 		@database.transaction do

@@ -13,6 +13,6 @@ class EnvironmentHandler < SiteContainer
 		request.environment.each { |key, value| output += "#{key}: #{value} (#{value.class})\n" }
 		input = request.environment['rack.input'].read()
 		output += "\nInput:\n#{input}"
-		return MIMEType::Plain, output
+		return WWWLib::MIMEType::Plain, output
 	end
 end

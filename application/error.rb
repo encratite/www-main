@@ -3,7 +3,7 @@ require 'www-library/RequestManager'
 require 'visual/general'
 
 def plainError(message)
-	raise RequestManager::Exception.new([MIMEType::Plain, message])
+	raise WWWLib::RequestManager::Exception.new([WWWLib::MIMEType::Plain, message])
 end
 
 def internalError(message)

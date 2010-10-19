@@ -12,7 +12,7 @@ class SyntaxHighlighting
 		output = []
 		VimSyntax::Scripts.each do |script|
 			value = script[0]
-			description = HTMLEntities.encode script[1]
+			description = WWWLib::HTMLEntities.encode script[1]
 			if !isCommon || (script.size >= 3 && script[2])
 				output << SelectOption.new(description, value)
 			end
@@ -80,7 +80,7 @@ class SyntaxHighlighting
 		
 		markup = outputFile.open.read
 		
-		code = extractString(markup, "<pre>\n", "</pre>")
+		code = WWWLib::extractString(markup, "<pre>\n", "</pre>")
 		plainError 'Unable to extract code from vim output.' if code == nil
 		
 		return code

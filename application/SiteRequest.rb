@@ -1,7 +1,8 @@
-require 'www-library/HTTPRequest'
 require 'SecuredFormWriter'
 
-class SiteRequest < HTTPRequest
+require 'www-library/HTTPRequest'
+
+class SiteRequest < WWWLib::HTTPRequest
 	attr_accessor :sessionUser
 	
 	def initialize(sessionManager, environment)

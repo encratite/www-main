@@ -3,7 +3,7 @@ require 'hash'
 require 'www-library/HTMLWriter'
 require 'www-library/random'
 
-class SecuredFormWriter < HTMLWriter
+class SecuredFormWriter < WWWLib::HTMLWriter
 	RandomString = 'security1'
 	HashField = 'security2'
 	RandomStringLength = 128
@@ -16,7 +16,7 @@ class SecuredFormWriter < HTMLWriter
 	
 	def securedField
 		p class: 'security' do
-			hidden(RandomString, ::RandomString.get(RandomStringLength))
+			hidden(RandomString, WWWLib::::RandomString.get(RandomStringLength))
 			hidden HashField
 		end
 	end

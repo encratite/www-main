@@ -1,8 +1,6 @@
 require 'configuration/loader'
 requireConfiguration 'site'
 
-require 'www-library/environment'
-
 class PastebinConfiguration
 	PostsPerPage = 100
 	Prefix = 'pastebin'
@@ -36,8 +34,5 @@ class PastebinConfiguration
 		['One week', WeekDays * DayHours * HourSeconds]
 	]
 	
-	VimPath =
-		getOS == :windows ? \
-		'"C:\\Program Files (x86)\\Vim\\vim72\\vim.exe"' : \
-		'vim'
+	VimPath = 'vim'
 end

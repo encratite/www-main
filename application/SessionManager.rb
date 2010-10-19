@@ -29,7 +29,7 @@ class SessionManager
 	def generateSessionString
 		dataset = @database[:login_session]
 		while true
-			sessionString = RandomString.get SiteConfiguration::SessionStringLength
+			sessionString = WWWLib::RandomString.get(SiteConfiguration::SessionStringLength)
 			break if dataset.where(session_string: sessionString).count == 0
 		end
 		return sessionString

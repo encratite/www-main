@@ -84,7 +84,7 @@ END
 	end
 
 	def visualRegistrationSuccess(userName)
-		userName = HTMLEntities::encode userName
+		userName = WWWLib::HTMLEntities::encode userName
 		title = 'Registration succesful'
 		content = visualMessage "Your account <b>#{userName}</b> has been created successfully. You have been automatically logged into your account."
 		[title, content]

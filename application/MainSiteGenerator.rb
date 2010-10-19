@@ -1,7 +1,7 @@
 require 'www-library/SiteGenerator'
 require 'visual/body'
 
-class MainSiteGenerator < SiteGenerator
+class MainSiteGenerator < WWWLib::SiteGenerator
 	def head(title, request)
 		return super(title) + visualHead(request)
 	end

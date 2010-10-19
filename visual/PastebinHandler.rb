@@ -167,7 +167,7 @@ class PastebinHandler < SiteContainer
 			end
 		end
 		
-		output.concat writeJavaScript(<<END
+		output.concat WWWLib::writeJavaScript(<<END
 showModeSelector();
 var content = document.getElementById('content');
 content.onkeydown = tabHandler;
@@ -200,7 +200,7 @@ END
 				['Unit', "#{unitOffset}/#{post.units.size}"],
 				['Description',  unit.bodyDescription],
 				['Type', unit.bodyPasteType],
-				['Size', getSizeString(unit.content.size)],
+				['Size', WWWLib::getSizeString(unit.content.size)],
 			]
 			
 			if unit.timeAdded != post.creation
@@ -358,8 +358,8 @@ END
 						end
 					end
 					
-					typeString = getTypeString post
-					sizeString = getSizeString post.contentSize
+					typeString = WWWLib::getTypeString(post)
+					sizeString = WWWLib::getSizeString(post.contentSize)
 					
 					[
 						author,

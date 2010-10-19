@@ -6,9 +6,9 @@ class IndexHandler < SiteContainer
 	Description = 'Index'
 	
 	def installHandlers
-		indexHandler = RequestHandler.menu(Description, nil, method(:getIndex))
+		indexHandler = WWWLib::RequestHandler.menu(Description, nil, method(:getIndex))
 		@mainHandler.add(indexHandler)
-		RequestHandler.newBufferedObjectsGroup
+		WWWLib::RequestHandler.newBufferedObjectsGroup
 	end
 	
 	def getIndex(request)
