@@ -12,4 +12,6 @@ class SiteConfiguration
 	
 	SessionStringLength = 128
 	CookieDurationInDays = 30
+	
+	DebuggingAddresses = []
 end

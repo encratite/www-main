@@ -13,6 +13,7 @@ requireConfiguration 'site'
 
 require 'www-library/RequestManager'
 require 'www-library/RequestHandler'
+require 'www-library/debug'
 
 class MainSite
 	attr_accessor :requestManager, :mainHandler
@@ -27,6 +28,11 @@ class MainSite
 		
 		@generator = getSiteGenerator
 		@pastebinGenerator = getSiteGenerator(['pastebin'], ['pastebin'])
+		
+		#set up additional addresses which will be able to view debugging output on exceptions thrown by scripts right in the browser
+		SiteConfiguration::DebuggingAddresses.each do |address|
+			WWWLib::PrivilegedAddresses.add(address)
+		end
 	end
 	
 	def getDatabaseObject
