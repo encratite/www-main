@@ -1,10 +1,11 @@
 require 'SiteContainer'
 
 require 'www-library/MIMEType'
+require 'www-library/RequestHandler'
 
 class EnvironmentHandler < SiteContainer
 	def installHandlers
-		handler = RequestHandler.handler('environment', method(:showEnvironment))
+		handler = WWWLib::RequestHandler.handler('environment', method(:showEnvironment))
 		@requestManager.addHandler handler
 	end
 

@@ -57,7 +57,7 @@ class MainSite
 	end
 	
 	def getCookie(name, value)
-		sessionCookie = Cookie.new(name, value, mainHandler.getPath)
+		sessionCookie = WWWLib::Cookie.new(name, value, mainHandler.getPath)
 		sessionCookie.expirationDays SiteConfiguration::CookieDurationInDays
 		return sessionCookie
 	end

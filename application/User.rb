@@ -7,13 +7,13 @@ class User < WWWLib::SymbolTransfer
 	def initialize(data = nil)
 		return if data == nil
 		transferSymbols data
-		@htmlName = WWWLib::HTMLEntities::encode @name
+		@htmlName = WWWLib::HTMLEntities.encode(@name)
 	end
 	
 	def set(id, name, password, email, isAdministrator)
 		@id = id
 		@name = name
-		@htmlName = WWWLib::HTMLEntities::encode @name
+		@htmlName = WWWLib::HTMLEntities.encode(@name)
 		@password = password
 		@email = email
 		@isAdministrator = isAdministrator

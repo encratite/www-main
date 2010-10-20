@@ -5,6 +5,7 @@ require 'SiteContainer'
 
 require 'www-library/JavaScript'
 require 'www-library/string'
+require 'www-library/HTMLWriter'
 
 require 'configuration/loader'
 requireConfiguration 'cookie'
@@ -118,8 +119,8 @@ class PastebinHandler < SiteContainer
 			
 			privacyOptions =
 			[
-				SelectOption.new('Public post', '0', !isPrivatePost),
-				SelectOption.new('Private post', '1', isPrivatePost)
+				WWWLib::SelectOption.new('Public post', '0', !isPrivatePost),
+				WWWLib::SelectOption.new('Private post', '1', isPrivatePost),
 			]
 			
 			writer.select(PastebinForm::PrivatePost,  privacyOptions, {label: 'Privacy options'})
@@ -147,7 +148,7 @@ class PastebinHandler < SiteContainer
 			offset = 0
 			
 			expirationOptions = PastebinConfiguration::ExpirationOptions.map do |description, seconds|
-				option = SelectOption.new(description, offset.to_s, offset == expirationIndex)
+				option = WWWLib::SelectOption.new(description, offset.to_s, offset == expirationIndex)
 				offset += 1
 				option
 			end		
@@ -167,7 +168,7 @@ class PastebinHandler < SiteContainer
 			end
 		end
 		
-		output.concat WWWLib::writeJavaScript(<<END
+		output.concat WWWLib.writeJavaScript(<<END
 showModeSelector();
 var content = document.getElementById('content');
 content.onkeydown = tabHandler;
@@ -200,7 +201,7 @@ END
 				['Unit', "#{unitOffset}/#{post.units.size}"],
 				['Description',  unit.bodyDescription],
 				['Type', unit.bodyPasteType],
-				['Size', WWWLib::getSizeString(unit.content.size)],
+				['Size', WWWLib.getSizeString(unit.content.size)],
 			]
 			
 			if unit.timeAdded != post.creation
@@ -216,7 +217,7 @@ END
 				idString = unit.id.to_s
 				actions = []
 				unitActions.each do |handler, description|
-					linkWriter = HTMLWriter.new
+					linkWriter = WWWLib::HTMLWriter.new
 					linkWriter.a(href: handler.getPath(idString)) { description }
 					actions << linkWriter.output
 				end
@@ -270,7 +271,7 @@ END
 	end
 
 	def showPastebinPost(request, post)
-		writer = HTMLWriter.new
+		writer = WWWLib::HTMLWriter.new
 
 		fields =
 		[
@@ -281,7 +282,7 @@ END
 		
 		permission = hasWriteAccess(request, post)
 		if permission
-			linkWriter = HTMLWriter.new
+			linkWriter = WWWLib::HTMLWriter.new
 			linkWriter.a(href: @deletePostHandler.getPath(post.id.to_s)) { 'Delete post' }
 			fields << ['Actions', linkWriter.output]
 		end
@@ -330,7 +331,7 @@ END
 	end
 
 	def listPastebinPosts(request, posts, page, pageCount)
-		writer = HTMLWriter.new
+		writer = WWWLib::HTMLWriter.new
 		
 		columns =
 		[
@@ -358,8 +359,8 @@ END
 						end
 					end
 					
-					typeString = WWWLib::getTypeString(post)
-					sizeString = WWWLib::getSizeString(post.contentSize)
+					typeString = getTypeString(post)
+					sizeString = WWWLib.getSizeString(post.contentSize)
 					
 					[
 						author,
@@ -384,7 +385,7 @@ END
 	
 	def confirmPostDeletion(post, request)
 		title = 'Post deleted'
-		writer = HTMLWriter.new
+		writer = WWWLib::HTMLWriter.new
 		writer.p do
 			writer.write 'Your post '
 			writer.b { "\"#{post.bodyDescription}\"" }
@@ -395,7 +396,7 @@ END
 	
 	def confirmUnitDeletion(post, request, deletedPost)
 		unit = post.activeUnit
-		writer = HTMLWriter.new
+		writer = WWWLib::HTMLWriter.new
 		title = nil
 		writer.p do
 			if unit.noDescription

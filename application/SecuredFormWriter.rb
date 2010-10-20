@@ -16,7 +16,7 @@ class SecuredFormWriter < WWWLib::HTMLWriter
 	
 	def securedField
 		p class: 'security' do
-			hidden(RandomString, WWWLib::::RandomString.get(RandomStringLength))
+			hidden(RandomString, WWWLib::RandomString.get(RandomStringLength))
 			hidden HashField
 		end
 	end

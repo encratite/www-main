@@ -165,7 +165,7 @@ class UserHandler < SiteContainer
 		request.sessionUser = nil
 		
 		fullContent = @generator.get visualLogout, request
-		reply = HTTPReply.new fullContent
+		reply = WWWLib::HTTPReply.new(fullContent)
 		reply.deleteCookie(CookieConfiguration::Session, @site.mainHandler.getPath)
 		return reply
 	end

@@ -83,7 +83,7 @@ class PastebinHandler < SiteContainer
 			puts "Actual data:\n#{actualData}"
 			puts "Debug data:\n#{debugData}"
 			
-			writer = HTMLWriter.new
+			writer = WWWLib::HTMLWriter.new
 			writer.p { 'Data does not match:' }
 			textAreaArguments = {cols: '50', rows: '30'}
 			writer.textArea('Actual data', 'test1', actualData, textAreaArguments)
@@ -332,7 +332,7 @@ class PastebinHandler < SiteContainer
 
 	def getRequestId(request)
 		arguments = request.arguments
-		id = WWWLib::readId(arguments[0])
+		id = WWWLib.readId(arguments[0])
 		argumentError if id == nil
 		return id
 	end
@@ -383,7 +383,7 @@ class PastebinHandler < SiteContainer
 		if arguments.empty?
 			page = 0
 		else
-			page = WWWLib::readId(arguments[0]) - 1
+			page = WWWLib.readId(arguments[0]) - 1
 		end
 		
 		@database.transaction do

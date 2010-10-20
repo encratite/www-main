@@ -11,7 +11,7 @@ class MenuRenderer
 				menuLevel.each do |item|
 					if item.condition.(request)
 						writer.li do
-							writer.a(href: WWWLib::slashify(item.path)) { item.description }
+							writer.a(href: WWWLib.slashify(item.path)) { item.description }
 						end
 					end
 				end

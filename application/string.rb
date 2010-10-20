@@ -1,5 +1,7 @@
+require 'www-library/HTMLWriter'
+
 def markString(input)
-	writer = HTMLWriter.new
+	writer = WWWLib::HTMLWriter.new
 	writer.i { input }
 	return writer.output
 end
