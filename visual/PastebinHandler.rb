@@ -128,8 +128,6 @@ class PastebinHandler < SiteContainer
 			firstOffset = 0
 			
 			if expirationIndex == nil
-				expirationIndex = firstOffset
-			else
 				cookie = request.cookies[CookieConfiguration::Expiration]
 				
 				if cookie != nil
@@ -442,7 +440,9 @@ END
 			highlightingSelectionMode = AllSyntaxHighlightingTypesIndex
 			lastSelection = unit.pasteType
 		end
-		body = pastebinForm(request, errors, postDescription, unitDescription, content, highlightingSelectionMode, lastSelection, editUnitId)
+		isPrivatePost = post.isPrivate
+		expirationIndex = post.expirationIndex
+		body = pastebinForm(request, errors, postDescription, unitDescription, content, highlightingSelectionMode, lastSelection, isPrivatePost, expirationIndex, editUnitId)
 		title = 'Editing post'
 		return @pastebinGenerator.get([title, body], request)
 	end

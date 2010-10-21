@@ -10,7 +10,7 @@ class PastebinPost < WWWLib::SymbolTransfer
 	AnonymousAuthor = 'Anonymous'
 	NoDescription = 'No description'
 	
-	attr_reader :id, :userId, :user, :units, :name, :isAnonymous, :author, :bodyAuthor, :noDescription, :description, :bodyDescription, :pasteType, :creation, :contentSize, :ip, :activeUnit, :modificationCounter, :expiration, :expirationIndex
+	attr_reader :id, :userId, :user, :units, :name, :isAnonymous, :author, :bodyAuthor, :noDescription, :description, :bodyDescription, :pasteType, :creation, :contentSize, :ip, :activeUnit, :modificationCounter, :expiration, :expirationIndex, :privateString
 	
 	attr_accessor :pasteTypes, :isPrivate
 	
@@ -28,12 +28,12 @@ class PastebinPost < WWWLib::SymbolTransfer
 		argumentError if postData.empty?
 		transferSymbols postData.first
 		initialiseMembers false
-		return nil
+		return
 	end
 	
 	def deletePostQueryInitialisation(id, database)
 		simpleInitialisation(id, database)
-		return nil
+		return
 	end
 	
 	def unitInitialisation(unitId, database, fields, fullUnitInitialisation = true)
@@ -91,7 +91,7 @@ class PastebinPost < WWWLib::SymbolTransfer
 		#unit ID will be transferred from the select * query
 		unitData.each { |unit| @units << PastebinUnit.new(unit) }
 		
-		return nil
+		return
 	end
 	
 	def initialiseMembers(fullMode = true)
@@ -119,7 +119,9 @@ class PastebinPost < WWWLib::SymbolTransfer
 		
 		@units = []
 		
-		return nil
+		@isPrivate = !@privateString.nil?
+		
+		return
 	end
 end
 
