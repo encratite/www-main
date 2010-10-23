@@ -210,7 +210,7 @@ class PastebinHandler < SiteContainer
 				editUnitId = input[-1].to_i
 				editPost = PastebinPost.new
 				editPost.editPermissionQueryInitialisation(editUnitId, @database)
-				writePermissionCheck(request, post)
+				writePermissionCheck(request, editPost)
 			else
 				editUnitId = nil
 			end
@@ -218,7 +218,7 @@ class PastebinHandler < SiteContainer
 			if !errors.empty?
 				#an error occured - break out of this function by raising an exception
 				#display a pastebin form with properly filled in fields (even while editing) and the error messages
-				errorContent = pastebinForm(request, errors, postDescription, unitDescription, content, highlightingSelectionMode, lastSelection, isPrivatePost, expirationIndex, editUnitId)
+				errorContent = pastebinForm(request, errors, author, postDescription, unitDescription, content, highlightingSelectionMode, lastSelection, isPrivatePost, expirationIndex, editUnitId)
 				#this raises an exception
 				pastebinError(errorContent, request)
 			end

@@ -27,7 +27,7 @@ class PastebinHandler < SiteContainer
 		return {maxlength: PastebinConfiguration.const_get(symbol)}
 	end
 
-	def pastebinForm(request, errors = nil, postDescription = nil, unitDescription = nil, content = nil, highlightingSelectionMode = nil, lastSelection = nil, isPrivatePost = nil, expirationIndex = nil, editUnitId = nil)
+	def pastebinForm(request, errors = nil, author = nil, postDescription = nil, unitDescription = nil, content = nil, highlightingSelectionMode = nil, lastSelection = nil, isPrivatePost = nil, expirationIndex = nil, editUnitId = nil)
 		editing = editUnitId != nil
 		output = ''
 		writer = SecuredFormWriter.new(output, request)
@@ -86,8 +86,10 @@ class PastebinHandler < SiteContainer
 			]
 			
 			if request.sessionUser == nil
-				authorName = request.cookies[CookieConfiguration::Author]
-				writer.text('Author (optional)', PastebinForm::Author, authorName, pasteFieldLength(:VimScriptLengthMaximum))
+				if author == nil
+					author = request.cookies[CookieConfiguration::Author]
+				end
+				writer.text('Author (optional)', PastebinForm::Author, author, pasteFieldLength(:VimScriptLengthMaximum))
 			else
 				writer.p { "You are currently logged in as <b>#{request.sessionUser.htmlName}</b>." }
 				writer.hidden(PastebinForm::Author, '')
@@ -427,6 +429,8 @@ END
 	
 	def editUnitForm(post, request)
 		errors = nil
+		author = post.editAuthor
+		puts author.inspect
 		postDescription = getDescriptionField post
 		unit = post.activeUnit
 		unitDescription = getDescriptionField unit
@@ -442,7 +446,7 @@ END
 		end
 		isPrivatePost = post.isPrivate
 		expirationIndex = post.expirationIndex
-		body = pastebinForm(request, errors, postDescription, unitDescription, content, highlightingSelectionMode, lastSelection, isPrivatePost, expirationIndex, editUnitId)
+		body = pastebinForm(request, errors, author, postDescription, unitDescription, content, highlightingSelectionMode, lastSelection, isPrivatePost, expirationIndex, editUnitId)
 		title = 'Editing post'
 		return @pastebinGenerator.get([title, body], request)
 	end

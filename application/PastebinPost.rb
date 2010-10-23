@@ -10,7 +10,7 @@ class PastebinPost < WWWLib::SymbolTransfer
 	AnonymousAuthor = 'Anonymous'
 	NoDescription = 'No description'
 	
-	attr_reader :id, :userId, :user, :units, :name, :isAnonymous, :author, :bodyAuthor, :noDescription, :description, :bodyDescription, :pasteType, :creation, :contentSize, :ip, :activeUnit, :modificationCounter, :expiration, :expirationIndex, :privateString
+	attr_reader :id, :userId, :user, :units, :name, :isAnonymous, :author, :bodyAuthor, :noDescription, :description, :bodyDescription, :pasteType, :creation, :contentSize, :ip, :activeUnit, :modificationCounter, :expiration, :expirationIndex, :privateString, :editAuthor
 	
 	attr_accessor :pasteTypes, :isPrivate
 	
@@ -19,7 +19,7 @@ class PastebinPost < WWWLib::SymbolTransfer
 		@bodyDescription = ''
 	end
 	
-	def simpleInitialisation(id, database)
+	def simpleInitialisation(id, database, fullMemberInitialisation)
 		@id = id
 		posts = database[:pastebin_post]
 		#just select all the fields for now, it's too much of a mess otherwise
@@ -27,7 +27,7 @@ class PastebinPost < WWWLib::SymbolTransfer
 		postData = posts.where(id: id)
 		argumentError if postData.empty?
 		transferSymbols postData.first
-		initialiseMembers false
+		initialiseMembers(fullMemberInitialisation)
 		return
 	end
 	
@@ -36,7 +36,7 @@ class PastebinPost < WWWLib::SymbolTransfer
 		return
 	end
 	
-	def unitInitialisation(unitId, database, fields, fullUnitInitialisation = true)
+	def unitInitialisation(unitId, database, fields, fullMemberInitialisation = false, fullUnitInitialisation = true)
 		units = database[:pastebin_unit]
 		row = units.where(id: unitId).select(*fields)
 		argumentError if row.empty?
@@ -44,7 +44,7 @@ class PastebinPost < WWWLib::SymbolTransfer
 		unitData[:id] = unitId
 		@activeUnit = PastebinUnit.new(unitData, fullUnitInitialisation)
 		postId = @activeUnit.postId
-		simpleInitialisation(postId, database)
+		simpleInitialisation(postId, database, fullMemberInitialisation)
 		return postId
 	end
 	
@@ -53,11 +53,11 @@ class PastebinPost < WWWLib::SymbolTransfer
 	end
 	
 	def editUnitQueryInitialisation(unitId, database)
-		return unitInitialisation(unitId, database, [:post_id, :description, :content, :paste_type])
+		return unitInitialisation(unitId, database, [:post_id, :description, :content, :paste_type], true)
 	end
 	
 	def editPermissionQueryInitialisation(unitId, database)
-		output = unitInitialisation(unitId, database, [:post_id, :modification_counter], false)
+		output = unitInitialisation(unitId, database, [:post_id, :modification_counter], false, false)
 		@isPrivate = @privateString != nil
 		return output
 	end
@@ -103,12 +103,16 @@ class PastebinPost < WWWLib::SymbolTransfer
 			@pasteTypes = []
 			
 			if @author == nil
+				@editAuthor = nil
 				if @user != nil
 					@author = @user.name
 				elsif @name != nil
 					#name from the post listing joins
 					@author = @name
 				end
+			else
+				#the dup is necessary because the editAuthor field would get ruined by the processDescription down there otherwise
+				@editAuthor = @author.dup
 			end
 			@isAnonymous = @author.empty?
 			processDescription(@isAnonymous, @author, @bodyAuthor, AnonymousAuthor)
