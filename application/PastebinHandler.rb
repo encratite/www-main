@@ -53,7 +53,8 @@ class PastebinHandler < SiteContainer
 	end
 
 	def postData(request)
-		@pastebinGenerator.get(['Pastebin', pastebinForm(request)], request)
+		form = PastebinForm.new(request)
+		@pastebinGenerator.get(['Pastebin', pastebinForm(form)], request)
 	end
 
 	def floodCheck(request)
@@ -218,7 +219,18 @@ class PastebinHandler < SiteContainer
 			if !errors.empty?
 				#an error occured - break out of this function by raising an exception
 				#display a pastebin form with properly filled in fields (even while editing) and the error messages
-				errorContent = pastebinForm(request, errors, author, postDescription, unitDescription, content, highlightingSelectionMode, lastSelection, isPrivatePost, expirationIndex, editUnitId)
+				form = PastebinForm.new(request)
+				form.errors = errors
+				form.author = author
+				form.postDescription = postDescription
+				form.unitDescription = unitDescription
+				form.content = content
+				form.highlightingSelectionMode = highlightingSelectionMode
+				form.lastSelection = lastSelection
+				form.isPrivatePost = isPrivatePost
+				form.expirationIndex = expirationIndex
+				form.editUnitId = editUnitId
+				errorContent = pastebinForm(form)
 				#this raises an exception
 				pastebinError(errorContent, request)
 			end

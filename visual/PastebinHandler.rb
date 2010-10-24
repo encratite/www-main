@@ -1,5 +1,3 @@
-require 'PastebinForm'
-require 'SecuredFormWriter'
 require 'PastebinHandler'
 require 'SiteContainer'
 
@@ -8,8 +6,9 @@ require 'www-library/string'
 require 'www-library/HTMLWriter'
 
 require 'configuration/loader'
-requireConfiguration 'cookie'
 requireConfiguration 'pastebin'
+
+require 'visual/PastebinHandler/pastebinForm'
 
 class PastebinHandler < SiteContainer
 	HighlightingGroups =
@@ -25,158 +24,6 @@ class PastebinHandler < SiteContainer
 	
 	def pasteFieldLength(symbol)
 		return {maxlength: PastebinConfiguration.const_get(symbol)}
-	end
-
-	def pastebinForm(request, errors = nil, author = nil, postDescription = nil, unitDescription = nil, content = nil, highlightingSelectionMode = nil, lastSelection = nil, isPrivatePost = nil, expirationIndex = nil, editUnitId = nil)
-		editing = editUnitId != nil
-		output = ''
-		writer = SecuredFormWriter.new(output, request)
-		
-		if errors != nil
-			writer.p { 'Your request could not be processed because one or multiple errors have occured:' }
-			writer.ul class: 'error' do
-				errors.each { |error| writer.li { error } }
-			end
-			writer.p { 'Please try again.' }
-		end
-		
-		if highlightingSelectionMode == nil
-			highlightingSelectionMode = request.cookies[CookieConfiguration::PastebinMode]
-			if highlightingSelectionMode == nil
-				highlightingSelectionMode = 0
-			else
-				highlightingSelectionMode = highlightingSelectionMode.to_i
-				highlightingSelectionMode = 0 if \
-					highlightingSelectionMode < 0 || \
-					highlightingSelectionMode >= HighlightingGroups.size
-			end
-		end
-		
-		lastSelection = request.cookies[CookieConfiguration::VimScript] if lastSelection == nil
-		
-		handler = editing ? @submitUnitModification : @submitNewPostHandler
-		
-		writer.securedForm(handler.getPath, request) do
-		
-			radioCounter = 0
-			
-			radioField = lambda do
-				checked = radioCounter == highlightingSelectionMode
-				arguments = {onclick: "highlightingMode(#{radioCounter});", id: "radio#{radioCounter}"}
-				
-				writer.radio(HighlightingGroups[radioCounter], PastebinForm::HighlightingGroup, PastebinForm::HighlightingGroupIdentifiers[radioCounter], checked, arguments)
-				
-				radioCounter += 1
-			end
-			
-			basicOptions = lastSelection ? SyntaxHighlighting.getSelectionList(true, lastSelection) : SyntaxHighlighting::CommonScripts
-			advancedOptions = lastSelection ? SyntaxHighlighting.getSelectionList(false, lastSelection) : SyntaxHighlighting::AllScripts
-			formFields =
-			[
-				lambda { writer.select(PastebinForm::CommonHighlighting, basicOptions) },
-				lambda { writer.select(PastebinForm::AdvancedHighlighting, advancedOptions) },
-				lambda do
-					writer.ul class: 'formLabel', id: (PastebinForm::ExpertHighlighting + 'List') do
-						fieldArguments = {type: 'input', name: PastebinForm::ExpertHighlighting}
-						fieldArguments[:value] = lastSelection if lastSelection != nil
-						writer.li { 'Specify the vim script you want to be used (e.g. "cpp"):' }
-						writer.li { writer.tag('input', fieldArguments) }
-					end
-				end
-			]
-			
-			if request.sessionUser == nil
-				if author == nil
-					author = request.cookies[CookieConfiguration::Author]
-				end
-				writer.text('Author (optional)', PastebinForm::Author, author, pasteFieldLength(:VimScriptLengthMaximum))
-			else
-				writer.p { "You are currently logged in as <b>#{request.sessionUser.htmlName}</b>." }
-				writer.hidden(PastebinForm::Author, '')
-			end
-			
-			columnCount = 2
-			
-			writer.text('Description of the post (optional)', PastebinForm::PostDescription, postDescription, pasteFieldLength(:PostDescriptionLengthMaximum))
-			writer.p { 'Specify the syntax highlighting selection method you would like to use:' }
-			writer.table id: 'syntaxTable' do
-				leftSide = {class: 'leftSide'}
-				rightSide = {class: 'rightSide'}
-				writer.tr do
-					writer.td(leftSide) { radioField.call }
-					writer.td(rightSide) {}
-				end
-
-				formFields.each do |formField|
-					writer.tr do
-						writer.td(leftSide) { radioField.call }
-						writer.td(rightSide) { formField.call }
-					end
-				end
-			end
-			
-			if isPrivatePost == nil
-				isPrivatePost = request.cookies[CookieConfiguration::Private] == '1'
-			end
-			
-			privacyOptions =
-			[
-				WWWLib::SelectOption.new('Public post', '0', !isPrivatePost),
-				WWWLib::SelectOption.new('Private post', '1', isPrivatePost),
-			]
-			
-			writer.select(PastebinForm::PrivatePost,  privacyOptions, {label: 'Privacy options'})
-			
-			firstOffset = 0
-			
-			if expirationIndex == nil
-				cookie = request.cookies[CookieConfiguration::Expiration]
-				
-				if cookie != nil
-					begin
-						expirationIndex = Integer cookie
-					rescue ArgumentError
-						expirationIndex = firstOffset
-					end
-				else
-					expirationIndex = firstOffset
-				end
-			end
-			
-			optionCount = PastebinConfiguration::ExpirationOptions.size
-			expirationIndex = firstOffset if !(firstOffset..(optionCount - 1)).include?(expirationIndex)
-			offset = 0
-			
-			expirationOptions = PastebinConfiguration::ExpirationOptions.map do |description, seconds|
-				option = WWWLib::SelectOption.new(description, offset.to_s, offset == expirationIndex)
-				offset += 1
-				option
-			end		
-			
-			writer.select(PastebinForm::Expiration, expirationOptions, {label: 'Post expiration'})
-			
-			writer.text('Description of this unit (optional)', PastebinForm::UnitDescription, unitDescription, pasteFieldLength(:UnitDescriptionLengthMaximum))
-			writer.textArea('Paste the content here', PastebinForm::Content, content, {cols: '30', rows: '10', maxlength: PastebinConfiguration::UnitSizeLimit})
-			
-			writer.textArea('Debug', PastebinForm::Debug) if PastebinForm::DebugMode
-			
-			if editing
-				writer.hidden(PastebinForm::EditUnitId, editUnitId)
-				writer.secureSubmit('Edit')
-			else
-				writer.secureSubmit
-			end
-		end
-		
-		output.concat WWWLib.writeJavaScript(<<END
-showModeSelector();
-var content = document.getElementById('content');
-content.onkeydown = tabHandler;
-content.onkeypress = tabPressHandler;
-END
-		)
-		
-		return output
 	end
 
 	def getModificationFields(fields, source)
@@ -428,14 +275,7 @@ END
 	end
 	
 	def editUnitForm(post, request)
-		errors = nil
-		author = post.editAuthor
-		puts author.inspect
-		postDescription = getDescriptionField post
 		unit = post.activeUnit
-		unitDescription = getDescriptionField unit
-		content = unit.content
-		editUnitId = unit.id
 		if unit.pasteType == nil
 			#it's plain text
 			highlightingSelectionMode = PlainTextHighlightingIndex
@@ -444,9 +284,18 @@ END
 			highlightingSelectionMode = AllSyntaxHighlightingTypesIndex
 			lastSelection = unit.pasteType
 		end
-		isPrivatePost = post.isPrivate
-		expirationIndex = post.expirationIndex
-		body = pastebinForm(request, errors, author, postDescription, unitDescription, content, highlightingSelectionMode, lastSelection, isPrivatePost, expirationIndex, editUnitId)
+		form = PastebinForm.new(request)
+		form.errors = nil
+		form.author = post.editAuthor
+		form.postDescription = getDescriptionField post
+		form.unitDescription = getDescriptionField unit
+		form.content = unit.content
+		form.highlightingSelectionMode = highlightingSelectionMode
+		form.lastSelection = lastSelection
+		form.isPrivatePost = post.isPrivate
+		form.expirationIndex = post.expirationIndex
+		form.editUnitId = unit.id
+		body = pastebinForm(form)
 		title = 'Editing post'
 		return @pastebinGenerator.get([title, body], request)
 	end
