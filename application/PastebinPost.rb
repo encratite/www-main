@@ -10,7 +10,7 @@ class PastebinPost < WWWLib::SymbolTransfer
 	AnonymousAuthor = 'Anonymous'
 	NoDescription = 'No description'
 	
-	attr_reader :id, :userId, :user, :units, :name, :isAnonymous, :author, :bodyAuthor, :noDescription, :description, :bodyDescription, :pasteType, :creation, :contentSize, :ip, :activeUnit, :modificationCounter, :expiration, :expirationIndex, :privateString, :editAuthor
+	attr_reader :id, :userId, :user, :units, :name, :author, :bodyAuthor, :noDescription, :description, :bodyDescription, :pasteType, :creation, :contentSize, :ip, :activeUnit, :modificationCounter, :expiration, :expirationIndex, :privateString, :editAuthor
 	
 	attr_accessor :pasteTypes, :isPrivate
 	
@@ -113,9 +113,9 @@ class PastebinPost < WWWLib::SymbolTransfer
 			else
 				#the dup is necessary because the editAuthor field would get ruined by the processDescription down there otherwise
 				@editAuthor = @author.dup
+				isAnonymous = @author.empty?
+				processDescription(isAnonymous, @author, @bodyAuthor, AnonymousAuthor)
 			end
-			@isAnonymous = @author.empty?
-			processDescription(@isAnonymous, @author, @bodyAuthor, AnonymousAuthor)
 		end
 		
 		@noDescription = @description.empty?
