@@ -1,8 +1,12 @@
+require 'fileutils'
+
 require 'SecuredFormWriter'
 require 'error'
 
 require 'configuration/loader'
 requireConfiguration 'VimSyntax'
+
+require 'nil/file'
 
 require 'www-library/HTML'
 require 'www-library/string'
@@ -54,6 +58,15 @@ class SyntaxHighlighting
 		
 		flags = ['f', 'n', 'X', 'e', 's']
 		
+		vimDirectory = Nil.joinPaths(Dir.home, '.vim')
+		scriptFile = 'pastebin.vim'
+		localPath = Nil.joinPaths('vim', scriptFile)
+		scriptPath = Nil.joinPaths('syntax', scriptFile)
+		fullPath = Nil.joinPaths(vimDirectory, scriptPath)
+		
+		FileUtils.mkdir_p(File.dirname(fullPath))
+		FileUtils.cp(localPath, fullPath)
+		
 		vimCommands =
 		[
 			"set filetype=#{script}",
@@ -62,7 +75,7 @@ class SyntaxHighlighting
 			'set wrap linebreak textwidth=0',
 			'syntax on',
 			'let html_use_css=1',
-			'run syntax/pastebin.vim',
+			"run #{scriptPath}",
 			"wq! #{outputFile.path}",
 			'q',
 		]
@@ -76,7 +89,10 @@ class SyntaxHighlighting
 		#output = system "#{PastebinConfiguration::VimPath} #{flags} #{vimCommands} #{inputFile.path}"
 		#plainError 'A vim error occured' if !output
 		line = "#{PastebinConfiguration::VimPath} #{flags} #{vimCommands} #{inputFile.path}"
-		`#{line}`
+		output = `#{line}`
+		
+		puts line
+		puts output
 		
 		markup = outputFile.open.read
 		

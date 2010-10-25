@@ -116,8 +116,8 @@ endif
 " Return HTML valid characters enclosed in a span of class style_name with
 " unprintable characters expanded and double spaces replaced as necessary.
 function! s:HtmlFormat(text, style_name, diff_style_name)
-  " Replace unprintable characters
-  let formatted = strtrans(a:text)
+  " Do not replace unprintable characters
+  let formatted = a:text
 
   " separate the two classes by a space to apply them both if there is a diff
   " style name
@@ -874,27 +874,8 @@ while s:lnum <= s:end
 	" Expand tabs
 	let s:expandedtab = strpart(s:line, s:startcol - 1, s:col - s:startcol)
 	let s:offset = 0
-	let s:idx = stridx(s:expandedtab, "\t")
-	while s:idx >= 0
-	  if has("multi_byte_encoding")
-	    if s:startcol + s:idx == 1
-	      let s:i = &ts
-	    else
-	      if s:idx == 0
-		let s:prevc = matchstr(s:line, '.\%' . (s:startcol + s:idx + s:offset) . 'c')
-	      else
-		let s:prevc = matchstr(s:expandedtab, '.\%' . (s:idx + 1) . 'c')
-	      endif
-	      let s:vcol = virtcol([s:lnum, s:startcol + s:idx + s:offset - len(s:prevc)])
-	      let s:i = &ts - (s:vcol % &ts)
-	    endif
-	    let s:offset -= s:i - 1
-	  else
-	    let s:i = &ts - ((s:idx + s:startcol - 1) % &ts)
-	  endif
-	  let s:expandedtab = substitute(s:expandedtab, '\t', repeat(' ', s:i), '')
-	  let s:idx = stridx(s:expandedtab, "\t")
-	endwhile
+	
+	" Do not replace the tabs
 
 	" get the highlight group name to use
 	let s:id = synIDtrans(s:id)
