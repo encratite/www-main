@@ -91,9 +91,6 @@ class SyntaxHighlighting
 		line = "#{PastebinConfiguration::VimPath} #{flags} #{vimCommands} #{inputFile.path}"
 		output = `#{line}`
 		
-		puts line
-		puts output
-		
 		markup = outputFile.open.read
 		
 		code = WWWLib.extractString(markup, "<pre>\n", "</pre>")

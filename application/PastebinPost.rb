@@ -4,6 +4,8 @@ require 'PastebinUnit'
 require 'error'
 require 'string'
 
+require 'visual/highlight'
+
 require 'www-library/SymbolTransfer'
 
 class PastebinPost < WWWLib::SymbolTransfer
@@ -110,6 +112,7 @@ class PastebinPost < WWWLib::SymbolTransfer
 					#name from the post listing joins
 					@author = @name
 				end
+				@bodyAuthor = makeBold @author
 			else
 				#the dup is necessary because the editAuthor field would get ruined by the processDescription down there otherwise
 				@editAuthor = @author.dup
