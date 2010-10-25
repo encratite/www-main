@@ -62,7 +62,7 @@ class SyntaxHighlighting
 			'set wrap linebreak textwidth=0',
 			'syntax on',
 			'let html_use_css=1',
-			'run syntax/2html.vim',
+			'run syntax/pastebin.vim',
 			"wq! #{outputFile.path}",
 			'q',
 		]

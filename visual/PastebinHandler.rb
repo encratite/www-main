@@ -84,7 +84,9 @@ class PastebinHandler < SiteContainer
 			end
 			
 			content = unit.highlightedContent || unit.content
-			content = content.gsub('  ', '&nbsp;&nbsp;')
+			space = '&nbsp;'
+			content = content.gsub('  ', space * 2)
+			content = content.gsub("\t", space * 4)
 			contentLines = content.split "\n"
 			
 			writer.div(class: 'unitContainer') do

@@ -44,6 +44,7 @@
 
 #content
 {
+	font-family: "Lucida Console", monospace;
 	margin: 0;
 	padding: 0.3em 0.5em 0.3em 0.5em;
 	width: 64em;
