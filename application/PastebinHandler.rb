@@ -401,6 +401,8 @@ class PastebinHandler < SiteContainer
 		@database.transaction do
 			dataset = @database[:pastebin_post]
 			postsPerPage = PastebinConfiguration::PostsPerPage
+			#private_string must be NULL - only public posts may be browsed
+			#reply_to must be NULL, too - we only want to see the posts which actually started a thread
 			posts = dataset.where(private_string: nil, reply_to: nil)
 			count = posts.count
 			pageCount = count == 0 ? 1 : (Float(count) / postsPerPage).ceil

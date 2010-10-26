@@ -150,6 +150,7 @@ ul.lineNumbers
 
 ul.lineNumbers li
 {
+	font-family: "Lucida Console", monospace;
 	height: 1.2em;
 	margin-right: 0.5em;
 	text-align: right;

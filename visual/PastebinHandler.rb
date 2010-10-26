@@ -84,9 +84,12 @@ class PastebinHandler < SiteContainer
 			end
 			
 			content = unit.highlightedContent || unit.content
+			
+			#generate a minimal amount of HTML entities to achieve the desired spacing
 			space = '&nbsp;'
-			content = content.gsub('  ', space * 2)
-			content = content.gsub("\t", space * 4)
+			content = content.gsub("\t", ' ' * 4)
+			content = content.gsub('  ', "#{space} ")
+			
 			contentLines = content.split "\n"
 			
 			writer.div(class: 'unitContainer') do
