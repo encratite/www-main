@@ -56,16 +56,31 @@ class PastebinHandler < SiteContainer
 			end
 			
 			if permission
-				unitActions =
+				unitActions = []
+				
+				downloadDescription = 'Download'
+				
+				if post.privateString == nil
+					#it's a public post - use the regular public unit download handler
+					unitActions << [@downloadHandler, downloadDescription]
+					
+				else
+					#it's a private post - use the private unit download handler with the correct private string
+					unitActions << [@privateDownloadHandler, downloadDescription, post.privateString]
+				end
+				
+				unitActions +=
 				[
 					[@editUnitHandler, 'Edit'],
 					[@deleteUnitHandler, 'Delete'],
 				]
 				idString = unit.id.to_s
 				actions = []
-				unitActions.each do |handler, description|
+				unitActions.each do |handler, description, customArguments = nil|
 					linkWriter = WWWLib::HTMLWriter.new
-					linkWriter.a(href: handler.getPath(idString)) { description }
+					arguments = [idString]
+					arguments += customArguments if customArguments != nil
+					linkWriter.a(href: handler.getPath(*arguments)) { description }
 					actions << linkWriter.output
 				end
 				actionsString = actions.join(', ')
