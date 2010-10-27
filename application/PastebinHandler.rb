@@ -536,4 +536,11 @@ class PastebinHandler < SiteContainer
 	end
 	
 	def download(request)
+		return processDownload(request, nil)
+	end
+	
+	def privateDownload(request)
+		privateString = request.arguments[1]
+		return processDownload(request, privateString)
+	end
 end
