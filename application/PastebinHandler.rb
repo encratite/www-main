@@ -26,6 +26,8 @@ class PastebinHandler < SiteContainer
 	DeleteUnit = 'deleteUnit'
 	EditUnit = 'edit'
 	SubmitUnitModification = 'submitModification'
+	Download = 'download'
+	PrivateDownload = 'privateDownload'
 	
 	def installHandlers
 		pastebinHandler = WWWLib::RequestHandler.menu('Pastebin', Pastebin, method(:postData))
@@ -42,7 +44,9 @@ class PastebinHandler < SiteContainer
 		@deletePostHandler = WWWLib::RequestHandler.handler(DeletePost, method(:deletePost), 1)
 		@deleteUnitHandler = WWWLib::RequestHandler.handler(DeleteUnit, method(:deleteUnit), 1)
 		@editUnitHandler = WWWLib::RequestHandler.handler(EditUnit, method(:editUnit), 1)
-		@submitUnitModification = WWWLib::RequestHandler.handler(SubmitUnitModification, method(:submitUnitModification))
+		@submitUnitModificationHandler = WWWLib::RequestHandler.handler(SubmitUnitModification, method(:submitUnitModification))
+		@downloadHandler = WWWLib::RequestHandler.handler(Download, method(:download), 1)
+		@privateDownloadHandler = WWWLib::RequestHandler.handler(PrivateDownload, method(:privateDownload), 2)
 		
 		WWWLib::RequestHandler.getBufferedObjects.each { |handler| pastebinHandler.add(handler) }
 	end
@@ -500,4 +504,36 @@ class PastebinHandler < SiteContainer
 	def submitUnitModification(request)
 		return processNewPostOrModification(request, true)
 	end
+	
+	def processDownload(request, privateString)
+		posts = @database[:pastebin_post]
+		units = @database[:pastebin_unit]
+		unitId = getRequestId request
+		
+		@database.transaction do
+			rows = units.select(:post_id, :content).where(id: unitId).all
+			raiseError(argumentError, request) if rows.empty?
+			unit = rows.first
+			postId = unit[:post_id]
+			unitContent = unit[:content]
+			rows = posts.select(:private_string).where(id: postId).all
+			raiseError(internalError 'Missing post', request) if rows.empty?
+			post = rows.first
+			postPrivateString = post[:private_string]
+			#it's a public post and it's being viewed using the regular download handler
+			publicSuccess = (privateString == nil && postPrivateString == nil)
+			#this might seem redundant but I like verbosity
+			#it's a private post, it's being viewed using the private download handler and the private string specified in the argument matches that of the post
+			privateSuccess = (privateString != nil && postPrivateString != nil && privateString == postPrivateString)
+			if !(publicSuccess || privateSuccess)
+				raiseError(argumentError, request)
+			end
+			#return the actual code as plain text
+			reply = WWWLib::HTTPReply.new(unitContent)
+			reply.plain
+			return reply
+		end
+	end
+	
+	def download(request)
 end

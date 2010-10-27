@@ -33,7 +33,7 @@ class PastebinHandler < SiteContainer
 		
 		form.lastSelection = form.request.cookies[CookieConfiguration::VimScript] if form.lastSelection == nil
 		
-		handler = editing ? @submitUnitModification : @submitNewPostHandler
+		handler = editing ? @submitUnitModificationHandler : @submitNewPostHandler
 		
 		writer.securedForm(handler.getPath, form.request) do
 		
