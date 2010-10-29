@@ -18,7 +18,9 @@ require 'www-library/HTTPReply'
 
 class PastebinHandler < SiteContainer
 	Pastebin = 'pastebin'
+	CreateReply = 'reply'
 	SubmitNewPost = 'submitNewPost'
+	SubmitReply = 'submitReply'
 	View = 'view'
 	ViewPrivate = 'viewPrivate'
 	List = 'list'
@@ -30,14 +32,15 @@ class PastebinHandler < SiteContainer
 	PrivateDownload = 'privateDownload'
 	
 	def installHandlers
-		pastebinHandler = WWWLib::RequestHandler.menu('Pastebin', Pastebin, method(:postData))
+		pastebinHandler = WWWLib::RequestHandler.menu('Pastebin', Pastebin, method(:createNewPost))
 		addMainHandler pastebinHandler
 		
 		WWWLib::RequestHandler.newBufferedObjectsGroup
 		
-		WWWLib::RequestHandler.menu('Create new post', nil, method(:postData))
+		WWWLib::RequestHandler.menu('Create new post', nil, method(:createNewPost))
 		WWWLib::RequestHandler.menu('View posts', List, method(:viewPosts), 0..1)
 		
+		@createReplyHandler = WWWLib::RequestHandler.handler(CreateReply, method(:createReply), 1)
 		@submitNewPostHandler = WWWLib::RequestHandler.handler(SubmitNewPost, method(:submitNewPost))
 		@viewPostHandler = WWWLib::RequestHandler.handler(View, method(:viewPost), 1)
 		@viewPrivatePostHandler = WWWLib::RequestHandler.handler(ViewPrivate, method(:viewPrivatePost), 1)
@@ -45,6 +48,7 @@ class PastebinHandler < SiteContainer
 		@deleteUnitHandler = WWWLib::RequestHandler.handler(DeleteUnit, method(:deleteUnit), 1)
 		@editUnitHandler = WWWLib::RequestHandler.handler(EditUnit, method(:editUnit), 1)
 		@submitUnitModificationHandler = WWWLib::RequestHandler.handler(SubmitUnitModification, method(:submitUnitModification))
+		@submitReplyHandler = WWWLib::RequestHandler.handler(SubmitReply, method(:submitReply))
 		@downloadHandler = WWWLib::RequestHandler.handler(Download, method(:download), 1)
 		@privateDownloadHandler = WWWLib::RequestHandler.handler(PrivateDownload, method(:privateDownload), 2)
 		
@@ -56,13 +60,23 @@ class PastebinHandler < SiteContainer
 		raise WWWLib::RequestManager::Exception.new(@pastebinGenerator.get(data, request))
 	end
 
-	def postData(request)
+	def createNewPost(request)
 		form = PastebinForm.new(request)
-		@pastebinGenerator.get(['Pastebin', pastebinForm(form)], request)
+		return @pastebinGenerator.get(['Pastebin', pastebinForm(form)], request)
+	end
+	
+	def createReply(request)
+		postId = getRequestId request
+		#check if the post ID is valid
+		posts = @database[:pastebin_post].where(id: postId).all
+		argumentError if posts.empty?
+		form = PastebinForm.new(request)
+		form.replyPostId = postId
+		return @pastebinGenerator.get(['Reply to post', pastebinForm(form)], request)
 	end
 
 	def floodCheck(request)
-		query = "select count(*) from flood_protection where ip = '#{request.address}' and paste_time + interval '#{PastebinConfiguration::PasteInterval} seconds' >= now()"
+		query = "select count(*) from flood_protection where ip = '#{request.address}' and paste_time + interval '#{PastebinConfiguration::PasteInterval} seconds' >= '#{Time.now.utc}'"
 		count = @database.fetch(query).first.values.first
 		return count > PastebinConfiguration::PastesPerInterval
 	end
@@ -141,13 +155,35 @@ class PastebinHandler < SiteContainer
 	end
 	
 	def submitNewPost(request)
-		return processNewPostOrModification(request, false)
+		return processPostSubmission(request, :new)
+	end
+	
+	def submitUnitModification(request)
+		return processPostSubmission(request, :edit)
+	end
+	
+	def submitReply(request)
+		return processPostSubmission(request, :reply)
 	end
 
-	def processNewPostOrModification(request, editing)
+	#mode may be either :new (for new posts), :edit (for submitting modifications for existing posts) or :reply (for new replies to existing posts)
+	def processPostSubmission(request, mode)
+		editing = mode == :edit
+		replying = mode == :reply
+		
 		debugPostSubmission request if PastebinForm::DebugMode
 		
-		source =  editing ? PastebinForm::EditPostFields : PastebinForm::NewSubmissionPostFields
+		case mode
+		when :new
+			source = PastebinForm::NewSubmissionPostFields
+		when :edit
+			source = PastebinForm::EditPostFields
+		when :reply
+			source = PastebinForm::ReplyPostFields
+		else
+			raise 'Invalid process submission mode specified'
+		end
+		
 		input = processFormFields(request, source)
 
 		author,
@@ -209,15 +245,21 @@ class PastebinHandler < SiteContainer
 			isPrivatePost = nil
 			expirationIndex = expiration
 			
-			if editing
+			case mode
+			when :new
+				editUnitId = nil
+			when :edit
 				#check if the unit ID is valid and determine the post associated with it
 				#right now the ID of the unit to be edited is the last field - could be changed by PastebinForm though, so watch out
 				editUnitId = input[-1].to_i
 				editPost = PastebinPost.new
 				editPost.editPermissionQueryInitialisation(editUnitId, @database)
 				writePermissionCheck(request, editPost)
-			else
-				editUnitId = nil
+			when :reply
+				#check if the user is replying to a valid post ID
+				replyPostId = input[-1].to_i
+				rows = posts.where(id: replyPostId)
+				argumentError if rows.empty?
 			end
 			
 			if !errors.empty?
@@ -247,7 +289,11 @@ class PastebinHandler < SiteContainer
 			postAuthor = !isLoggedIn ? author : nil
 			expirationTime = now + PastebinConfiguration::ExpirationOptions[expiration][1]
 			postExpiration = expiration == 0 ? nil : expirationTime
-			postReply = nil
+			if replying
+				postReply = replyPostId
+			else
+				postReply = nil
+			end
 
 			postData =
 			{
@@ -499,10 +545,6 @@ class PastebinHandler < SiteContainer
 	
 	def writePermissionCheck(request, post)
 		raiseError(permissionError, request) if !hasWriteAccess(request, post)
-	end
-	
-	def submitUnitModification(request)
-		return processNewPostOrModification(request, true)
 	end
 	
 	def processDownload(request, privateString)

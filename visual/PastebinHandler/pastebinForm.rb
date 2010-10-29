@@ -8,6 +8,7 @@ requireConfiguration 'cookie'
 class PastebinHandler < SiteContainer
 	def pastebinForm(form)
 		editing = form.editUnitId != nil
+		replying = form.replyPostId != nil
 		output = ''
 		writer = SecuredFormWriter.new(output, form.request)
 		
@@ -71,7 +72,11 @@ class PastebinHandler < SiteContainer
 				end
 				writer.text('Author (optional)', PastebinForm::Author, form.author, pasteFieldLength(:VimScriptLengthMaximum))
 			else
-				writer.p { "You are currently logged in as <b>#{form.request.sessionUser.htmlName}</b>." }
+				writer.p do
+					writer.write 'You are currently logged in as '
+					writer.b { form.request.sessionUser.htmlName }
+					writer.write '.'
+				end
 				writer.hidden(PastebinForm::Author, '')
 			end
 			
@@ -143,6 +148,9 @@ class PastebinHandler < SiteContainer
 			if editing
 				writer.hidden(PastebinForm::EditUnitId, form.editUnitId)
 				writer.secureSubmit('Edit')
+			elsif replying
+			writer.hidden(PastebinForm::ReplyPostId, form.replyPostId)
+				writer.secureSubmit('Reply')
 			else
 				writer.secureSubmit
 			end

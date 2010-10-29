@@ -55,37 +55,43 @@ class PastebinHandler < SiteContainer
 				unitFields << ['Time added', unit.timeAdded]
 			end
 			
+			unitActions = []
+			
+			downloadDescription = 'Download'
+				
+			if post.privateString == nil
+				#it's a public post - use the regular public unit download handler
+				unitActions << [@downloadHandler, downloadDescription]
+				
+			else
+				#it's a private post - use the private unit download handler with the correct private string
+				unitActions << [@privateDownloadHandler, downloadDescription, post.privateString]
+			end
+			
 			if permission
-				unitActions = []
-				
-				downloadDescription = 'Download'
-				
-				if post.privateString == nil
-					#it's a public post - use the regular public unit download handler
-					unitActions << [@downloadHandler, downloadDescription]
-					
-				else
-					#it's a private post - use the private unit download handler with the correct private string
-					unitActions << [@privateDownloadHandler, downloadDescription, [post.privateString]]
-				end
-				
 				unitActions +=
 				[
 					[@editUnitHandler, 'Edit'],
 					[@deleteUnitHandler, 'Delete'],
 				]
-				idString = unit.id.to_s
-				actions = []
-				unitActions.each do |handler, description, customArguments = nil|
-					linkWriter = WWWLib::HTMLWriter.new
-					arguments = [idString]
-					arguments += customArguments if customArguments != nil
-					linkWriter.a(href: handler.getPath(*arguments)) { description }
-					actions << linkWriter.output
-				end
-				actionsString = actions.join(', ')
-				unitFields << ['Actions', actionsString]
 			end
+			
+			idString = unit.id.to_s
+			actions = []
+			unitActions.each do |handler, description, customArguments = nil|
+				linkWriter = WWWLib::HTMLWriter.new
+				arguments = [idString]
+				if customArguments.class != Array
+					customArguments = [customArguments]
+				end
+				arguments += customArguments if customArguments != nil
+				linkWriter.a(href: handler.getPath(*arguments)) { description }
+				actions << linkWriter.output
+			end
+			
+			actionsString = actions.join(', ')
+			
+			unitFields << ['Actions', actionsString]
 			
 			getModificationFields(unitFields, unit)
 			
@@ -148,12 +154,23 @@ class PastebinHandler < SiteContainer
 			['Time created', post.creation]
 		]
 		
+		actions =
+		[
+			[@createReplyHandler, 'Reply'],
+		]
+		
 		permission = hasWriteAccess(request, post)
-		if permission
+		
+		actions << [@deletePostHandler, 'Delete post'] if permission
+		
+		links = []
+		actions.each do |handler, description|
 			linkWriter = WWWLib::HTMLWriter.new
-			linkWriter.a(href: @deletePostHandler.getPath(post.id.to_s)) { 'Delete post' }
-			fields << ['Actions', linkWriter.output]
+			linkWriter.a(href: handler.getPath(post.id.to_s)) { description }
+			links << linkWriter.output
 		end
+		
+		fields << ['Actions', links.join(', ')]
 		
 		getModificationFields(fields, post)
 		

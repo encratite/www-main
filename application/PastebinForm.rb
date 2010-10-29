@@ -16,6 +16,7 @@ class PastebinForm
 	Content = 'content'
 	
 	EditUnitId = 'unit'
+	ReplyPostId = 'post'
 	
 	NoHighlighting = 'none'
 	
@@ -51,6 +52,7 @@ class PastebinForm
 	]
 	
 	EditPostFields = NewSubmissionPostFields + [EditUnitId]
+	ReplyPostFields = NewSubmissionPostFields + [ReplyPostId]
 	
 	attr_accessor(
 		:request,
@@ -64,6 +66,7 @@ class PastebinForm
 		:isPrivatePost,
 		:expirationIndex,
 		:editUnitId,
+		:replyPostId,
 	)
 	
 	def initialize(request)
@@ -78,5 +81,6 @@ class PastebinForm
 		@isPrivatePost = nil
 		@expirationIndex = nil
 		@editUnitId = nil
+		@replyPostId = nil
 	end
 end
