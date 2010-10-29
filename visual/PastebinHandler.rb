@@ -66,7 +66,7 @@ class PastebinHandler < SiteContainer
 					
 				else
 					#it's a private post - use the private unit download handler with the correct private string
-					unitActions << [@privateDownloadHandler, downloadDescription, post.privateString]
+					unitActions << [@privateDownloadHandler, downloadDescription, [post.privateString]]
 				end
 				
 				unitActions +=
@@ -131,6 +131,7 @@ class PastebinHandler < SiteContainer
 						writer.li(arguments) { lineCounter.to_s }
 						lineCounter += 1
 					end
+					nil
 				end
 			end
 			unitOffset += 1

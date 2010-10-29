@@ -46,6 +46,7 @@ class PastebinHandler < SiteContainer
 				writer.radio(HighlightingGroups[radioCounter], PastebinForm::HighlightingGroup, PastebinForm::HighlightingGroupIdentifiers[radioCounter], checked, arguments)
 				
 				radioCounter += 1
+				nil
 			end
 			
 			basicOptions = form.lastSelection ? SyntaxHighlighting.getSelectionList(true, form.lastSelection) : SyntaxHighlighting::CommonScripts

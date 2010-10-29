@@ -1,3 +1,5 @@
+require 'www-library/RequestManager'
+
 class SiteContainer
 	def initialize(site)
 		site.instance_variables.each do |variable|
@@ -37,6 +39,6 @@ class SiteContainer
 	end
 	
 	def raiseError(error, request)
-		raise RequestManager::Exception.new(@generator.get(error, request))
+		raise WWWLib::RequestManager::Exception.new(@generator.get(error, request))
 	end
 end
