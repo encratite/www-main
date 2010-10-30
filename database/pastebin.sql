@@ -21,12 +21,14 @@ create table pastebin_post
 	
 	--This index into an array in the Ruby code specifies the expiration option which was used when the post was created originally
 	--It is used when the post is edited
-	expiration_index int not null,
+	--It's null when reply_to is not null (i.e. it's a reply and only the expiration of the original post is considered)
+	expiration_index int,
 	
 	--Contains the private string for the URL for private pastebin entries - it is null for public posts
+	--For replies it is equal to the private_string of the original post
 	private_string text,
 	
-	--null if this is a new thread
+	--null if this is a new thread and not a reply
 	reply_to integer references pastebin_post(id)
 );
 

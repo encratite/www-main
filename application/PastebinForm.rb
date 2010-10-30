@@ -31,7 +31,7 @@ class PastebinForm
 	PrivatePost = 'privatePost'
 	Expiration = 'expiration'
 	
-	NewSubmissionPostFields =
+	CommonPostFields =
 	[
 		Author,
 		
@@ -43,16 +43,21 @@ class PastebinForm
 		AdvancedHighlighting,
 		ExpertHighlighting,
 		
-		PrivatePost,
-		Expiration,
-		
 		UnitDescription,
 		
 		Content,
 	]
 	
+	CreationPostFields =
+	[
+		PrivatePost,
+		Expiration,
+	]
+	
+	NewSubmissionPostFields = CommonPostFields + CreationPostFields
 	EditPostFields = NewSubmissionPostFields + [EditUnitId]
-	ReplyPostFields = NewSubmissionPostFields + [ReplyPostId]
+	ReplyPostFields = CommonPostFields + [ReplyPostId]
+	EditReplyPostFields = CommonPostFields + [EditUnitId]
 	
 	attr_accessor(
 		:request,
@@ -67,6 +72,7 @@ class PastebinForm
 		:expirationIndex,
 		:editUnitId,
 		:replyPostId,
+		:editPost,
 	)
 	
 	def initialize(request)
@@ -82,5 +88,6 @@ class PastebinForm
 		@expirationIndex = nil
 		@editUnitId = nil
 		@replyPostId = nil
+		@editPost = nil
 	end
 end

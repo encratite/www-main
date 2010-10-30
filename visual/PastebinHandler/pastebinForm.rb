@@ -34,7 +34,13 @@ class PastebinHandler < SiteContainer
 		
 		form.lastSelection = form.request.cookies[CookieConfiguration::VimScript] if form.lastSelection == nil
 		
-		handler = editing ? @submitUnitModificationHandler : @submitNewPostHandler
+		if editing
+			handler = @submitUnitModificationHandler
+		elsif replying
+			handler = @submitReplyHandler
+		else
+			handler = @submitNewPostHandler
+		end
 		
 		writer.securedForm(handler.getPath, form.request) do
 		
@@ -109,36 +115,43 @@ class PastebinHandler < SiteContainer
 				WWWLib::SelectOption.new('Public post', '0', !form.isPrivatePost),
 				WWWLib::SelectOption.new('Private post', '1', form.isPrivatePost),
 			]
+		
+			editPost = form.editPost
+		
+			#privacy is determined by the initial post when replying
+			#same for the expiration - it cannot be modified in the replies
 			
-			writer.select(PastebinForm::PrivatePost,  privacyOptions, {label: 'Privacy options'})
-			
-			firstOffset = 0
-			
-			if form.expirationIndex == nil
-				cookie = form.request.cookies[CookieConfiguration::Expiration]
+			if editPost == nil || editPost.replyTo == nil
+				writer.select(PastebinForm::PrivatePost,  privacyOptions, {label: 'Privacy options'})
+
+				firstOffset = 0
 				
-				if cookie != nil
-					begin
-						form.expirationIndex = Integer cookie
-					rescue ArgumentError
+				if form.expirationIndex == nil
+					cookie = form.request.cookies[CookieConfiguration::Expiration]
+					
+					if cookie != nil
+						begin
+							form.expirationIndex = Integer cookie
+						rescue ArgumentError
+							form.expirationIndex = firstOffset
+						end
+					else
 						form.expirationIndex = firstOffset
 					end
-				else
-					form.expirationIndex = firstOffset
 				end
+				
+				optionCount = PastebinConfiguration::ExpirationOptions.size
+				form.expirationIndex = firstOffset if !(firstOffset..(optionCount - 1)).include?(form.expirationIndex)
+				offset = 0
+				
+				expirationOptions = PastebinConfiguration::ExpirationOptions.map do |description, seconds|
+					option = WWWLib::SelectOption.new(description, offset.to_s, offset == form.expirationIndex)
+					offset += 1
+					option
+				end		
+				
+				writer.select(PastebinForm::Expiration, expirationOptions, {label: 'Post expiration'})
 			end
-			
-			optionCount = PastebinConfiguration::ExpirationOptions.size
-			form.expirationIndex = firstOffset if !(firstOffset..(optionCount - 1)).include?(form.expirationIndex)
-			offset = 0
-			
-			expirationOptions = PastebinConfiguration::ExpirationOptions.map do |description, seconds|
-				option = WWWLib::SelectOption.new(description, offset.to_s, offset == form.expirationIndex)
-				offset += 1
-				option
-			end		
-			
-			writer.select(PastebinForm::Expiration, expirationOptions, {label: 'Post expiration'})
 			
 			writer.text('Description of this unit (optional)', PastebinForm::UnitDescription, form.unitDescription, pasteFieldLength(:UnitDescriptionLengthMaximum))
 			writer.textArea('Paste the content here', PastebinForm::Content, form.content, {cols: '30', rows: '10', maxlength: PastebinConfiguration::UnitSizeLimit})

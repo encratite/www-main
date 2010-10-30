@@ -12,7 +12,7 @@ class PastebinPost < WWWLib::SymbolTransfer
 	AnonymousAuthor = 'Anonymous'
 	NoDescription = 'No description'
 	
-	attr_reader :id, :userId, :user, :units, :name, :author, :bodyAuthor, :noDescription, :description, :bodyDescription, :pasteType, :creation, :contentSize, :ip, :activeUnit, :modificationCounter, :expiration, :expirationIndex, :privateString, :editAuthor
+	attr_reader :id, :userId, :user, :units, :name, :author, :bodyAuthor, :noDescription, :description, :bodyDescription, :pasteType, :creation, :contentSize, :ip, :activeUnit, :modificationCounter, :expiration, :expirationIndex, :privateString, :editAuthor, :replyTo
 	
 	attr_accessor :pasteTypes, :isPrivate
 	
@@ -21,7 +21,7 @@ class PastebinPost < WWWLib::SymbolTransfer
 		@bodyDescription = ''
 	end
 	
-	def simpleInitialisation(id, database, fullMemberInitialisation)
+	def simpleInitialisation(id, database, fullPostInitialisation)
 		@id = id
 		posts = database[:pastebin_post]
 		#just select all the fields for now, it's too much of a mess otherwise
@@ -29,16 +29,16 @@ class PastebinPost < WWWLib::SymbolTransfer
 		postData = posts.where(id: id)
 		argumentError if postData.empty?
 		transferSymbols postData.first
-		initialiseMembers(fullMemberInitialisation)
+		initialiseMembers(fullPostInitialisation)
 		return
 	end
 	
 	def deletePostQueryInitialisation(id, database)
-		simpleInitialisation(id, database)
+		simpleInitialisation(id, database, false)
 		return
 	end
 	
-	def unitInitialisation(unitId, database, fields, fullMemberInitialisation = false, fullUnitInitialisation = true)
+	def unitInitialisation(unitId, database, fields, fullPostInitialisation = false, fullUnitInitialisation = true)
 		units = database[:pastebin_unit]
 		row = units.where(id: unitId).select(*fields)
 		argumentError if row.empty?
@@ -46,7 +46,7 @@ class PastebinPost < WWWLib::SymbolTransfer
 		unitData[:id] = unitId
 		@activeUnit = PastebinUnit.new(unitData, fullUnitInitialisation)
 		postId = @activeUnit.postId
-		simpleInitialisation(postId, database, fullMemberInitialisation)
+		simpleInitialisation(postId, database, fullPostInitialisation)
 		return postId
 	end
 	

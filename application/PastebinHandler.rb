@@ -165,6 +165,12 @@ class PastebinHandler < SiteContainer
 	def submitReply(request)
 		return processPostSubmission(request, :reply)
 	end
+	
+	def getIntPost(request, symbol)
+		output = request.getPost(PastebinForm.const_get(symbol))
+		return nil if output == nil
+		return output.to_i
+	end
 
 	#mode may be either :new (for new posts), :edit (for submitting modifications for existing posts) or :reply (for new replies to existing posts)
 	def processPostSubmission(request, mode)
@@ -186,6 +192,7 @@ class PastebinHandler < SiteContainer
 		
 		input = processFormFields(request, source)
 
+		#CommonPostFields
 		author,
 			
 		postDescription,
@@ -196,19 +203,17 @@ class PastebinHandler < SiteContainer
 		advancedHighlighting,
 		expertHighlighting,
 		
-		privatePost,
-		expiration,
-		
 		unitDescription,
 		
 		content = input
 		
+		#CreationPostFields - only available with mode == :new and mode == :edit of a post with reply_to = NULL
+		privatePost = getIntPost(request, :PrivatePost)
+		expiration = getIntPost(request, :Expiration)
+		
 		stringLengthChecks = getStringLengthChecks(author, postDescription, unitDescription, content, expertHighlighting)
 		
 		errors = []
-		
-		privatePost = privatePost.to_i
-		expiration = expiration.to_i
 		
 		validValues = getValidValues(highlightingGroup, privatePost, expiration)
 		
@@ -251,15 +256,18 @@ class PastebinHandler < SiteContainer
 			when :edit
 				#check if the unit ID is valid and determine the post associated with it
 				#right now the ID of the unit to be edited is the last field - could be changed by PastebinForm though, so watch out
-				editUnitId = input[-1].to_i
+				editUnitId = request.getPost(PastebinForm::EditUnitId).to_i
 				editPost = PastebinPost.new
 				editPost.editPermissionQueryInitialisation(editUnitId, @database)
 				writePermissionCheck(request, editPost)
 			when :reply
 				#check if the user is replying to a valid post ID
-				replyPostId = input[-1].to_i
-				rows = posts.where(id: replyPostId)
+				replyPostId = request.getPost(PastebinForm::ReplyPostId).to_i
+				rows = posts.where(id: replyPostId).all
 				argumentError if rows.empty?
+				#we actually need some of data from the parent post in order to set the private string in the reply row correctly - they are supposed to be identical after all
+				parentPost = PastebinPost.new
+				parentPost.transferSymbols(rows.first)
 			end
 			
 			if !errors.empty?
@@ -276,6 +284,9 @@ class PastebinHandler < SiteContainer
 				form.isPrivatePost = isPrivatePost
 				form.expirationIndex = expirationIndex
 				form.editUnitId = editUnitId
+				if mode == :edit
+					form.editPost = editPost
+				end
 				errorContent = pastebinForm(form)
 				#this raises an exception
 				pastebinError(errorContent, request)
@@ -304,17 +315,21 @@ class PastebinHandler < SiteContainer
 				
 				description: postDescription,
 				
-				expiration: postExpiration,
-				expiration_index: expirationIndex,
-				
 				reply_to: postReply,
 			}
 			
-			isPrivate = privatePost == 1
-			privateString = isPrivate ? createPrivateString(PastebinConfiguration::PrivateStringLength) : nil
+			editingPrimaryPost = (mode == :edit && editPost.replyTo == nil)
+			
+			if mode == :new || editingPrimaryPost
+				postData[:expiration] = postExpiration
+				postData[:expiration_index] = expirationIndex
+				
+				isPrivate = privatePost == 1
+				privateString = isPrivate ? createPrivateString(PastebinConfiguration::PrivateStringLength) : nil
+			end
 
 			if editing
-				if !(editPost.isPrivate && isPrivate)
+				if editingPrimaryPost && !(editPost.isPrivate && isPrivate)
 					#there are basically 4 cases to cover - just exclude the one where no new private string must be generated and written to the post
 					#unnecessarily writing a null is not a big deal anyways
 					postData[:private_string] = privateString
@@ -325,7 +340,12 @@ class PastebinHandler < SiteContainer
 				postId = editPost.id
 				posts.where(id: postId).update(postData)
 			else
-				postData[:private_string] = privateString
+				case mode
+				when :new
+					postData[:private_string] = privateString
+				when :reply
+					postData[:private_string] = parentPost.privateString
+				end
 				postData[:creation] = now
 				postId = posts.insert(postData)
 			end

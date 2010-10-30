@@ -333,6 +333,7 @@ class PastebinHandler < SiteContainer
 		form.isPrivatePost = post.isPrivate
 		form.expirationIndex = post.expirationIndex
 		form.editUnitId = unit.id
+		form.editPost = post
 		body = pastebinForm(form)
 		title = 'Editing post'
 		return @pastebinGenerator.get([title, body], request)
