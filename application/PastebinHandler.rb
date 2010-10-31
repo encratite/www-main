@@ -286,6 +286,7 @@ class PastebinHandler < SiteContainer
 				#we actually need some of data from the parent post in order to set the private string in the reply row correctly - they are supposed to be identical after all
 				parentPost = PastebinPost.new
 				parentPost.transferSymbols(rows.first)
+				puts replyPostId.inspect
 			end
 			
 			if !errors.empty?

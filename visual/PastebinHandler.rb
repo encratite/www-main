@@ -43,10 +43,21 @@ class PastebinHandler < SiteContainer
 	def processPastebinUnits(writer, post, permission)
 		unitOffset = 1
 		post.units.each do |unit|
-			unitFields =
+			unitFields = []
+			
+			unitCount = post.units.size
+			
+			
+			if unitCount > 1
+				unitFields << ['Unit', "#{unitOffset}/#{unitCount}"]
+			end
+				
+			if !unit.noDescription
+				unitFields << ['Description',  unit.bodyDescription]
+			end
+			
+			unitFields +=
 			[
-				['Unit', "#{unitOffset}/#{post.units.size}"],
-				['Description',  unit.bodyDescription],
 				['Type', unit.bodyPasteType],
 				['Size', WWWLib.getSizeString(unit.content.size)],
 			]
