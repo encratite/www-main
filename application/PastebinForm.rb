@@ -71,9 +71,12 @@ class PastebinForm
 		:isPrivatePost,
 		:expirationIndex,
 		:editUnitId,
-		:replyPostId,
 		:editPost,
+		:replyPost,
+		:mode,
 	)
+	
+	#mode may be either :new, :edit or :reply
 	
 	def initialize(request)
 		@request = request
@@ -87,7 +90,8 @@ class PastebinForm
 		@isPrivatePost = nil
 		@expirationIndex = nil
 		@editUnitId = nil
-		@replyPostId = nil
+		@replyPost = nil
 		@editPost = nil
+		@mode = nil
 	end
 end

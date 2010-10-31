@@ -62,6 +62,7 @@ class PastebinHandler < SiteContainer
 
 	def createNewPost(request)
 		form = PastebinForm.new(request)
+		form.mode = :new
 		return @pastebinGenerator.get(['Pastebin', pastebinForm(form)], request)
 	end
 	
@@ -70,8 +71,11 @@ class PastebinHandler < SiteContainer
 		#check if the post ID is valid
 		posts = @database[:pastebin_post].where(id: postId).all
 		argumentError if posts.empty?
+		replyPost = PastebinPost.new
+		replyPost.transferSymbols(posts.first)
 		form = PastebinForm.new(request)
-		form.replyPostId = postId
+		form.mode = :reply
+		form.replyPost = replyPost
 		return @pastebinGenerator.get(['Reply to post', pastebinForm(form)], request)
 	end
 
@@ -128,9 +132,15 @@ class PastebinHandler < SiteContainer
 		validValues =
 		[
 			[highlightingGroup, 'highlighting group', PastebinForm::HighlightingGroupIdentifiers],
-			[privatePost, 'privacy option', [0, 1]],
-			[expiration, 'expiration option', (0..(PastebinConfiguration::ExpirationOptions.size - 1))],
 		]
+		
+		if privatePost != nil && expiration != nil
+			validValues +=
+			[
+				[privatePost, 'privacy option', [0, 1]],
+				[expiration, 'expiration option', (0..(PastebinConfiguration::ExpirationOptions.size - 1))],
+			]
+		end
 		
 		return validValues
 	end
@@ -177,13 +187,26 @@ class PastebinHandler < SiteContainer
 		editing = mode == :edit
 		replying = mode == :reply
 		
+		if editing
+			#check if the unit ID is valid and determine the post associated with it
+			#right now the ID of the unit to be edited is the last field - could be changed by PastebinForm though, so watch out
+			editUnitId = request.getPost(PastebinForm::EditUnitId).to_i
+			editPost = PastebinPost.new
+			editPost.editPermissionQueryInitialisation(editUnitId, @database)
+			writePermissionCheck(request, editPost)
+		end
+		
+		editingPrimaryPost = (mode == :edit && editPost.replyTo == nil)
+		
 		debugPostSubmission request if PastebinForm::DebugMode
 		
 		case mode
 		when :new
 			source = PastebinForm::NewSubmissionPostFields
 		when :edit
-			source = PastebinForm::EditPostFields
+			source = editingPrimaryPost ?
+				PastebinForm::EditPostFields :
+				PastebinForm::EditReplyPostFields
 		when :reply
 			source = PastebinForm::ReplyPostFields
 		else
@@ -254,12 +277,7 @@ class PastebinHandler < SiteContainer
 			when :new
 				editUnitId = nil
 			when :edit
-				#check if the unit ID is valid and determine the post associated with it
-				#right now the ID of the unit to be edited is the last field - could be changed by PastebinForm though, so watch out
-				editUnitId = request.getPost(PastebinForm::EditUnitId).to_i
-				editPost = PastebinPost.new
-				editPost.editPermissionQueryInitialisation(editUnitId, @database)
-				writePermissionCheck(request, editPost)
+				
 			when :reply
 				#check if the user is replying to a valid post ID
 				replyPostId = request.getPost(PastebinForm::ReplyPostId).to_i
@@ -287,6 +305,7 @@ class PastebinHandler < SiteContainer
 				if mode == :edit
 					form.editPost = editPost
 				end
+				form.mode = mode
 				errorContent = pastebinForm(form)
 				#this raises an exception
 				pastebinError(errorContent, request)
@@ -298,8 +317,6 @@ class PastebinHandler < SiteContainer
 			
 			postUser = isLoggedIn ? request.sessionUser.id : nil
 			postAuthor = !isLoggedIn ? author : nil
-			expirationTime = now + PastebinConfiguration::ExpirationOptions[expiration][1]
-			postExpiration = expiration == 0 ? nil : expirationTime
 			if replying
 				postReply = replyPostId
 			else
@@ -318,9 +335,10 @@ class PastebinHandler < SiteContainer
 				reply_to: postReply,
 			}
 			
-			editingPrimaryPost = (mode == :edit && editPost.replyTo == nil)
-			
 			if mode == :new || editingPrimaryPost
+				expirationTime = now + PastebinConfiguration::ExpirationOptions[expiration][1]
+				postExpiration = expiration == 0 ? nil : expirationTime
+			
 				postData[:expiration] = postExpiration
 				postData[:expiration_index] = expirationIndex
 				

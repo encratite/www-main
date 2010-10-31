@@ -334,6 +334,7 @@ class PastebinHandler < SiteContainer
 		form.expirationIndex = post.expirationIndex
 		form.editUnitId = unit.id
 		form.editPost = post
+		form.mode = :edit
 		body = pastebinForm(form)
 		title = 'Editing post'
 		return @pastebinGenerator.get([title, body], request)

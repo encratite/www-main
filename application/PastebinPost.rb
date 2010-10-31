@@ -12,7 +12,29 @@ class PastebinPost < WWWLib::SymbolTransfer
 	AnonymousAuthor = 'Anonymous'
 	NoDescription = 'No description'
 	
-	attr_reader :id, :userId, :user, :units, :name, :author, :bodyAuthor, :noDescription, :description, :bodyDescription, :pasteType, :creation, :contentSize, :ip, :activeUnit, :modificationCounter, :expiration, :expirationIndex, :privateString, :editAuthor, :replyTo
+	attr_reader(
+		:id,
+		:userId,
+		:user,
+		:units,
+		:name,
+		:author,
+		:bodyAuthor,
+		:noDescription,
+		:description,
+		:bodyDescription,
+		:pasteType,
+		:creation,
+		:contentSize,
+		:ip,
+		:activeUnit,
+		:modificationCounter,
+		:expiration,
+		:expirationIndex,
+		:privateString,
+		:editAuthor,
+		:replyTo,
+	)
 	
 	attr_accessor :pasteTypes, :isPrivate
 	

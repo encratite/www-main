@@ -8,7 +8,7 @@ requireConfiguration 'cookie'
 class PastebinHandler < SiteContainer
 	def pastebinForm(form)
 		editing = form.editUnitId != nil
-		replying = form.replyPostId != nil
+		replying = form.replyPost != nil
 		output = ''
 		writer = SecuredFormWriter.new(output, form.request)
 		
@@ -117,11 +117,13 @@ class PastebinHandler < SiteContainer
 			]
 		
 			editPost = form.editPost
+			replyPost = form.replyPost
 		
-			#privacy is determined by the initial post when replying
-			#same for the expiration - it cannot be modified in the replies
+			#the expiration and the privacy settings are only visible in the following modes:
+			#-making a new post
+			#-when editing a non-reply post
 			
-			if editPost == nil || editPost.replyTo == nil
+			if form.mode == :new || (form.mode == :edit && editPost.replyTo == nil)
 				writer.select(PastebinForm::PrivatePost,  privacyOptions, {label: 'Privacy options'})
 
 				firstOffset = 0
@@ -162,7 +164,7 @@ class PastebinHandler < SiteContainer
 				writer.hidden(PastebinForm::EditUnitId, form.editUnitId)
 				writer.secureSubmit('Edit')
 			elsif replying
-			writer.hidden(PastebinForm::ReplyPostId, form.replyPostId)
+				writer.hidden(PastebinForm::ReplyPostId, form.replyPost.id)
 				writer.secureSubmit('Reply')
 			else
 				writer.secureSubmit
