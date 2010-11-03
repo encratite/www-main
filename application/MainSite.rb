@@ -4,6 +4,7 @@ require 'SiteRequest'
 require 'hash'
 require 'error'
 require 'SecuredFormWriter'
+require 'Database'
 
 require 'sequel'
 
@@ -44,7 +45,7 @@ class MainSite
 			password: DatabaseConfiguration::Password,
 			database: DatabaseConfiguration::Database
 		)
-		return database
+		return Database.new(database)
 	end
 	
 	def getSiteGenerator(stylesheets = [], scripts = [])

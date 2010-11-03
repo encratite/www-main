@@ -31,6 +31,12 @@ class PastebinHandler < SiteContainer
 	Download = 'download'
 	PrivateDownload = 'privateDownload'
 	
+	def initialize(site)
+		super
+		@posts = @database[:pastebin_post]
+		@units = @database[:pastebin_unit]
+	end
+	
 	def installHandlers
 		pastebinHandler = WWWLib::RequestHandler.menu('Pastebin', Pastebin, method(:createNewPost))
 		addMainHandler pastebinHandler
@@ -69,7 +75,7 @@ class PastebinHandler < SiteContainer
 	def createReply(request)
 		postId = getRequestId request
 		#check if the post ID is valid
-		posts = @database[:pastebin_post].where(id: postId).all
+		posts = @posts.where(id: postId).all
 		argumentError if posts.empty?
 		replyPost = PastebinPost.new
 		replyPost.transferSymbols(posts.first)
@@ -267,9 +273,6 @@ class PastebinHandler < SiteContainer
 				end
 			end
 			
-			posts = @database[:pastebin_post]
-			units = @database[:pastebin_unit]
-			
 			isPrivatePost = nil
 			expirationIndex = expiration
 			
@@ -281,12 +284,11 @@ class PastebinHandler < SiteContainer
 			when :reply
 				#check if the user is replying to a valid post ID
 				replyPostId = request.getPost(PastebinForm::ReplyPostId).to_i
-				rows = posts.where(id: replyPostId).all
+				rows = @posts.where(id: replyPostId).all
 				argumentError if rows.empty?
 				#we actually need some of data from the parent post in order to set the private string in the reply row correctly - they are supposed to be identical after all
 				parentPost = PastebinPost.new
 				parentPost.transferSymbols(rows.first)
-				puts replyPostId.inspect
 			end
 			
 			if !errors.empty?
@@ -357,7 +359,7 @@ class PastebinHandler < SiteContainer
 				postData[:modification_counter] = editPost.modificationCounter + 1
 				postData[:last_modification] = now
 				postId = editPost.id
-				posts.where(id: postId).update(postData)
+				@posts.where(id: postId).update(postData)
 			else
 				case mode
 				when :new
@@ -366,7 +368,7 @@ class PastebinHandler < SiteContainer
 					postData[:private_string] = parentPost.privateString
 				end
 				postData[:creation] = now
-				postId = posts.insert(postData)
+				postId = @posts.insert(postData)
 			end
 			
 			isPlain = highlightingGroup == PastebinForm::NoHighlighting
@@ -394,10 +396,10 @@ class PastebinHandler < SiteContainer
 				#increase the modification counter for the unit, too
 				unitData[:modification_counter] = editPost.activeUnit.modificationCounter + 1
 				unitData[:last_modification] = now
-				units.where(id: editUnitId).update(unitData)
+				@units.where(id: editUnitId).update(unitData)
 			else
 				unitData[:time_added] = now
-				units.insert(unitData)
+				@units.insert(unitData)
 			end
 			
 			if privateString == nil
@@ -488,11 +490,10 @@ class PastebinHandler < SiteContainer
 		end
 		
 		@database.transaction do
-			dataset = @database[:pastebin_post]
 			postsPerPage = PastebinConfiguration::PostsPerPage
 			#private_string must be NULL - only public posts may be browsed
 			#reply_to must be NULL, too - we only want to see the posts which actually started a thread
-			posts = dataset.where(private_string: nil, reply_to: nil)
+			posts = @posts.where(private_string: nil, reply_to: nil)
 			count = posts.count
 			pageCount = count == 0 ? 1 : (Float(count) / postsPerPage).ceil
 			pastebinError('Invalid page specified.', request) if page >= pageCount
@@ -537,12 +538,10 @@ class PastebinHandler < SiteContainer
 	end
 	
 	def deletePostTree(id)
-		posts = @database[:pastebin_post]
 		replies = posts.where(reply_to: id)
 		replies.each { |reply| deletePostTree reply.id }
-		units = @database[:pastebin_unit]
-		units.where(post_id: id).delete
-		posts.where(id: id).delete
+		@units.where(post_id: id).delete
+		@posts.where(id: id).delete
 	end
 	
 	def deletePost(request)
@@ -563,9 +562,8 @@ class PastebinHandler < SiteContainer
 		@database.transaction do
 			postId = post.deleteUnitQueryInitialisation(unitId, @database)
 			writePermissionCheck(request, post)
-			units = @database[:pastebin_unit]
-			units.where(id: unitId).delete
-			unitCount = units.where(post_id: postId).count
+			@units.where(id: unitId).delete
+			unitCount = @units.where(post_id: postId).count
 			deletedPost = unitCount == 0
 			deletePostTree postId if deletedPost
 		end
@@ -587,17 +585,15 @@ class PastebinHandler < SiteContainer
 	end
 	
 	def processDownload(request, privateString)
-		posts = @database[:pastebin_post]
-		units = @database[:pastebin_unit]
 		unitId = getRequestId request
 		
 		@database.transaction do
-			rows = units.select(:post_id, :content).where(id: unitId).all
+			rows = @units.select(:post_id, :content).where(id: unitId).all
 			raiseError(argumentError, request) if rows.empty?
 			unit = rows.first
 			postId = unit[:post_id]
 			unitContent = unit[:content]
-			rows = posts.select(:private_string).where(id: postId).all
+			rows = @posts.select(:private_string).where(id: postId).all
 			raiseError(internalError 'Missing post', request) if rows.empty?
 			post = rows.first
 			postPrivateString = post[:private_string]
