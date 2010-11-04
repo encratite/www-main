@@ -109,7 +109,7 @@ class UserHandler < SiteContainer
 		errors = []
 		
 		error = lambda { |message| errors << message }	
-		printErrorForm = lambda { @generator.get visualRegisterForm(errors, user, email), request }
+		printErrorForm = lambda { @generator.get visualRegisterForm(request, errors, user, email), request }
 		errorOccured = lambda { !errors.empty? }
 		
 		error.call 'Your user name may not be empty.' if user.empty?
@@ -123,7 +123,7 @@ class UserHandler < SiteContainer
 		reply = nil
 		
 		@database.transaction do
-			error.call 'The user name you have chosen is already taken. Please choose another one.' if dataset.where(name: user).count > 0
+			error.call 'The user name you have chosen is already taken. Please choose another one.' if @database.user.where(name: user).count > 0
 			
 			return printErrorForm.call if errorOccured.call
 			

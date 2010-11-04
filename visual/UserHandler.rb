@@ -58,9 +58,10 @@ END
 			end
 			
 			writer.ul class: 'error' do
+				
 				error.each { |message| writer.li { message } }
 			end
-			writer.p 'Please go over the writer again and correct the invalid entries.'
+			writer.p { 'Please go over the writer again and correct the invalid entries.' }
 		else
 			writer.p do
 				lines =

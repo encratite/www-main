@@ -350,10 +350,15 @@ class PastebinHandler < SiteContainer
 			end
 
 			if editing
-				if editingPrimaryPost && !(editPost.isPrivate && isPrivate)
-					#there are basically 4 cases to cover - just exclude the one where no new private string must be generated and written to the post
-					#unnecessarily writing a null is not a big deal anyways
-					postData[:private_string] = privateString
+				if editingPrimaryPost && 
+					if editPost.isPrivate && isPrivate
+						#the post remains private - reuse its private string in the referral
+						privateString = editPost.privateString
+					else
+						#there are basically 4 cases to cover - just exclude the one where no new private string must be generated and written to the post
+						#unnecessarily writing a null is not a big deal anyways
+						postData[:private_string] = privateString
+					end
 				end
 				#increase the modification counter
 				postData[:modification_counter] = editPost.modificationCounter + 1
@@ -538,7 +543,7 @@ class PastebinHandler < SiteContainer
 	end
 	
 	def deletePostTree(id)
-		replies = posts.where(reply_to: id)
+		replies = @database.post.where(reply_to: id)
 		replies.each { |reply| deletePostTree reply.id }
 		@units.where(post_id: id).delete
 		@posts.where(id: id).delete

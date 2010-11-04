@@ -189,7 +189,10 @@ class PastebinHandler < SiteContainer
 			fields << ['Expires', post.expiration]
 		end
 		
-		fields << ['Number of units', post.units.size]
+		unitCount = post.units.size
+		if unitCount > 1
+			fields << ['Number of units', unitCount]
+		end
 		
 		writer.table(class: 'descriptionTable') do
 			fields.each do |description, value|

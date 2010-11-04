@@ -6,11 +6,11 @@ class Database < SymbolicAssignment
 	def initialize(database)
 		tableMap =
 		{
-			user => :site_user,
-			loginSession => :login_session,
-			post => :pastebin_post,
-			unit => :pastebin_unit,
-			floodProtection => :flood_protection,
+			user: :site_user,
+			loginSession: :login_session,
+			post: :pastebin_post,
+			unit: :pastebin_unit,
+			floodProtection: :flood_protection,
 		}
 		
 		tableMap.each do |member, tableSymbol|
