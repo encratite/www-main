@@ -33,8 +33,8 @@ class PastebinHandler < SiteContainer
 	
 	def initialize(site)
 		super
-		@posts = @database[:pastebin_post]
-		@units = @database[:pastebin_unit]
+		@posts = @database.post
+		@units = @database.unit
 	end
 	
 	def installHandlers
@@ -87,12 +87,12 @@ class PastebinHandler < SiteContainer
 
 	def floodCheck(request)
 		query = "select count(*) from flood_protection where ip = '#{request.address}' and paste_time + interval '#{PastebinConfiguration::PasteInterval} seconds' >= '#{Time.now.utc}'"
-		count = @database.fetch(query).first.values.first
+		count = @database.connection.fetch(query).first.values.first
 		return count > PastebinConfiguration::PastesPerInterval
 	end
 
 	def createPrivateString(length)
-		dataset = @database[:pastebin_post]
+		dataset = @database.post
 		while true
 			sessionString = WWWLib::RandomString.get length
 			break if dataset.where(private_string: sessionString).count == 0

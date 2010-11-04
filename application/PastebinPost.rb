@@ -45,10 +45,9 @@ class PastebinPost < WWWLib::SymbolTransfer
 	
 	def simpleInitialisation(id, database, fullPostInitialisation)
 		@id = id
-		posts = database[:pastebin_post]
 		#just select all the fields for now, it's too much of a mess otherwise
 		#the data per row are rather small anyways, the actual problem is the content within the units
-		postData = posts.where(id: id)
+		postData = database.post.where(id: id)
 		argumentError if postData.empty?
 		transferSymbols postData.first
 		initialiseMembers(fullPostInitialisation)
@@ -61,8 +60,7 @@ class PastebinPost < WWWLib::SymbolTransfer
 	end
 	
 	def unitInitialisation(unitId, database, fields, fullPostInitialisation = false, fullUnitInitialisation = true)
-		units = database[:pastebin_unit]
-		row = units.where(id: unitId).select(*fields)
+		row = database.unit.where(id: unitId).select(*fields)
 		argumentError if row.empty?
 		unitData = row.first
 		unitData[:id] = unitId
@@ -87,7 +85,7 @@ class PastebinPost < WWWLib::SymbolTransfer
 	end
 	
 	def showPostQueryInitialisation(target, handler, request, database)
-		dataset = database[:pastebin_post]
+		dataset = database.post
 		
 		if target.class == String
 			postData = dataset.where(private_string: target)
@@ -101,16 +99,14 @@ class PastebinPost < WWWLib::SymbolTransfer
 		transferSymbols postData
 		
 		if @userId != nil
-			dataset = database[:site_user]
-			userData = dataset.where(id: @userId)
+			userData = database.user.where(id: @userId)
 			internalError 'Unable to retrieve the user associated with this post.' if userData.empty?
 			@user = User.new(userData.first)
 		end
 		
 		initialiseMembers
 		
-		dataset = database[:pastebin_unit]
-		unitData = dataset.where(post_id: @id)
+		unitData = database.unit.where(post_id: @id)
 		internalError 'No units are associated with this post.' if unitData.empty?
 		#unit ID will be transferred from the select * query
 		unitData.each { |unit| @units << PastebinUnit.new(unit) }

@@ -71,8 +71,7 @@ class UserHandler < SiteContainer
 		
 		passwordHash = hashWithSalt password
 		
-		dataset = @database[:site_user]
-		result = dataset.where(name: user, password: passwordHash).first
+		result = @database.user.where(name: user, password: passwordHash).first
 		if result == nil
 			return @generator.get visualLoginError, request
 		else
@@ -121,8 +120,6 @@ class UserHandler < SiteContainer
 		
 		return printErrorForm.call if errorOccured.call
 		
-		dataset = @database[:site_user]
-		
 		reply = nil
 		
 		@database.transaction do
@@ -131,7 +128,7 @@ class UserHandler < SiteContainer
 			return printErrorForm.call if errorOccured.call
 			
 			passwordHash = hashWithSalt password
-			userId = dataset.insert(name: user, password: passwordHash, email: email)
+			userId = @database.user.insert(name: user, password: passwordHash, email: email)
 			sessionString = @sessionManager.createSession(userId, request.address)
 			sessionCookie = WWWLib::Cookie.new(CookieConfiguration::Session, sessionString, @site.mainHandler.getPath)
 			sessionCookie.expirationDays SiteConfiguration::CookieDurationInDays
@@ -159,8 +156,7 @@ class UserHandler < SiteContainer
 		end
 		
 		sessionString = request.cookies[CookieConfiguration::Session]
-		dataset = @database[:login_session]
-		dataset.filter(session_string: sessionString).delete
+		@database.loginSession.filter(session_string: sessionString).delete
 		
 		request.sessionUser = nil
 		

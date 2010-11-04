@@ -1,7 +1,7 @@
 require 'nil/symbol'
 
 class Database < SymbolicAssignment
-	attr_read :user, :loginSession, :post, :unit, :floodProtection
+	attr_reader :user, :loginSession, :post, :unit, :floodProtection, :connection
 	
 	def initialize(database)
 		tableMap =
@@ -16,6 +16,14 @@ class Database < SymbolicAssignment
 		tableMap.each do |member, tableSymbol|
 			value = database[tableSymbol]
 			setMember(member, value)
+		end
+		
+		@connection = database
+	end
+	
+	def transaction(&block)
+		@connection.transaction do
+			block.call
 		end
 	end
 end
