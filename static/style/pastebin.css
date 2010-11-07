@@ -218,3 +218,11 @@ ul.contentList span, ul.contentList a
 	color: #ff00ff;
 }
 
+ul.postTree
+{
+}
+
+ul.innerPostTree
+{
+	margin-left: 4em;
+}
