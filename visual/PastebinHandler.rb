@@ -155,7 +155,7 @@ class PastebinHandler < SiteContainer
 		end
 	end
 
-	def showPastebinPost(request, post)
+	def showPastebinPost(request, post, tree)
 		writer = WWWLib::HTMLWriter.new
 
 		fields =

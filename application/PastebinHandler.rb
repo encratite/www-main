@@ -448,21 +448,25 @@ class PastebinHandler < SiteContainer
 	def viewPost(request)
 		postId = getRequestId request
 		post = nil
+		tree = nil
 		@database.transaction do
 			post = PastebinPost.new
 			post.showPostQueryInitialisation(postId, self, request, @database)
+			tree = PostTree.new(@database, post)
 		end
-		return showPastebinPost(request, post)
+		return showPastebinPost(request, post, tree)
 	end
 	
 	def viewPrivatePost(request)
 		privateString = request.arguments[0]
 		post = nil
+		tree = nil
 		@database.transaction do
 			post = PastebinPost.new
 			post.showPostQueryInitialisation(privateString, self, request, @database)
+			tree = PostTree.new(@database, post)
 		end
-		return showPastebinPost(request, post)
+		return showPastebinPost(request, post, tree)
 	end
 	
 	def parsePosts(posts)

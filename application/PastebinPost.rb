@@ -34,13 +34,16 @@ class PastebinPost < WWWLib::SymbolTransfer
 		:privateString,
 		:editAuthor,
 		:replyTo,
+		:children,
 	)
 	
-	attr_accessor :pasteTypes, :isPrivate
+	attr_accessor :pasteTypes, :isPrivate,
 	
 	def initialize
 		@bodyAuthor = ''
 		@bodyDescription = ''
+		#used by PostTree
+		@children = []
 	end
 	
 	def simpleInitialisation(id, database, fullPostInitialisation)
@@ -147,6 +150,21 @@ class PastebinPost < WWWLib::SymbolTransfer
 		@isPrivate = !@privateString.nil?
 		
 		return
+	end
+	
+	def loadChildren(database)
+		children = database.post.where(reply_to: @id).all
+		children.each do |child|
+			childPost = PastebinPost.new
+			childPost.transferSymbols(child)
+			#perform depth first search
+			childPost.loadChildren
+			@children << childPost
+		end
+		#sort the children according to their age so the oldest ones pop up first in the post tree output
+		@children.sort do |a, b|
+			a.creation <=> b.creation
+		end
 	end
 end
 
