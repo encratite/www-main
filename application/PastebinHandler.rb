@@ -3,6 +3,7 @@ require 'error'
 require 'SyntaxHighlighting'
 require 'PastebinPost'
 require 'SiteContainer'
+require 'PostTree'
 
 require 'configuration/loader'
 requireConfiguration 'pastebin'
@@ -444,29 +445,29 @@ class PastebinHandler < SiteContainer
 		argumentError if id == nil
 		return id
 	end
-
-	def viewPost(request)
-		postId = getRequestId request
+	
+	def processPostView(request, isPrivate)
+		if isPrivate
+			target = request.arguments[0]
+		else
+			target = getRequestId request
+		end
 		post = nil
 		tree = nil
 		@database.transaction do
 			post = PastebinPost.new
-			post.showPostQueryInitialisation(postId, self, request, @database)
+			post.showPostQueryInitialisation(target, self, request, @database)
 			tree = PostTree.new(@database, post)
 		end
 		return showPastebinPost(request, post, tree)
 	end
+
+	def viewPost(request)
+		return processPostView(request, false)
+	end
 	
 	def viewPrivatePost(request)
-		privateString = request.arguments[0]
-		post = nil
-		tree = nil
-		@database.transaction do
-			post = PastebinPost.new
-			post.showPostQueryInitialisation(privateString, self, request, @database)
-			tree = PostTree.new(@database, post)
-		end
-		return showPastebinPost(request, post, tree)
+		return processPostView(request, true)
 	end
 	
 	def parsePosts(posts)

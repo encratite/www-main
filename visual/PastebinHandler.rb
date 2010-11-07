@@ -19,6 +19,8 @@ class PastebinHandler < SiteContainer
 		'Expert mode (manually specify the name of a vim script)'
 	]
 	
+	PostTreeListClass = 'postTree'
+	
 	PlainTextHighlightingIndex = 0
 	AllSyntaxHighlightingTypesIndex = 2
 	
@@ -154,6 +156,22 @@ class PastebinHandler < SiteContainer
 			unitOffset += 1
 		end
 	end
+	
+	def drawPostTree(writer, post)
+		writer.li do
+			post.bodyDescription
+		end
+		children = post.children
+		if !children.empty?
+			writer.li(newlineType: :full) do
+				writer.ul(class: PostTreeListClass) do
+					children.each do |child|
+						drawPostTree(writer, child)
+					end
+				end
+			end
+		end
+	end
 
 	def showPastebinPost(request, post, tree)
 		writer = WWWLib::HTMLWriter.new
@@ -204,6 +222,12 @@ class PastebinHandler < SiteContainer
 		end
 		
 		processPastebinUnits(writer, post, permission)
+		
+		if !post.children.empty?
+			writer.ul(class: PostTreeListClass) do
+				drawPostTree(writer, post)
+			end
+		end
 		
 		title = "#{getDescription(post)} - Pastebin"
 		

@@ -1,11 +1,11 @@
-require 'www-library/SiteGenerator'
 require 'visual/body'
+
+require 'www-library/SiteGenerator'
 
 class MainSiteGenerator < WWWLib::SiteGenerator
 	def get(data, request)
 		title, content = data
-		content += visualFoot
-		additionalHeader = visualHead request
-		super(title, content, additionalHeader)
+		content = wrapContent(request, content)
+		super(title, content)
 	end
 end

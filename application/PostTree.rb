@@ -8,7 +8,7 @@ class PostTree
 	
 	def createTree(post)
 		rootPost = getRootPost(post)
-		rootPost.loadChildren
+		rootPost.loadChildren(@database)
 		@root = rootPost
 	end
 	

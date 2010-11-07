@@ -1,10 +1,13 @@
 require 'visual/MenuRenderer'
 
-def visualHead(request)
-	output = MenuRenderer.renderMenu request
-	output += "<div id=\"siteContent\">\n"
-end
+require 'www-library/HTMLWriter'
 
-def visualFoot()
-	return "</div>\n"
+def wrapContent(request, content)
+	writer = WWWLib::HTMLWriter.new
+	menu = MenuRenderer.renderMenu(request)
+	writer.write(menu)
+	writer.div(id: 'siteContent') do
+		content
+	end
+	return writer.output
 end

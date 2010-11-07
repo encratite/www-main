@@ -37,7 +37,7 @@ class PastebinPost < WWWLib::SymbolTransfer
 		:children,
 	)
 	
-	attr_accessor :pasteTypes, :isPrivate,
+	attr_accessor :pasteTypes, :isPrivate
 	
 	def initialize
 		@bodyAuthor = ''
@@ -157,14 +157,17 @@ class PastebinPost < WWWLib::SymbolTransfer
 		children.each do |child|
 			childPost = PastebinPost.new
 			childPost.transferSymbols(child)
+			childPost.initialiseMembers
 			#perform depth first search
-			childPost.loadChildren
+			childPost.loadChildren(database)
 			@children << childPost
 		end
 		#sort the children according to their age so the oldest ones pop up first in the post tree output
 		@children.sort do |a, b|
 			a.creation <=> b.creation
 		end
+		
+		return
 	end
 end
 
