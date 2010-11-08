@@ -168,6 +168,58 @@ ul.contentList span, ul.contentList a
 	font-family: "Lucida Console", monospace;
 }
 
+table.pastebinUnit
+{
+	border-collapse: separate;
+	border-spacing: 0;
+	border: 1px solid black;
+}
+
+table.pastebinUnit td
+{
+	margin: 0;
+	font-family: "Lucida Console", monospace;
+}
+
+td.lineCounter
+{
+	padding: 0 0.5em 0 1em;
+	text-align: right;
+	background-color: white;
+	border: none;
+	border-right: 1px solid black;
+}
+
+td.oddLine
+{
+	border: none;
+	background-color: #ffffff;
+	border-bottom: 1px dotted #808080;
+	padding: 0 1em 0 1em;
+}
+
+td.evenLine
+{
+	border: none;
+	background-color: #f8f8f8;
+	border-bottom: 1px dotted #808080;
+	padding: 0 1em 0 1em;
+}
+
+td.oddLastLine
+{
+	border: none;
+	background-color: #ffffff;
+	padding: 0 1em 0 1em;
+}
+
+td.evenLastLine
+{
+	border: none;
+	background-color: #f8f8f8;
+	padding: 0 1em 0 1em;
+}
+
 .Comment
 {
 	color: #008000;
