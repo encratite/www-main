@@ -95,20 +95,33 @@ table.postList td, table.postList th
 	padding: 0 0.6em 0 0.6em;
 }
 
-div.unitContainer
+ul.lineNumbers
 {
-	margin-top: 1em;
-	position: absolute;
-	white-space: nowrap;
-	display: inline-block;
-	padding: 0 2em 2em 0;
+	width: 4em;
+	border: 1px solid black;
+	float: left;
+}
+
+ul.lineNumbers li
+{
+	font-family: "Lucida Console", monospace;
+	height: 1.2em;
+	margin-right: 0.5em;
+	text-align: right;
+	border-bottom: 1px dotted white;
+}
+
+ul.lineNumbers li.lastLine
+{
+	text-align: right;
+	border-bottom: none;
 }
 
 ul.contentList
 {
-	margin: 0 0 0 4em;
 	border: 1px solid black;
-	display: inline-block;
+	border-left: none;
+	float: left;
 }
 
 ul.contentList li
@@ -140,95 +153,25 @@ ul.contentList li.evenLastLine
 	background-color: #f4f4f4;
 }
 
-ul.lineNumbers
-{
-	position: absolute;
-	top: 0;
-	left: -1px;
-	width: 4em;
-	border: 1px solid black;
-	display: inline-block;
-}
-
-ul.lineNumbers li
-{
-	font-family: "Lucida Console", monospace;
-	height: 1.2em;
-	margin-right: 0.5em;
-	text-align: right;
-	border-bottom: 1px dotted white;
-}
-
-ul.lineNumbers li.lastLine
-{
-	text-align: right;
-	border-bottom: none;
-}
-
 ul.contentList span, ul.contentList a
 {
 	font-family: "Lucida Console", monospace;
 }
 
-table.pastebinUnit
-{
-	border-collapse: separate;
-	border-spacing: 0;
-	border: 1px solid black;
-}
-
-table.pastebinUnit td
-{
-	margin: 0;
-	font-family: "Lucida Console", monospace;
-}
-
-td.lineCounter
-{
-	padding: 0 0.5em 0 1em;
-	text-align: right;
-	background-color: white;
-	border: none;
-	border-right: 1px solid black;
-}
-
-td.oddLine
-{
-	border: none;
-	background-color: #ffffff;
-	border-bottom: 1px dotted #808080;
-	padding: 0 1em 0 1em;
-}
-
-td.evenLine
-{
-	border: none;
-	background-color: #f8f8f8;
-	border-bottom: 1px dotted #808080;
-	padding: 0 1em 0 1em;
-}
-
-td.oddLastLine
-{
-	border: none;
-	background-color: #ffffff;
-	padding: 0 1em 0 1em;
-}
-
-td.evenLastLine
-{
-	border: none;
-	background-color: #f8f8f8;
-	padding: 0 1em 0 1em;
-}
-
 ul.postTree
 {
+	padding-top: 2em;
+	clear: both;
 }
 
 ul.innerPostTree
 {
-	margin-left: 4em;
+	margin-left: 2em;
+}
+
+li.postTreeChild
+{
+	list-style-type: circle;
 }
 
 .Comment
