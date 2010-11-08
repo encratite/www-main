@@ -22,6 +22,8 @@ class PastebinHandler < SiteContainer
 	PlainTextHighlightingIndex = 0
 	AllSyntaxHighlightingTypesIndex = 2
 	
+	UseList = true
+	
 	def pasteFieldLength(symbol)
 		return {maxlength: PastebinConfiguration.const_get(symbol)}
 	end
@@ -125,8 +127,20 @@ class PastebinHandler < SiteContainer
 			
 			contentLines = content.split "\n"
 			
+			if UseList
+				renderContentAsList(writer, contentLines)
+			else
+				renderContentAsTable(writer, contentLines)
+			end
+			
+			unitOffset += 1
+		end
+	end
+	
+	def renderContentAsList(writer, contentLines)
+		writer.div(class: 'unitContainer') do
 			isEven = false
-			writer.table(class: 'pastebinUnit') do
+			writer.ul(class: 'contentList') do
 				lineCounter = 1
 				contentLines.each do |line|
 					if lineCounter == contentLines.size
@@ -134,16 +148,42 @@ class PastebinHandler < SiteContainer
 					else
 						lineClass = isEven ? 'evenLine' : 'oddLine'
 					end
-					writer.tr do
-						writer.td(class: 'lineCounter', newlineType: :final) { lineCounter }
-						writer.td(class: lineClass, newlineType: :final) { line }
-					end
+					writer.li(class: lineClass) { line }
 					isEven = !isEven
 					lineCounter += 1
 				end
 			end
 			
-			unitOffset += 1
+			writer.ul(class: 'lineNumbers') do
+				lineCounter = 1
+				contentLines.size.times do |i|
+					arguments = {}
+					arguments[:class] = 'lastLine' if lineCounter == contentLines.size
+					writer.li(arguments) { lineCounter.to_s }
+					lineCounter += 1
+				end
+				nil
+			end
+		end
+	end
+	
+	def renderContentAsTable(writer, contentLines)
+		isEven = false
+		writer.table(class: 'pastebinUnit') do
+			lineCounter = 1
+			contentLines.each do |line|
+				if lineCounter == contentLines.size
+					lineClass = isEven ? 'evenLastLine' : 'oddLastLine'
+				else
+					lineClass = isEven ? 'evenLine' : 'oddLine'
+				end
+				writer.tr do
+					writer.td(class: 'lineCounter', newlineType: :final) { lineCounter }
+					writer.td(class: lineClass, newlineType: :final) { line }
+				end
+				isEven = !isEven
+				lineCounter += 1
+			end
 		end
 	end
 	
