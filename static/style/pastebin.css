@@ -169,6 +169,11 @@ ul.innerPostTree
 	margin-left: 2em;
 }
 
+li.postTreeRoot
+{
+	margin-left: 2em;
+}
+
 li.postTreeChild
 {
 	list-style-type: circle;

@@ -160,15 +160,25 @@ class PastebinHandler < SiteContainer
 	end
 	
 	def drawPostTree(writer, post, isRoot = true)
-		arguments = {newlineType: :final}
-		if !isRoot
-			arguments[:class] = 'postTreeChild'
+		treeRootClass = 'postTreeRoot'
+		listClass = isRoot ? treeRootClass : 'postTreeChild'
+		writer.li(class: listClass, newlineType: :final) do
+			if post.isPrivate
+				target = @viewPrivatePostHandler.getPath(post.privateString)
+			else
+				target = @viewPostHandler.getPath(post.id)
+			end
+			writer.a(href: target) do
+				post.bodyDescription
+			end
 		end
-		function = lambda { post.bodyDescription }
-		writer.tag('li', arguments, function)
 		children = post.children
 		if !children.empty?
-			writer.li(newlineType: :full) do
+			arguments = {newlineType: :full}
+			if isRoot
+				arguments[:class] = treeRootClass
+			end
+			writer.tagCall('li', arguments) do
 				writer.ul(class: 'innerPostTree') do
 					children.each do |child|
 						drawPostTree(writer, child, false)
@@ -228,9 +238,11 @@ class PastebinHandler < SiteContainer
 		
 		processPastebinUnits(writer, post, permission)
 		
-		if !post.children.empty?
+		root = tree.root
+		if !root.children.empty?
 			writer.ul(class: 'postTree') do
-				drawPostTree(writer, post)
+				writer.li { 'Posts in this thread:' }
+				drawPostTree(writer, root)
 			end
 		end
 		

@@ -24,9 +24,10 @@ class PostTree
 		end
 		
 		hash = posts.first
-		output = PastebinPost.new
-		output.transferSymbols(hash)
-		output.initialiseMembers
+		parent = PastebinPost.new
+		parent.transferSymbols(hash)
+		parent.initialiseMembers
+		output = getRootPost(parent)
 		return output
 	end
 end
