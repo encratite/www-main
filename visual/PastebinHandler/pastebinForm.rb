@@ -34,12 +34,17 @@ class PastebinHandler < SiteContainer
 		
 		form.lastSelection = form.request.cookies[CookieConfiguration::VimScript] if form.lastSelection == nil
 		
-		if editing
-			handler = @submitUnitModificationHandler
-		elsif replying
-			handler = @submitReplyHandler
-		else
-			handler = @submitNewPostHandler
+		handlerMap =
+		{
+			new: @submitNewPostHandler,
+			edit: @submitUnitModificationHandler,
+			reply: @submitReplyHandler,
+			privateReply: @submitPrivateReplyHandler,
+		}
+		
+		handler = handlerMap[form.mode]
+		if handler == nil
+			raise "Encountered an unknown form mode: #{form.mode}"
 		end
 		
 		writer.securedForm(handler.getPath, form.request) do
@@ -160,14 +165,18 @@ class PastebinHandler < SiteContainer
 			
 			writer.textArea('Debug', PastebinForm::Debug) if PastebinForm::DebugMode
 			
-			if editing
+			case
+			when :new
+				writer.secureSubmit
+			when :edit
 				writer.hidden(PastebinForm::EditUnitId, form.editUnitId)
 				writer.secureSubmit('Edit')
-			elsif replying
+			when :reply
 				writer.hidden(PastebinForm::ReplyPostId, form.replyPost.id)
 				writer.secureSubmit('Reply')
-			else
-				writer.secureSubmit
+			when :privateReply
+				writer.hidden(PastebinForm::ReplyPrivateString, form.replyPost.privateString)
+				writer.secureSubmit('Reply')
 			end
 		end
 		

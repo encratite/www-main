@@ -17,6 +17,7 @@ class PastebinForm
 	
 	EditUnitId = 'unit'
 	ReplyPostId = 'post'
+	ReplyPrivateString = 'privateString'
 	
 	NoHighlighting = 'none'
 	
@@ -57,6 +58,7 @@ class PastebinForm
 	NewSubmissionPostFields = CommonPostFields + CreationPostFields
 	EditPostFields = NewSubmissionPostFields + [EditUnitId]
 	ReplyPostFields = CommonPostFields + [ReplyPostId]
+	PrivateReplyPostFields = CommonPostFields + [ReplyPrivateString]
 	EditReplyPostFields = CommonPostFields + [EditUnitId]
 	
 	attr_accessor(
@@ -76,7 +78,7 @@ class PastebinForm
 		:mode,
 	)
 	
-	#mode may be either :new, :edit or :reply
+	#mode may be either :new, :edit, :reply or :privateReply
 	
 	def initialize(request)
 		@request = request

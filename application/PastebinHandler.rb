@@ -20,8 +20,10 @@ require 'www-library/HTTPReply'
 class PastebinHandler < SiteContainer
 	Pastebin = 'pastebin'
 	CreateReply = 'reply'
+	CreatePrivateReply = 'privateReply'
 	SubmitNewPost = 'submitNewPost'
 	SubmitReply = 'submitReply'
+	SubmitPrivateReply = 'submitPrivateReply'
 	View = 'view'
 	ViewPrivate = 'viewPrivate'
 	List = 'list'
@@ -48,6 +50,7 @@ class PastebinHandler < SiteContainer
 		WWWLib::RequestHandler.menu('View posts', List, method(:viewPosts), 0..1)
 		
 		@createReplyHandler = WWWLib::RequestHandler.handler(CreateReply, method(:createReply), 1)
+		@createPrivateReplyHandler = WWWLib::RequestHandler.handler(CreatePrivateReply, method(:createPrivateReply), 1)
 		@submitNewPostHandler = WWWLib::RequestHandler.handler(SubmitNewPost, method(:submitNewPost))
 		@viewPostHandler = WWWLib::RequestHandler.handler(View, method(:viewPost), 1)
 		@viewPrivatePostHandler = WWWLib::RequestHandler.handler(ViewPrivate, method(:viewPrivatePost), 1)
@@ -56,6 +59,7 @@ class PastebinHandler < SiteContainer
 		@editUnitHandler = WWWLib::RequestHandler.handler(EditUnit, method(:editUnit), 1)
 		@submitUnitModificationHandler = WWWLib::RequestHandler.handler(SubmitUnitModification, method(:submitUnitModification))
 		@submitReplyHandler = WWWLib::RequestHandler.handler(SubmitReply, method(:submitReply))
+		@submitPrivateReplyHandler = WWWLib::RequestHandler.handler(SubmitPrivateReply, method(:submitPrivateReply))
 		@downloadHandler = WWWLib::RequestHandler.handler(Download, method(:download), 1)
 		@privateDownloadHandler = WWWLib::RequestHandler.handler(PrivateDownload, method(:privateDownload), 2)
 		
@@ -73,17 +77,33 @@ class PastebinHandler < SiteContainer
 		return @pastebinGenerator.get(['Pastebin', pastebinForm(form)], request)
 	end
 	
-	def createReply(request)
-		postId = getRequestId request
+	def processReplyCreationRequest(request, private)
 		#check if the post ID is valid
-		posts = @posts.where(id: postId).all
+		if private
+			privateString = request.arguments[0]
+			posts = @posts.where(private_string: privateString)
+			mode = :privateReply
+		else
+			postId = getRequestId request
+			posts = @posts.where(id: postId, private_string: nil)
+			mode = :reply
+		end
+		posts = posts.all
 		argumentError if posts.empty?
 		replyPost = PastebinPost.new
 		replyPost.transferSymbols(posts.first)
 		form = PastebinForm.new(request)
-		form.mode = :reply
+		form.mode = mode
 		form.replyPost = replyPost
 		return @pastebinGenerator.get(['Reply to post', pastebinForm(form)], request)
+	end
+	
+	def createReply(request)
+		return processReplyCreationRequest(request, false)
+	end
+	
+	def createPrivateReply(request)
+		return processReplyCreationRequest(request, true)
 	end
 
 	def floodCheck(request)
@@ -183,16 +203,41 @@ class PastebinHandler < SiteContainer
 		return processPostSubmission(request, :reply)
 	end
 	
-	def getIntPost(request, symbol)
+	def submitPrivateReply(request)
+		return processPostSubmission(request, :privateReply)
+	end
+	
+	def getPostValue(request, symbol)
 		output = request.getPost(PastebinForm.const_get(symbol))
 		return nil if output == nil
+		return output
+	end
+	
+	def getIntPost(request, symbol)
+		output = getPostValue(request, symbol)
+		return nil if output == nil
 		return output.to_i
+	end
+	
+	def getPrivateString
+		return createPrivateString(PastebinConfiguration::PrivateStringLength)
+	end
+	
+	def updatePostTreeVisibility(postId, isPrivate)
+		children = @database.post.select(:id).where(reply_to: postId).all
+		children.each do |row|
+			id = row[:id]
+			privateString = isPrivate ? getPrivateString : nil
+			@database.post.where(id: id).update(private_string, privateString)
+			#depth first search
+			updatePostTreeVisibility(id, isPrivate)
+		end
 	end
 
 	#mode may be either :new (for new posts), :edit (for submitting modifications for existing posts) or :reply (for new replies to existing posts)
 	def processPostSubmission(request, mode)
 		editing = mode == :edit
-		replying = mode == :reply
+		replying = mode == :reply || mode == :privateReply
 		
 		if editing
 			#check if the unit ID is valid and determine the post associated with it
@@ -216,6 +261,8 @@ class PastebinHandler < SiteContainer
 				PastebinForm::EditReplyPostFields
 		when :reply
 			source = PastebinForm::ReplyPostFields
+		when :privateReply
+			source = PastebinForm::PrivateReplyPostFields
 		else
 			raise 'Invalid process submission mode specified'
 		end
@@ -282,12 +329,18 @@ class PastebinHandler < SiteContainer
 				editUnitId = nil
 			when :edit
 				
-			when :reply
-				#check if the user is replying to a valid post ID
+			when :reply, :privateReply
 				replyPostId = request.getPost(PastebinForm::ReplyPostId).to_i
-				rows = @posts.where(id: replyPostId).all
+				if mode == :reply
+					#check if the user is replying to a valid post ID only
+					stringTarget = nil
+				else
+					#check if the user is replying to a valid combination of post ID and private string
+					replyPostPrivateString = getPostValue(request, :ReplyPrivateString)
+					stringTarget = replyPostPrivateString
+				end
+				rows = @posts.where(id: replyPostId, private_string: stringTarget).all
 				argumentError if rows.empty?
-				#we actually need some of data from the parent post in order to set the private string in the reply row correctly - they are supposed to be identical after all
 				parentPost = PastebinPost.new
 				parentPost.transferSymbols(rows.first)
 			end
@@ -347,19 +400,31 @@ class PastebinHandler < SiteContainer
 				postData[:expiration_index] = expirationIndex
 				
 				isPrivate = privatePost == 1
-				privateString = isPrivate ? createPrivateString(PastebinConfiguration::PrivateStringLength) : nil
+				privateString = isPrivate ? getPrivateString : nil
 			end
 
 			if editing
-				if editingPrimaryPost && 
-					if editPost.isPrivate && isPrivate
-						#the post remains private - reuse its private string in the referral
-						privateString = editPost.privateString
+				if editingPrimaryPost
+					if editPost.isPrivate
+						if isPrivate
+							#the post remains private - reuse its private string in the refer(r)al
+							privateString = editPost.privateString
+						else
+							#the post was previously private and is now public
+							#this means that all its replies must now be made public, too
+							updatePostTreeVisibility(editPost.id, false)
+						end
 					else
-						#there are basically 4 cases to cover - just exclude the one where no new private string must be generated and written to the post
-						#unnecessarily writing a null is not a big deal anyways
-						postData[:private_string] = privateString
+						if isPrivate
+							#the post was previously public and is now private
+							#this means that all its replies must now be made private, too
+							updatePostTreeVisibility(editPost.id, true)
+						else
+							#the post remains public - no need to do anything
+						end
 					end
+					
+					postData[:private_string] = privateString
 				end
 				#increase the modification counter
 				postData[:modification_counter] = editPost.modificationCounter + 1
@@ -368,11 +433,12 @@ class PastebinHandler < SiteContainer
 				@posts.where(id: postId).update(postData)
 			else
 				case mode
-				when :new
-					postData[:private_string] = privateString
 				when :reply
-					postData[:private_string] = parentPost.privateString
+					privateString = parentPost.privateString
+				when :privateReply
+					privateString = parentPost.isPrivate ? getPrivateString : nil
 				end
+				postData[:private_string] = privateString
 				postData[:creation] = now
 				postId = @posts.insert(postData)
 			end
@@ -395,7 +461,7 @@ class PastebinHandler < SiteContainer
 				
 				highlighted_content: highlightedContent,
 				
-				paste_type: pasteType
+				paste_type: pasteType,
 			}
 			
 			if editing
