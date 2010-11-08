@@ -23,7 +23,10 @@ class PostTree
 			raise "Unable to find the parent of post #{post.id}!"
 		end
 		
-		output = posts.first
+		hash = posts.first
+		output = PastebinPost.new
+		output.transferSymbols(hash)
+		output.initialiseMembers
 		return output
 	end
 end

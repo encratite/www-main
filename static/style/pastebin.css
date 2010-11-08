@@ -108,6 +108,7 @@ ul.contentList
 {
 	margin: 0 0 0 4em;
 	border: 1px solid black;
+	display: inline-block;
 }
 
 ul.contentList li
@@ -146,6 +147,7 @@ ul.lineNumbers
 	left: -1px;
 	width: 4em;
 	border: 1px solid black;
+	display: inline-block;
 }
 
 ul.lineNumbers li
@@ -220,6 +222,15 @@ td.evenLastLine
 	padding: 0 1em 0 1em;
 }
 
+ul.postTree
+{
+}
+
+ul.innerPostTree
+{
+	margin-left: 4em;
+}
+
 .Comment
 {
 	color: #008000;
@@ -270,11 +281,3 @@ td.evenLastLine
 	color: #ff00ff;
 }
 
-ul.postTree
-{
-}
-
-ul.innerPostTree
-{
-	margin-left: 4em;
-}
