@@ -5,7 +5,7 @@ class PastebinConfiguration
 	PostsPerPage = 100
 	Prefix = 'pastebin'
 	
-	PrivateStringLength = 32
+	PrivateStringLength = 12
 	
 	AuthorLengthMaximum = SiteConfiguration::GeneralStringLengthMaximum
 	PostDescriptionLengthMaximum = SiteConfiguration::GeneralStringLengthMaximum

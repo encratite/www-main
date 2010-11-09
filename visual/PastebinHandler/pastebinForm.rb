@@ -38,13 +38,16 @@ class PastebinHandler < SiteContainer
 		{
 			new: @submitNewPostHandler,
 			edit: @submitUnitModificationHandler,
+			privateEdit: @submitPrivateUnitModificationHandler
 			reply: @submitReplyHandler,
 			privateReply: @submitPrivateReplyHandler,
 		}
 		
-		handler = handlerMap[form.mode]
+		mode = form.mode
+		
+		handler = handlerMap[mode]
 		if handler == nil
-			raise "Encountered an unknown form mode: #{form.mode}"
+			raise "Encountered an unknown form mode: #{mode}"
 		end
 		
 		writer.securedForm(handler.getPath, form.request) do
@@ -72,7 +75,7 @@ class PastebinHandler < SiteContainer
 						fieldArguments = {type: 'input', name: PastebinForm::ExpertHighlighting}
 						fieldArguments[:value] = form.lastSelection if form.lastSelection != nil
 						writer.li { 'Specify the vim script you want to be used (e.g. "cpp"):' }
-						writer.li { writer.tag('input', fieldArguments) }
+						writer.li(newlineType: :full) { writer.tag('input', fieldArguments) }
 					end
 				end
 			]
@@ -128,7 +131,7 @@ class PastebinHandler < SiteContainer
 			#-making a new post
 			#-when editing a non-reply post
 			
-			if form.mode == :new || (form.mode == :edit && editPost.replyTo == nil)
+			if mode == :new || (mode == :edit && editPost.replyTo == nil)
 				writer.select(PastebinForm::PrivatePost,  privacyOptions, {label: 'Privacy options'})
 
 				firstOffset = 0
@@ -165,17 +168,21 @@ class PastebinHandler < SiteContainer
 			
 			writer.textArea('Debug', PastebinForm::Debug) if PastebinForm::DebugMode
 			
-			case
+			case mode
 			when :new
 				writer.secureSubmit
-			when :edit
+			when :edit, :privateEdit
 				writer.hidden(PastebinForm::EditUnitId, form.editUnitId)
+				if mode == :privateEdit
+					writer.hidden(PastebinForm::EditPrivateString, form.editPost.privateString)
+				end
 				writer.secureSubmit('Edit')
-			when :reply
-				writer.hidden(PastebinForm::ReplyPostId, form.replyPost.id)
-				writer.secureSubmit('Reply')
-			when :privateReply
-				writer.hidden(PastebinForm::ReplyPrivateString, form.replyPost.privateString)
+			when :reply, :privateReply
+				if mode == :reply
+					writer.hidden(PastebinForm::ReplyPostId, form.replyPost.id)
+				else
+					writer.hidden(PastebinForm::ReplyPrivateString, form.replyPost.privateString)
+				end
 				writer.secureSubmit('Reply')
 			end
 		end

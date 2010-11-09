@@ -30,7 +30,9 @@ class PastebinHandler < SiteContainer
 	DeletePost = 'delete'
 	DeleteUnit = 'deleteUnit'
 	EditUnit = 'edit'
+	EditPrivateUnit = 'editPrivate'
 	SubmitUnitModification = 'submitModification'
+	SubmitPrivateUnitModification = 'submitPrivateModification'
 	Download = 'download'
 	PrivateDownload = 'privateDownload'
 	
@@ -57,7 +59,9 @@ class PastebinHandler < SiteContainer
 		@deletePostHandler = WWWLib::RequestHandler.handler(DeletePost, method(:deletePost), 1)
 		@deleteUnitHandler = WWWLib::RequestHandler.handler(DeleteUnit, method(:deleteUnit), 1)
 		@editUnitHandler = WWWLib::RequestHandler.handler(EditUnit, method(:editUnit), 1)
+		@editPrivateUnitHandler = WWWLib::RequestHandler.handler(EditPrivateUnit, method(:editPrivateUnit), 2)
 		@submitUnitModificationHandler = WWWLib::RequestHandler.handler(SubmitUnitModification, method(:submitUnitModification))
+		@submitPrivateUnitModificationHandler = WWWLib::RequestHandler.handler(SubmitPrivateUnitModification, method(:submitPrivateUnitModification))
 		@submitReplyHandler = WWWLib::RequestHandler.handler(SubmitReply, method(:submitReply))
 		@submitPrivateReplyHandler = WWWLib::RequestHandler.handler(SubmitPrivateReply, method(:submitPrivateReply))
 		@downloadHandler = WWWLib::RequestHandler.handler(Download, method(:download), 1)
@@ -199,6 +203,10 @@ class PastebinHandler < SiteContainer
 		return processPostSubmission(request, :edit)
 	end
 	
+	def submitPrivateUnitModification(request)
+		return processPostSubmission(request, :privateEdit)
+	end
+	
 	def submitReply(request)
 		return processPostSubmission(request, :reply)
 	end
@@ -228,7 +236,7 @@ class PastebinHandler < SiteContainer
 		children.each do |row|
 			id = row[:id]
 			privateString = isPrivate ? getPrivateString : nil
-			@database.post.where(id: id).update(private_string, privateString)
+			@database.post.where(id: id).update(private_string: privateString)
 			#depth first search
 			updatePostTreeVisibility(id, isPrivate)
 		end
@@ -236,8 +244,8 @@ class PastebinHandler < SiteContainer
 
 	#mode may be either :new (for new posts), :edit (for submitting modifications for existing posts) or :reply (for new replies to existing posts)
 	def processPostSubmission(request, mode)
-		editing = mode == :edit
-		replying = mode == :reply || mode == :privateReply
+		editing = [:edit, :privateEdit].include?(mode)
+		replying = [:reply, :privateReply].include?(mode)
 		
 		if editing
 			#check if the unit ID is valid and determine the post associated with it
@@ -245,10 +253,16 @@ class PastebinHandler < SiteContainer
 			editUnitId = request.getPost(PastebinForm::EditUnitId).to_i
 			editPost = PastebinPost.new
 			editPost.editPermissionQueryInitialisation(editUnitId, @database)
+			if mode == :privateEdit
+				#check if the private string specified in the post matches
+				#doesn't matter if it returns nil
+				requestPrivateString = request.getPost(PastebinForm::EditPrivateString)
+				argumentError if requestPrivateString != editPost.privateString
+			end
 			writePermissionCheck(request, editPost)
 		end
 		
-		editingPrimaryPost = (mode == :edit && editPost.replyTo == nil)
+		editingPrimaryPost = (editing && editPost.replyTo == nil)
 		
 		debugPostSubmission request if PastebinForm::DebugMode
 		
@@ -259,6 +273,10 @@ class PastebinHandler < SiteContainer
 			source = editingPrimaryPost ?
 				PastebinForm::EditPostFields :
 				PastebinForm::EditReplyPostFields
+		when :privateEdit
+			source = editingPrimaryPost ?
+				PastebinForm::EditPrivatePostFields :
+				PastebinForm::EditPrivateReplyPostFields
 		when :reply
 			source = PastebinForm::ReplyPostFields
 		when :privateReply
@@ -327,22 +345,20 @@ class PastebinHandler < SiteContainer
 			case mode
 			when :new
 				editUnitId = nil
-			when :edit
-				
 			when :reply, :privateReply
 				replyPostId = request.getPost(PastebinForm::ReplyPostId).to_i
 				if mode == :reply
 					#check if the user is replying to a valid post ID only
-					stringTarget = nil
+					rows = @posts.where(id: replyPostId, private_string: nil).all
 				else
 					#check if the user is replying to a valid combination of post ID and private string
 					replyPostPrivateString = getPostValue(request, :ReplyPrivateString)
-					stringTarget = replyPostPrivateString
+					rows = @posts.where(private_string: replyPostPrivateString).all
 				end
-				rows = @posts.where(id: replyPostId, private_string: stringTarget).all
 				argumentError if rows.empty?
 				parentPost = PastebinPost.new
 				parentPost.transferSymbols(rows.first)
+				replyPostId = parentPost.id
 			end
 			
 			if !errors.empty?
@@ -651,6 +667,18 @@ class PastebinHandler < SiteContainer
 		post = PastebinPost.new
 		@database.transaction do
 			post.editUnitQueryInitialisation(unitId, @database)
+			writePermissionCheck(request, post)
+			return editUnitForm(post, request)
+		end
+	end
+	
+	def editPrivateUnit(request)
+		unitId = getRequestId request
+		privateString = request.arguments[1]
+		post = PastebinPost.new
+		@database.transaction do
+			post.editUnitQueryInitialisation(unitId, @database)
+			argumentError if post.privateString != privateString
 			writePermissionCheck(request, post)
 			return editUnitForm(post, request)
 		end

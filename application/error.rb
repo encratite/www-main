@@ -23,9 +23,19 @@ def hashError
 end
 
 def argumentError
+	puts getStackTrace
 	plainError 'You have specified invalid arguments.'
 end
 
 def permissionError
 	['Permission error', visualError('You do not have permission to perform this action.')]
+end
+
+def getStackTrace
+	begin
+		raise nil
+	rescue => exception
+		output = exception.backtrace[2..-1]
+		return output
+	end
 end
