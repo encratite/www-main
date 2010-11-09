@@ -68,34 +68,39 @@ class PastebinHandler < SiteContainer
 			
 			unitActions = []
 			
-			downloadDescription = 'Download'
+			id = unit.id.to_s
+			baseArgument = [id]
 				
-			if post.privateString == nil
-				#it's a public post - use the regular public unit download handler
-				unitActions << [@downloadHandler, downloadDescription]
+			if post.isPrivate
+				#it's a private post - use the private unit download handler with the correct private string
+				downloadHandler = @privateDownloadHandler
+				downloadArgument = [id, post.privateString]
 				
 			else
-				#it's a private post - use the private unit download handler with the correct private string
-				unitActions << [@privateDownloadHandler, downloadDescription, post.privateString]
+				#it's a public post - use the regular public unit download handler
+				downloadHandler = @downloadHandler
+				downloadArgument = baseArgument
 			end
+			unitActions << [downloadHandler, 'Download', downloadArgument]
 			
 			if permission
+				editArguments = baseArgument
+				if post.isPrivate
+					editArguments << post.privateString 
+					editHandler = @editPrivateUnitHandler
+				else
+					editHandler = @editUnitHandler
+				end
 				unitActions +=
 				[
-					[@editUnitHandler, 'Edit'],
-					[@deleteUnitHandler, 'Delete'],
+					[editHandler, 'Edit', editArguments],
+					[@deleteUnitHandler, 'Delete', baseArgument],
 				]
 			end
 			
-			idString = unit.id.to_s
 			actions = []
-			unitActions.each do |handler, description, customArguments = nil|
+			unitActions.each do |handler, description, arguments|
 				linkWriter = WWWLib::HTMLWriter.new
-				arguments = [idString]
-				if customArguments.class != Array
-					customArguments = [customArguments]
-				end
-				arguments += customArguments if customArguments != nil
 				linkWriter.a(href: handler.getPath(*arguments)) { description }
 				actions << linkWriter.output
 			end
@@ -198,19 +203,25 @@ class PastebinHandler < SiteContainer
 			['Time created', post.creation]
 		]
 		
-		actions =
-		[
-			[@createReplyHandler, 'Reply'],
-		]
+		id = post.id.to_s
+		
+		actions = []
+		
+		replyDescription = 'Reply'
+		if post.isPrivate
+			actions << [@createPrivateReplyHandler, replyDescription, post.privateString]
+		else
+			actions << [@createReplyHandler, replyDescription, id]
+		end
 		
 		permission = hasWriteAccess(request, post)
 		
-		actions << [@deletePostHandler, 'Delete post'] if permission
+		actions << [@deletePostHandler, 'Delete post', id] if permission
 		
 		links = []
-		actions.each do |handler, description|
+		actions.each do |handler, description, argument|
 			linkWriter = WWWLib::HTMLWriter.new
-			linkWriter.a(href: handler.getPath(post.id.to_s)) { description }
+			linkWriter.a(href: handler.getPath(argument)) { description }
 			links << linkWriter.output
 		end
 		
@@ -389,7 +400,7 @@ class PastebinHandler < SiteContainer
 		form.expirationIndex = post.expirationIndex
 		form.editUnitId = unit.id
 		form.editPost = post
-		form.mode = post.isPrivate ? :editPrivate : :edit
+		form.mode = post.isPrivate ? :privateEdit : :edit
 		body = pastebinForm(form)
 		title = 'Editing post'
 		return @pastebinGenerator.get([title, body], request)

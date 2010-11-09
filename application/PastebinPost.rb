@@ -153,7 +153,7 @@ class PastebinPost < WWWLib::SymbolTransfer
 	end
 	
 	def loadChildren(database)
-		puts "Loading children of ID #{@id}"
+		#puts "Loading children of ID #{@id}"
 		children = database.post.where(reply_to: @id).all
 		children.each do |child|
 			childPost = PastebinPost.new

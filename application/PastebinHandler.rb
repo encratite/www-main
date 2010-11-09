@@ -117,9 +117,10 @@ class PastebinHandler < SiteContainer
 	end
 
 	def createPrivateString(length)
+		puts "Private string length: #{length}"
 		dataset = @database.post
 		while true
-			sessionString = WWWLib::RandomString.get length
+			sessionString = WWWLib::RandomString.get(length)
 			break if dataset.where(private_string: sessionString).count == 0
 		end
 		return sessionString
@@ -244,8 +245,8 @@ class PastebinHandler < SiteContainer
 
 	#mode may be either :new (for new posts), :edit (for submitting modifications for existing posts) or :reply (for new replies to existing posts)
 	def processPostSubmission(request, mode)
-		editing = [:edit, :privateEdit].include?(mode)
-		replying = [:reply, :privateReply].include?(mode)
+		editing = isEditMode(mode)
+		replying = isReplyMode(mode)
 		
 		if editing
 			#check if the unit ID is valid and determine the post associated with it
@@ -723,5 +724,13 @@ class PastebinHandler < SiteContainer
 	def privateDownload(request)
 		privateString = request.arguments[1]
 		return processDownload(request, privateString)
+	end
+	
+	def isEditMode(mode)
+		return [:edit, :privateEdit].include?(mode)
+	end
+	
+	def isReplyMode(mode)
+		return [:reply, :privateReply].include?(mode)
 	end
 end

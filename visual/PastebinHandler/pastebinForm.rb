@@ -7,8 +7,11 @@ requireConfiguration 'cookie'
 
 class PastebinHandler < SiteContainer
 	def pastebinForm(form)
-		editing = form.editUnitId != nil
-		replying = form.replyPost != nil
+		mode = form.mode
+		
+		editing = isEditMode(mode)
+		replying = isReplyMode(mode)
+		
 		output = ''
 		writer = SecuredFormWriter.new(output, form.request)
 		
@@ -38,12 +41,10 @@ class PastebinHandler < SiteContainer
 		{
 			new: @submitNewPostHandler,
 			edit: @submitUnitModificationHandler,
-			privateEdit: @submitPrivateUnitModificationHandler
+			privateEdit: @submitPrivateUnitModificationHandler,
 			reply: @submitReplyHandler,
 			privateReply: @submitPrivateReplyHandler,
 		}
-		
-		mode = form.mode
 		
 		handler = handlerMap[mode]
 		if handler == nil
@@ -131,7 +132,7 @@ class PastebinHandler < SiteContainer
 			#-making a new post
 			#-when editing a non-reply post
 			
-			if mode == :new || (mode == :edit && editPost.replyTo == nil)
+			if mode == :new || (editing && editPost.replyTo == nil)
 				writer.select(PastebinForm::PrivatePost,  privacyOptions, {label: 'Privacy options'})
 
 				firstOffset = 0
