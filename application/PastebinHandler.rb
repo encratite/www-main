@@ -9,6 +9,8 @@ requireConfiguration 'pastebin'
 
 require 'visual/PastebinHandler'
 
+require 'PastebinHandler/processPostSubmission'
+
 require 'www-library/RequestManager'
 require 'www-library/random'
 require 'www-library/input'
