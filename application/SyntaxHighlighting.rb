@@ -59,6 +59,7 @@ class SyntaxHighlighting
 		flags = ['f', 'n', 'X', 'e', 's']
 		
 		vimDirectory = Nil.joinPaths(Dir.home, '.vim')
+		#scriptFile = 'pastebin.vim'
 		scriptFile = 'pastebin.vim'
 		localPath = Nil.joinPaths('vim', scriptFile)
 		scriptPath = Nil.joinPaths('syntax', scriptFile)
@@ -71,7 +72,6 @@ class SyntaxHighlighting
 		[
 			"set filetype=#{script}",
 			'set background=light',
-			#'colorscheme navajo',
 			'set wrap linebreak textwidth=0',
 			'syntax on',
 			'let html_use_css=1',
@@ -94,7 +94,9 @@ class SyntaxHighlighting
 		markup = outputFile.open.read
 		
 		code = WWWLib.extractString(markup, "<pre>\n", "</pre>")
-		plainError 'Unable to extract code from vim output.' if code == nil
+		if code == nil
+			plainError 'Unable to extract code from vim output.'
+		end
 		
 		return code
 	end

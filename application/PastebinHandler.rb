@@ -117,7 +117,6 @@ class PastebinHandler < SiteContainer
 	end
 
 	def createPrivateString(length)
-		puts "Private string length: #{length}"
 		dataset = @database.post
 		while true
 			sessionString = WWWLib::RandomString.get(length)
