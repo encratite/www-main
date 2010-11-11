@@ -1,4 +1,3 @@
-require 'PastebinForm'
 require 'error'
 require 'PastebinPost'
 require 'SiteContainer'
@@ -38,40 +37,43 @@ class PastebinHandler < SiteContainer
 		
 		handlers =
 		[
-			[:submitNewPostHandler, 'submitNewPost', :submitNewPost],
-			[:deletePostHandler, 'delete', :deletePost, 1],
-			[:deleteUnitHandler, 'deleteUnit', :deleteUnit, 1],
+			[:submitNewPostHandler, 'submitNewPost', :submitNewPost, false],
+			[:viewPostHandler, 'view', :viewPost, true],
+			[:downloadHandler, 'download', :download, true],
+			[:deletePostHandler, 'delete', :deletePost, true],
+			[:deleteUnitHandler, 'deleteUnit', :deleteUnit, true],
 			
-			[:createReplyHandler, 'reply', :createReply, 1],
-			[:createPrivateReplyHandler, 'privateReply', :createPrivateReply, 1],
+			[:createReplyHandler, 'reply', :createReply, true],
+			[:submitReplyHandler, 'submitReply', :submitReply, false],
 			
-			[:viewPostHandler, 'view', :viewPost, 1],
-			[:viewPrivatePostHandler, 'viewPrivate', :viewPrivatePost, 1],
+			[:editUnitHandler, 'edit', :editUnit, true],
+			[:submitUnitModificationHandler, 'submitModification', :submitUnitModification, false],
 			
-			[:editUnitHandler, 'edit', :editUnit, 1],
-			[:editPrivateUnitHandler, 'editPrivate', :editPrivateUnit, 2],
-			
-			[:submitUnitModificationHandler, 'submitModification', :submitUnitModification],
-			[:submitPrivateUnitModificationHandler, 'submitPrivateModification', :submitPrivateUnitModification],
-			
-			[:submitReplyHandler, 'submitReply', :submitReply],
-			[:submitPrivateReplyHandler, 'submitPrivateReply', :submitPrivateReply],
-			
-			[:downloadHandler, 'download', :download, 1],
-			[:privateDownloadHandler, 'privateDownload', :privateDownload, 2],
-			
-			[:addUnitHandler, 'addUnit', :addUnit, 1],
-			[:addPrivateUnitHandler, 'addPrivateUnit', :addPrivateUnit, 1],
-			
-			[:submitUnitHandler, 'submitUnit', :submitUnit],
-			[:submitPrivateUnitHandler, 'submitPrivateUnit', :submitPrivateUnit],
+			[:addUnitHandler, 'addUnit', :addUnit, true],
+			[:submitUnitHandler, 'submitUnit', :submitUnit, false],
 		]
 		
-		handlers.each do |arguments|
-			handlerSymbol = arguments[0]
-			arguments = arguments[1..-1]
-			arguments[1] = method(arguments[1])
-			handler = WWWLib::RequestHandler.handler(*arguments)
+		handlers.each do |handlerSymbol, string, methodSymbol, hasGetArguments|
+			actualMethod = method(methodSymbol)
+			if hasGetArguments
+				proxyMethod = lambda do |request|
+					arguments = request.arguments
+					isPrivate = arguments[0].to_i == 1
+					if isPrivate
+						privateString = arguments[1]
+						output = actualMethod.call(request, isPrivate, privateString)
+					else
+						id = arguments[1].to_i
+						output = actualMethod.call(request, isPrivate, id)
+					end
+					output
+				end
+				argumentCount = 2
+			else
+				proxyMethod = actualMethod
+				argumentCount = nil
+			end
+			handler = WWWLib::RequestHandler.handler(name, proxyMethod, argumentCount)
 			setMember(handlerSymbol, handler)
 		end
 		
@@ -83,75 +85,20 @@ class PastebinHandler < SiteContainer
 		raise WWWLib::RequestManager::Exception.new(@pastebinGenerator.get(data, request))
 	end
 
-	def createNewPost(request)
-		form = PastebinForm.new(request)
-		form.mode = :new
-		return @pastebinGenerator.get(['Pastebin', pastebinForm(form)], request)
-	end
-	
-	def processReplyCreationRequest(request, private)
-		#check if the post ID is valid
-		if private
-			privateString = request.arguments[0]
-			posts = @posts.where(private_string: privateString)
-			mode = :privateReply
-		else
-			postId = getRequestId request
-			posts = @posts.where(id: postId, private_string: nil)
-			mode = :reply
-		end
-		posts = posts.all
-		argumentError if posts.empty?
-		replyPost = PastebinPost.new
-		replyPost.transferSymbols(posts.first)
-		form = PastebinForm.new(request)
-		form.mode = mode
-		form.replyPost = replyPost
-		return @pastebinGenerator.get(['Reply to post', pastebinForm(form)], request)
-	end
-	
-	def createReply(request)
-		return processReplyCreationRequest(request, false)
-	end
-	
-	def createPrivateReply(request)
-		return processReplyCreationRequest(request, true)
-	end
-
 	def floodCheck(request)
 		query = "select count(*) from flood_protection where ip = '#{request.address}' and paste_time + interval '#{PastebinConfiguration::PasteInterval} seconds' >= '#{Time.now.utc}'"
 		count = @database.connection.fetch(query).first.values.first
 		return count > PastebinConfiguration::PastesPerInterval
 	end
-
-	def createPrivateString(length)
+	
+	def getPrivateString
+		length = PastebinConfiguration::PrivateStringLength
 		dataset = @database.post
 		while true
 			sessionString = WWWLib::RandomString.get(length)
 			break if dataset.where(private_string: sessionString).count == 0
 		end
 		return sessionString
-	end
-	
-	def debugPostSubmission(request)
-		actualData = serialiseFields(getFieldValues(request, PastebinForm::NewSubmissionPostFields))
-		debugData = request.getPost(PastebinForm::Debug)
-		
-		if debugData == actualData
-			puts 'Data matches'
-			#pastebinError('Data matches.', request)
-		else
-			puts 'Data does not match!'
-			puts "Actual data:\n#{actualData}"
-			puts "Debug data:\n#{debugData}"
-			
-			writer = WWWLib::HTMLWriter.new
-			writer.p { 'Data does not match:' }
-			textAreaArguments = {cols: '50', rows: '30'}
-			writer.textArea('Actual data', 'test1', actualData, textAreaArguments)
-			writer.textArea('Debug data', 'test2', debugData, textAreaArguments)
-			#pastebinError(writer.output, request)
-		end
 	end
 	
 	def getStringLengthChecks(author, postDescription, unitDescription, content, expertHighlighting)
@@ -203,26 +150,6 @@ class PastebinHandler < SiteContainer
 		end
 	end
 	
-	def submitNewPost(request)
-		return processPostSubmission(request, :new)
-	end
-	
-	def submitUnitModification(request)
-		return processPostSubmission(request, :edit)
-	end
-	
-	def submitPrivateUnitModification(request)
-		return processPostSubmission(request, :privateEdit)
-	end
-	
-	def submitReply(request)
-		return processPostSubmission(request, :reply)
-	end
-	
-	def submitPrivateReply(request)
-		return processPostSubmission(request, :privateReply)
-	end
-	
 	def getPostValue(request, symbol)
 		output = request.getPost(PastebinForm.const_get(symbol))
 		return nil if output == nil
@@ -233,10 +160,6 @@ class PastebinHandler < SiteContainer
 		output = getPostValue(request, symbol)
 		return nil if output == nil
 		return output.to_i
-	end
-	
-	def getPrivateString
-		return createPrivateString(PastebinConfiguration::PrivateStringLength)
 	end
 	
 	def updatePostTreeVisibility(postId, isPrivate)
@@ -271,14 +194,6 @@ class PastebinHandler < SiteContainer
 			tree = PostTree.new(@database, post)
 		end
 		return showPastebinPost(request, post, tree)
-	end
-
-	def viewPost(request)
-		return processPostView(request, false)
-	end
-	
-	def viewPrivatePost(request)
-		return processPostView(request, true)
 	end
 	
 	def parsePosts(posts)
@@ -389,28 +304,6 @@ class PastebinHandler < SiteContainer
 			deletePostTree postId if deletedPost
 		end
 		return confirmUnitDeletion(post, request, deletedPost)
-	end
-	
-	def editUnit(request)
-		unitId = getRequestId request
-		post = PastebinPost.new
-		@database.transaction do
-			post.editUnitQueryInitialisation(unitId, @database)
-			writePermissionCheck(request, post)
-			return editUnitForm(post, request)
-		end
-	end
-	
-	def editPrivateUnit(request)
-		unitId = getRequestId request
-		privateString = request.arguments[1]
-		post = PastebinPost.new
-		@database.transaction do
-			post.editUnitQueryInitialisation(unitId, @database)
-			argumentError if post.privateString != privateString
-			writePermissionCheck(request, post)
-			return editUnitForm(post, request)
-		end
 	end
 	
 	def writePermissionCheck(request, post)

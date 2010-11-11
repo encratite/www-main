@@ -34,8 +34,6 @@ class PastebinHandler < SiteContainer
 		
 		editingPrimaryPost = (editing && editPost.replyTo == nil)
 		
-		debugPostSubmission request if PastebinForm::DebugMode
-		
 		case mode
 		when :new
 			source = PastebinForm::NewSubmissionPostFields

@@ -6,18 +6,10 @@ function hashGenerator()
 	this.getHash = getHash;
 	
 	this.hash = ~this.hash;
-	
-	this.debugging = false;
-	
-	if(this.debugging)
-		this.content = '';
 }
 
 function hashData(input)
 {
-	if(this.debugging)
-		this.content += input;
-	
 	var shifts = new Array(1, 4, 7, 8, 24);
 	
 	var hash = this.hash;
