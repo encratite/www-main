@@ -376,33 +376,5 @@ class PastebinHandler < SiteContainer
 	
 	def getDescriptionField(object)
 		return object.noDescription ? '' : object.description
-	end
-	
-	def editUnitForm(post, request)
-		unit = post.activeUnit
-		if unit.pasteType == nil
-			#it's plain text
-			highlightingSelectionMode = PlainTextHighlightingIndex
-			lastSelection = nil
-		else
-			highlightingSelectionMode = AllSyntaxHighlightingTypesIndex
-			lastSelection = unit.pasteType
-		end
-		form = PastebinForm.new(request)
-		form.errors = nil
-		form.author = post.editAuthor
-		form.postDescription = getDescriptionField post
-		form.unitDescription = getDescriptionField unit
-		form.content = unit.content
-		form.highlightingSelectionMode = highlightingSelectionMode
-		form.lastSelection = lastSelection
-		form.isPrivatePost = post.isPrivate
-		form.expirationIndex = post.expirationIndex
-		form.editUnitId = unit.id
-		form.editPost = post
-		form.mode = post.isPrivate ? :privateEdit : :edit
-		body = pastebinForm(form)
-		title = 'Editing post'
-		return @pastebinGenerator.get([title, body], request)
-	end
+	end	
 end

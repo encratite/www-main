@@ -38,21 +38,33 @@ class PastebinHandler < SiteContainer
 		
 		handlers =
 		[
-			[:createReplyHandler, 'reply', :createReply, 1],
-			[:createPrivateReplyHandler, 'privateReply', :createPrivateReply, 1],
 			[:submitNewPostHandler, 'submitNewPost', :submitNewPost],
-			[:viewPostHandler, 'view', :viewPost, 1],
-			[:viewPrivatePostHandler, 'viewPrivate', :viewPrivatePost, 1],
 			[:deletePostHandler, 'delete', :deletePost, 1],
 			[:deleteUnitHandler, 'deleteUnit', :deleteUnit, 1],
+			
+			[:createReplyHandler, 'reply', :createReply, 1],
+			[:createPrivateReplyHandler, 'privateReply', :createPrivateReply, 1],
+			
+			[:viewPostHandler, 'view', :viewPost, 1],
+			[:viewPrivatePostHandler, 'viewPrivate', :viewPrivatePost, 1],
+			
 			[:editUnitHandler, 'edit', :editUnit, 1],
 			[:editPrivateUnitHandler, 'editPrivate', :editPrivateUnit, 2],
+			
 			[:submitUnitModificationHandler, 'submitModification', :submitUnitModification],
 			[:submitPrivateUnitModificationHandler, 'submitPrivateModification', :submitPrivateUnitModification],
-			[:submitReplyHandler, 'reply', :submitReply],
-			[:submitPrivateReplyHandler, 'privateReply', :submitPrivateReply],
+			
+			[:submitReplyHandler, 'submitReply', :submitReply],
+			[:submitPrivateReplyHandler, 'submitPrivateReply', :submitPrivateReply],
+			
 			[:downloadHandler, 'download', :download, 1],
 			[:privateDownloadHandler, 'privateDownload', :privateDownload, 2],
+			
+			[:addUnitHandler, 'addUnit', :addUnit, 1],
+			[:addPrivateUnitHandler, 'addPrivateUnit', :addPrivateUnit, 1],
+			
+			[:submitUnitHandler, 'submitUnit', :submitUnit],
+			[:submitPrivateUnitHandler, 'submitPrivateUnit', :submitPrivateUnit],
 		]
 		
 		handlers.each do |arguments|
@@ -448,5 +460,76 @@ class PastebinHandler < SiteContainer
 	
 	def isReplyMode(mode)
 		return [:reply, :privateReply].include?(mode)
+	end
+	
+	def isAddUnitMode(mode)
+		return [:addUnit, :privateAddUnit].include?(mode)
+	end
+			
+	def addUnit(request)
+		postId = getRequestId request
+		post = PastebinPost.new
+		@database.transaction do
+			post.simpleInitialisation(postId, @database, true)
+			writePermissionCheck(request, post)
+			return addUnitForm(post, request)
+		end
+	end
+	
+	def addPrivateUnit(request)
+		privateString = request.arguments.first
+		post = PastebinPost.new
+		@database.transaction do
+			post.simpleInitialisation(postId, @database, true)
+			argumentError if post.privateString != privateString
+			writePermissionCheck(request, post)
+			return addUnitForm(post, request)
+		end
+	end
+	
+	def submitUnit(request)
+	end
+	
+	def submitPrivateUnit(request)
+	end
+	
+	def editUnitForm(post, request)
+		unit = post.activeUnit
+		if unit.pasteType == nil
+			#it's plain text
+			highlightingSelectionMode = PlainTextHighlightingIndex
+			lastSelection = nil
+		else
+			highlightingSelectionMode = AllSyntaxHighlightingTypesIndex
+			lastSelection = unit.pasteType
+		end
+		form = PastebinForm.new(request)
+		form.author = post.editAuthor
+		form.postDescription = getDescriptionField post
+		form.unitDescription = getDescriptionField unit
+		form.content = unit.content
+		form.highlightingSelectionMode = highlightingSelectionMode
+		form.lastSelection = lastSelection
+		form.isPrivatePost = post.isPrivate
+		form.expirationIndex = post.expirationIndex
+		form.editUnitId = unit.id
+		form.editPost = post
+		form.mode = post.isPrivate ? :privateEdit : :edit
+		body = pastebinForm(form)
+		title = 'Editing post'
+		return @pastebinGenerator.get([title, body], request)
+	end
+	
+	def addUnitForm(post, request)
+		form = PastebinForm.new(request)
+		form.author = post.editAuthor
+		form.postDescription = getDescriptionField post
+		form.isPrivatePost = post.isPrivate
+		form.expirationIndex = post.expirationIndex
+		form.editPost = post
+		form.mode = post.isPrivate ? :privateAddUnit : :addUnit
+		body = pastebinForm(form)
+		title = 'Add a unit to your post'
+		return @pastebinGenerator.get([title, body], request)
 	end
 end

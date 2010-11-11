@@ -11,6 +11,7 @@ class PastebinHandler < SiteContainer
 		
 		editing = isEditMode(mode)
 		replying = isReplyMode(mode)
+		addingUnit = isAddUnitMode(mode)
 		
 		output = ''
 		writer = SecuredFormWriter.new(output, form.request)
@@ -40,10 +41,15 @@ class PastebinHandler < SiteContainer
 		handlerMap =
 		{
 			new: @submitNewPostHandler,
+			
 			edit: @submitUnitModificationHandler,
 			privateEdit: @submitPrivateUnitModificationHandler,
+			
 			reply: @submitReplyHandler,
 			privateReply: @submitPrivateReplyHandler,
+			
+			addUnit: @addUnitHandler,
+			privateAddUnit: @addPrivateUnitHandler,
 		}
 		
 		handler = handlerMap[mode]
@@ -131,8 +137,9 @@ class PastebinHandler < SiteContainer
 			#the expiration and the privacy settings are only visible in the following modes:
 			#-making a new post
 			#-when editing a non-reply post
+			#-when adding a unit to a non-reply post
 			
-			if mode == :new || (editing && editPost.replyTo == nil)
+			if mode == :new || ((editing || addingUnit) && editPost.replyTo == nil)
 				writer.select(PastebinForm::PrivatePost,  privacyOptions, {label: 'Privacy options'})
 
 				firstOffset = 0
@@ -173,7 +180,7 @@ class PastebinHandler < SiteContainer
 			when :new
 				writer.secureSubmit
 			when :edit, :privateEdit
-				writer.hidden(PastebinForm::EditUnitId, form.editUnitId)
+				writer.hidden(PastebinForm::EditUnitId, form.editPost.id)
 				if mode == :privateEdit
 					writer.hidden(PastebinForm::EditPrivateString, form.editPost.privateString)
 				end
@@ -185,6 +192,13 @@ class PastebinHandler < SiteContainer
 					writer.hidden(PastebinForm::ReplyPrivateString, form.replyPost.privateString)
 				end
 				writer.secureSubmit('Reply')
+			when :addUnit, :privateAddUnit
+				if mode == :addUnit
+					writer.hidden(PastebinForm::AddUnitPostId, form.editPost.id)
+				else
+					writer.hidden(PastebinForm::AddUnitPostPrivateString, form.editPost.privateString)
+				end
+				writer.secureSubmit('Add unit')
 			end
 		end
 		

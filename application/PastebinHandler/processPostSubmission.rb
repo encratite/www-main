@@ -15,6 +15,7 @@ class PastebinHandler < SiteContainer
 	def processPostSubmission(request, mode)
 		editing = isEditMode(mode)
 		replying = isReplyMode(mode)
+		addingUnit = isAddUnitMode(mode)
 		
 		if editing
 			#check if the unit ID is valid and determine the post associated with it
@@ -127,6 +128,7 @@ class PastebinHandler < SiteContainer
 				argumentError if rows.empty?
 				parentPost = PastebinPost.new
 				parentPost.transferSymbols(rows.first)
+				parentPost.initialiseMembers
 				replyPostId = parentPost.id
 			end
 			
@@ -144,8 +146,10 @@ class PastebinHandler < SiteContainer
 				form.isPrivatePost = isPrivatePost
 				form.expirationIndex = expirationIndex
 				form.editUnitId = editUnitId
-				if mode == :edit
+				if editing
 					form.editPost = editPost
+				elsif replying
+					form.replyPost = parentPost
 				end
 				form.mode = mode
 				errorContent = pastebinForm(form)
