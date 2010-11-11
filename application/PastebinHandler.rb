@@ -16,24 +16,10 @@ require 'www-library/random'
 require 'www-library/input'
 require 'www-library/HTTPReply'
 
+require 'nil/symbol'
+
 class PastebinHandler < SiteContainer
-	Pastebin = 'pastebin'
-	CreateReply = 'reply'
-	CreatePrivateReply = 'privateReply'
-	SubmitNewPost = 'submitNewPost'
-	SubmitReply = 'submitReply'
-	SubmitPrivateReply = 'submitPrivateReply'
-	View = 'view'
-	ViewPrivate = 'viewPrivate'
-	List = 'list'
-	DeletePost = 'delete'
-	DeleteUnit = 'deleteUnit'
-	EditUnit = 'edit'
-	EditPrivateUnit = 'editPrivate'
-	SubmitUnitModification = 'submitModification'
-	SubmitPrivateUnitModification = 'submitPrivateModification'
-	Download = 'download'
-	PrivateDownload = 'privateDownload'
+	include SymbolicAssignment
 	
 	def initialize(site)
 		super
@@ -42,29 +28,40 @@ class PastebinHandler < SiteContainer
 	end
 	
 	def installHandlers
-		pastebinHandler = WWWLib::RequestHandler.menu('Pastebin', Pastebin, method(:createNewPost))
+		pastebinHandler = WWWLib::RequestHandler.menu('Pastebin', 'pastebin', method(:createNewPost))
 		addMainHandler pastebinHandler
 		
 		WWWLib::RequestHandler.newBufferedObjectsGroup
 		
 		WWWLib::RequestHandler.menu('Create new post', nil, method(:createNewPost))
-		WWWLib::RequestHandler.menu('View posts', List, method(:viewPosts), 0..1)
+		WWWLib::RequestHandler.menu('View posts', 'list', method(:viewPosts), 0..1)
 		
-		@createReplyHandler = WWWLib::RequestHandler.handler(CreateReply, method(:createReply), 1)
-		@createPrivateReplyHandler = WWWLib::RequestHandler.handler(CreatePrivateReply, method(:createPrivateReply), 1)
-		@submitNewPostHandler = WWWLib::RequestHandler.handler(SubmitNewPost, method(:submitNewPost))
-		@viewPostHandler = WWWLib::RequestHandler.handler(View, method(:viewPost), 1)
-		@viewPrivatePostHandler = WWWLib::RequestHandler.handler(ViewPrivate, method(:viewPrivatePost), 1)
-		@deletePostHandler = WWWLib::RequestHandler.handler(DeletePost, method(:deletePost), 1)
-		@deleteUnitHandler = WWWLib::RequestHandler.handler(DeleteUnit, method(:deleteUnit), 1)
-		@editUnitHandler = WWWLib::RequestHandler.handler(EditUnit, method(:editUnit), 1)
-		@editPrivateUnitHandler = WWWLib::RequestHandler.handler(EditPrivateUnit, method(:editPrivateUnit), 2)
-		@submitUnitModificationHandler = WWWLib::RequestHandler.handler(SubmitUnitModification, method(:submitUnitModification))
-		@submitPrivateUnitModificationHandler = WWWLib::RequestHandler.handler(SubmitPrivateUnitModification, method(:submitPrivateUnitModification))
-		@submitReplyHandler = WWWLib::RequestHandler.handler(SubmitReply, method(:submitReply))
-		@submitPrivateReplyHandler = WWWLib::RequestHandler.handler(SubmitPrivateReply, method(:submitPrivateReply))
-		@downloadHandler = WWWLib::RequestHandler.handler(Download, method(:download), 1)
-		@privateDownloadHandler = WWWLib::RequestHandler.handler(PrivateDownload, method(:privateDownload), 2)
+		handlers =
+		[
+			[:createReplyHandler, 'reply', :createReply, 1],
+			[:createPrivateReplyHandler, 'privateReply', :createPrivateReply, 1],
+			[:submitNewPostHandler, 'submitNewPost', :submitNewPost],
+			[:viewPostHandler, 'view', :viewPost, 1],
+			[:viewPrivatePostHandler, 'viewPrivate', :viewPrivatePost, 1],
+			[:deletePostHandler, 'delete', :deletePost, 1],
+			[:deleteUnitHandler, 'deleteUnit', :deleteUnit, 1],
+			[:editUnitHandler, 'edit', :editUnit, 1],
+			[:editPrivateUnitHandler, 'editPrivate', :editPrivateUnit, 2],
+			[:submitUnitModificationHandler, 'submitModification', :submitUnitModification],
+			[:submitPrivateUnitModificationHandler, 'submitPrivateModification', :submitPrivateUnitModification],
+			[:submitReplyHandler, 'reply', :submitReply],
+			[:submitPrivateReplyHandler, 'privateReply', :submitPrivateReply],
+			[:downloadHandler, 'download', :download, 1],
+			[:privateDownloadHandler, 'privateDownload', :privateDownload, 2],
+		]
+		
+		handlers.each do |arguments|
+			handlerSymbol = arguments[0]
+			arguments = arguments[1..-1]
+			arguments[1] = method(arguments[1])
+			handler = WWWLib::RequestHandler.handler(*arguments)
+			setMember(handlerSymbol, handler)
+		end
 		
 		WWWLib::RequestHandler.getBufferedObjects.each { |handler| pastebinHandler.add(handler) }
 	end

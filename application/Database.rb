@@ -1,6 +1,8 @@
 require 'nil/symbol'
 
-class Database < SymbolicAssignment
+class Database
+	include SymbolicAssignment
+
 	attr_reader :user, :loginSession, :post, :unit, :floodProtection, :connection
 	
 	def initialize(database)
