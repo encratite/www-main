@@ -47,47 +47,52 @@ class PastebinPost < WWWLib::SymbolTransfer
 		@database = database
 	end
 	
-	def simpleInitialisation(target, fullPostInitialisation)
+	def postInitialisation(isPrivate, target, fullPostInitialisation)
 		#just select all the fields for now, it's too much of a mess otherwise
 		#the data per row are rather small anyways, the actual problem is the content within the units
 		dataset = @database.post
 		if target.class == String
-			postData = dataset.where(id: target)
+			if isPrivate
+				postData = dataset.where(id: target)
+			else
+				postData = dataset.where(id: target, private_string: nil)
+			end
 		else
 			postData = dataset.where(private_string: target)
 		end
+		postData = postData.all
 		argumentError if postData.empty?
 		transferSymbols postData.first
 		initialiseMembers(fullPostInitialisation)
 		return
 	end
 	
-	def deletePostQueryInitialisation(target)
-		simpleInitialisation(target, false)
+	def deletePostQueryInitialisation(isPrivate, target)
+		postInitialisation(isPrivate, target, false)
 		return
 	end
 	
-	def unitInitialisation(id, fields, fullPostInitialisation = false, fullUnitInitialisation = true)
+	def unitInitialisation(isPrivate, id, fields, fullPostInitialisation = false, fullUnitInitialisation = true)
 		row = @database.unit.where(id: target).select(*fields).all
 		argumentError if row.empty?
 		unitData = row.first
 		unitData[:id] = unitId
 		@activeUnit = PastebinUnit.new(unitData, fullUnitInitialisation)
 		postId = @activeUnit.postId
-		simpleInitialisation(postId, fullPostInitialisation)
+		postInitialisation(isPrivate, postId, fullPostInitialisation)
 		return postId
 	end
 	
-	def deleteUnitQueryInitialisation(target)
-		return unitInitialisation(target, [:post_id, :description, :paste_type])
+	def deleteUnitQueryInitialisation(isPrivate, target)
+		return unitInitialisation(isPrivate, target, [:post_id, :description, :paste_type])
 	end
 	
-	def editUnitQueryInitialisation(target)
-		return unitInitialisation(target, [:post_id, :description, :content, :paste_type], true)
+	def editUnitQueryInitialisation(isPrivate, target)
+		return unitInitialisation(isPrivate, target, [:post_id, :description, :content, :paste_type], true)
 	end
 	
-	def editPermissionQueryInitialisation(target)
-		output = unitInitialisation(target, [:post_id, :modification_counter], false, false)
+	def editPermissionQueryInitialisation(isPrivate, target)
+		output = unitInitialisation(isPrivate, target, [:post_id, :modification_counter], false, false)
 		@isPrivate = @privateString != nil
 		return output
 	end
