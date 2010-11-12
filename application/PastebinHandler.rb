@@ -35,22 +35,76 @@ class PastebinHandler < SiteContainer
 		WWWLib::RequestHandler.menu('Create new post', nil, method(:createNewPost))
 		WWWLib::RequestHandler.menu('View posts', 'list', method(:viewPosts), 0..1)
 		
+		#The handlers basically feature three types of argument passing.
+		#1. POST only => nil
+		#2. GET for a post => :post
+		#3. GET for a unit => :unit
 		handlers =
 		[
-			[:submitNewPostHandler, 'submitNewPost', :submitNewPost, false],
-			[:viewPostHandler, 'view', :viewPost, true],
-			[:downloadHandler, 'download', :download, true],
-			[:deletePostHandler, 'delete', :deletePost, true],
-			[:deleteUnitHandler, 'deleteUnit', :deleteUnit, true],
+			#POST only
+			[:submitNewPostHandler, 'submitNewPost', :submitNewPost, nil],
+			#GET
+			#For public posts:
+			#    1. integer: 0 for a public post
+			#    2. integer: ID of the post
+			#For private posts:
+			#    1. integer: 1
+			#    2. string: private string of the post
+			[:viewPostHandler, 'view', :viewPost, :post],
+			#GET
+			#For public posts:
+			#    1. integer: ID of the unit
+			#For private posts:
+			#    1. integer: ID of the unit
+			#    2. string: private string of the post
+			[:downloadHandler, 'download', :download, :unit],
+			#GET
+			#For public posts:
+			#    1. integer: 0 for a public post
+			#    2. integer: ID of the post
+			#For private posts:
+			#    1. integer: 1
+			#    2. string: private string of the post
+			[:deletePostHandler, 'delete', :deletePost, :post],
+			#GET
+			#For public posts:
+			#    1. integer: ID of the unit
+			#For private posts:
+			#    1. integer: ID of the unit
+			#    2. string: private string of the post
+			[:deleteUnitHandler, 'deleteUnit', :deleteUnit, :unit],
 			
-			[:createReplyHandler, 'reply', :createReply, true],
-			[:submitReplyHandler, 'submitReply', :submitReply, false],
+			#GET
+			#For public posts:
+			#    1. integer: 0 for a public post
+			#    2. integer: ID of the post
+			#For private posts:
+			#    1. integer: 1
+			#    2. string: private string of the post
+			[:createReplyHandler, 'reply', :createReply, :post],
+			#POST only
+			[:submitReplyHandler, 'submitReply', :submitReply, nil],
 			
-			[:editUnitHandler, 'edit', :editUnit, true],
-			[:submitUnitModificationHandler, 'submitModification', :submitUnitModification, false],
+			#GET
+			#For public posts:
+			#    1. integer: ID of the unit
+			#For private posts:
+			#    1. integer: ID of the unit
+			#    2. string: private string of the post
+			[:editUnitHandler, 'edit', :editUnit, :unit],
+			#POST only
+			[:submitUnitModificationHandler, 'submitModification', :submitUnitModification, nil],
 			
-			[:addUnitHandler, 'addUnit', :addUnit, true],
-			[:submitUnitHandler, 'submitUnit', :submitUnit, false],
+			#GET
+			#For public posts:
+			#    1. integer: 0 for a public post
+			#    2. integer: ID of the post
+			#For private posts:
+			#    1. integer: 1
+			#    2. string: private string of the post
+			[:addUnitHandler, 'addUnit', :addUnit, :post],
+			#POST only
+			[:submitUnitHandler, 'submitUnit', :submitUnit, nil],
 		]
 		
 		handlers.each do |handlerSymbol, string, methodSymbol, hasGetArguments|
