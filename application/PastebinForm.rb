@@ -55,10 +55,9 @@ class PastebinForm
 	]
 	
 	NewSubmissionPostFields = CommonPostFields + CreationPostFields
-	
 	EditPostFields = NewSubmissionPostFields + [EditUnitId]
-	EditReplyPostFields = CommonPostFields + [EditUnitId]
-	ReplyPostFields = CommonPostFields + [ReplyPostId]
+	#ReplyPostId is only specified when it's a public post - otherwise it relies on PrivateString
+	ReplyPostFields = CommonPostFields
 	AddUnitPostFields = NewSubmissionPostFields + [AddUnitPostId]
 	
 	attr_accessor(

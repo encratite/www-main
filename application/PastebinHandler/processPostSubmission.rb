@@ -13,45 +13,21 @@ require 'www-library/HTTPReply'
 class PastebinHandler < SiteContainer
 	#mode may be either :new (for new posts), :edit (for submitting modifications for existing posts) or :reply (for new replies to existing posts)
 	def processPostSubmission(request, mode)
-		editing = isEditMode(mode)
-		replying = isReplyMode(mode)
-		addingUnit = isAddUnitMode(mode)
+		new = mode == :new
+		editing = mode == :edit
+		replying = mode == :reply
+		addingUnit = mode == :addUnit
 		
-		if editing
-			#check if the unit ID is valid and determine the post associated with it
-			#right now the ID of the unit to be edited is the last field - could be changed by PastebinForm though, so watch out
-			editUnitId = request.getPost(PastebinForm::EditUnitId).to_i
-			editPost = PastebinPost.new(@database)
-			editPost.editPermissionQueryInitialisation(editUnitId, @database)
-			if mode == :privateEdit
-				#check if the private string specified in the post matches
-				#doesn't matter if it returns nil
-				requestPrivateString = request.getPost(PastebinForm::EditPrivateString)
-				argumentError if requestPrivateString != editPost.privateString
-			end
-			writePermissionCheck(request, editPost)
-		end
+		sourceMap =
+		{
+			new: :NewSubmissionPostFields,
+			edit: :EditPostFields,
+			reply: :ReplyPostFields,
+			addUnit: :AddUnitPostFields,
+		}
 		
-		editingPrimaryPost = (editing && editPost.replyTo == nil)
-		
-		case mode
-		when :new
-			source = PastebinForm::NewSubmissionPostFields
-		when :edit
-			source = editingPrimaryPost ?
-				PastebinForm::EditPostFields :
-				PastebinForm::EditReplyPostFields
-		when :privateEdit
-			source = editingPrimaryPost ?
-				PastebinForm::EditPrivatePostFields :
-				PastebinForm::EditPrivateReplyPostFields
-		when :reply
-			source = PastebinForm::ReplyPostFields
-		when :privateReply
-			source = PastebinForm::PrivateReplyPostFields
-		else
-			raise 'Invalid process submission mode specified'
-		end
+		source = sourceMap[mode]
+		raise 'Invalid process submission mode specified' if source == nil
 		
 		input = processFormFields(request, source)
 
@@ -72,13 +48,18 @@ class PastebinHandler < SiteContainer
 		
 		#CreationPostFields - only available with mode == :new and mode == :edit of a post with reply_to = NULL
 		privatePost = getIntPost(request, :PrivatePost)
-		expiration = getIntPost(request, :Expiration)
+		expirationIndex = getIntPost(request, :Expiration)
+		
+		#for private submissions
+		privateString = getPostValue(request, :PrivateString)
+		
+		isPrivate = privateString != nil
 		
 		stringLengthChecks = getStringLengthChecks(author, postDescription, unitDescription, content, expertHighlighting)
 		
 		errors = []
 		
-		validValues = getValidValues(highlightingGroup, privatePost, expiration)
+		validValues = getValidValues(highlightingGroup, privatePost, expirationIndex)
 		
 		syntaxHighlightingFields =
 		[
@@ -105,29 +86,6 @@ class PastebinHandler < SiteContainer
 				else
 					errors << 'The vim syntax highlighting script you have specified does not exist.'
 				end
-			end
-			
-			isPrivatePost = nil
-			expirationIndex = expiration
-			
-			case mode
-			when :new
-				editUnitId = nil
-			when :reply, :privateReply
-				replyPostId = request.getPost(PastebinForm::ReplyPostId).to_i
-				if mode == :reply
-					#check if the user is replying to a valid post ID only
-					rows = @posts.where(id: replyPostId, private_string: nil).all
-				else
-					#check if the user is replying to a valid combination of post ID and private string
-					replyPostPrivateString = getPostValue(request, :ReplyPrivateString)
-					rows = @posts.where(private_string: replyPostPrivateString).all
-				end
-				argumentError if rows.empty?
-				parentPost = PastebinPost.new(@database)
-				parentPost.transferSymbols(rows.first)
-				parentPost.initialiseMembers
-				replyPostId = parentPost.id
 			end
 			
 			if !errors.empty?
@@ -161,17 +119,7 @@ class PastebinHandler < SiteContainer
 			
 			postUser = isLoggedIn ? request.sessionUser.id : nil
 			postAuthor = !isLoggedIn ? author : nil
-			if replying
-				postReply = replyPostId
-			else
-				if editing
-					postReply = editPost.replyTo
-				else
-					#new post
-					postReply = nil
-				end
-			end
-
+			
 			postData =
 			{
 				user_id: postUser,
@@ -180,12 +128,41 @@ class PastebinHandler < SiteContainer
 				ip: request.address,
 				
 				description: postDescription,
-				
-				reply_to: postReply,
 			}
 			
+			useReplyId = lambda { |id| postData[:reply_to] = id }
+			
+			case mode
+			
+			when :new
+				useReplyId.call(nil)
+				
+			when :edit
+				#check if the unit ID is valid and determine the post associated with it
+				editUnitId = getInpost(request, :EditUnitId)
+				argumentError if editUnitId == nil
+				editPost = PastebinPost.new(@database)
+				editPost.editPermissionQueryInitialisation(isPrivate, editUnitId, @database)
+				argumentError if privateString != editPost.privateString
+				writePermissionCheck(request, editPost)
+				useReplyId.call(editPost.replyTo)
+				
+			when :reply
+				target = isPrivate ? privateString : getPostInt(request, :ReplyPostId)
+				argumentError if target == nil
+				parentPost = PastebinPost.new(@database)
+				parentPost.postInitialisation(isPrivate, target)
+				useReplyId.call(parentPost.id)
+				
+			when :addUnit
+				#?
+				
+			end
+			
+			editingPrimaryPost = (editing && editPost.replyTo == nil)
+			
 			if mode == :new || editingPrimaryPost
-				expirationTime = now + PastebinConfiguration::ExpirationOptions[expiration][1]
+				expirationTime = now + PastebinConfiguration::ExpirationOptions[expirationIndex][1]
 				postExpiration = expiration == 0 ? nil : expirationTime
 			
 				postData[:expiration] = postExpiration
@@ -194,6 +171,8 @@ class PastebinHandler < SiteContainer
 				isPrivate = privatePost == 1
 				privateString = isPrivate ? getPrivateString : nil
 			end
+			
+			#continue
 
 			if editing
 				if editingPrimaryPost

@@ -47,7 +47,7 @@ class PastebinPost < WWWLib::SymbolTransfer
 		@database = database
 	end
 	
-	def postInitialisation(isPrivate, target, fullPostInitialisation)
+	def postInitialisation(isPrivate, target, fullPostInitialisation = true)
 		#just select all the fields for now, it's too much of a mess otherwise
 		#the data per row are rather small anyways, the actual problem is the content within the units
 		dataset = @database.post
