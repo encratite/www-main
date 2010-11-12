@@ -21,7 +21,7 @@ class PastebinHandler < SiteContainer
 			#check if the unit ID is valid and determine the post associated with it
 			#right now the ID of the unit to be edited is the last field - could be changed by PastebinForm though, so watch out
 			editUnitId = request.getPost(PastebinForm::EditUnitId).to_i
-			editPost = PastebinPost.new
+			editPost = PastebinPost.new(@database)
 			editPost.editPermissionQueryInitialisation(editUnitId, @database)
 			if mode == :privateEdit
 				#check if the private string specified in the post matches
@@ -124,7 +124,7 @@ class PastebinHandler < SiteContainer
 					rows = @posts.where(private_string: replyPostPrivateString).all
 				end
 				argumentError if rows.empty?
-				parentPost = PastebinPost.new
+				parentPost = PastebinPost.new(@database)
 				parentPost.transferSymbols(rows.first)
 				parentPost.initialiseMembers
 				replyPostId = parentPost.id

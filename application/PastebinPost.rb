@@ -161,7 +161,7 @@ class PastebinPost < WWWLib::SymbolTransfer
 		#puts "Loading children of ID #{@id}"
 		children = @database.post.where(reply_to: @id).all
 		children.each do |child|
-			childPost = PastebinPost.new
+			childPost = PastebinPost.new(@database)
 			childPost.transferSymbols(child)
 			childPost.initialiseMembers
 			#perform depth first search

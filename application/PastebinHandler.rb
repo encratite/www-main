@@ -213,7 +213,7 @@ class PastebinHandler < SiteContainer
 		lastId = nil
 		currentPost = nil
 		posts.each do |rawPost|
-			post = PastebinPost.new
+			post = PastebinPost.new(@database)
 			post.transferSymbols rawPost
 			post.initialiseMembers
 			if post.pastebinPostId == lastId

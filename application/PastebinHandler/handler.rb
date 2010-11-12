@@ -64,7 +64,7 @@ class PastebinHandler < SiteContainer
 		mode = :reply
 		posts = posts.all
 		argumentError if posts.empty?
-		replyPost = PastebinPost.new
+		replyPost = PastebinPost.new(@database)
 		replyPost.transferSymbols(posts.first)
 		form = PastebinForm.new(request)
 		form.mode = mode
@@ -88,7 +88,7 @@ class PastebinHandler < SiteContainer
 		post = nil
 		tree = nil
 		@database.transaction do
-			post = PastebinPost.new
+			post = PastebinPost.new(@database)
 			post.showPostQueryInitialisation(target, self, request, @database)
 			tree = PostTree.new(@database, post)
 		end
@@ -96,7 +96,7 @@ class PastebinHandler < SiteContainer
 	end
 	
 	def editUnit(request, unitId, privateString)
-		post = PastebinPost.new
+		post = PastebinPost.new(@database)
 		@database.transaction do
 			post.editUnitQueryInitialisation(unitId, @database)
 			argumentError if post.privateString != privateString
@@ -125,7 +125,7 @@ class PastebinHandler < SiteContainer
 	end
 	
 	def deletePost(request, isPrivate, target)
-		post = PastebinPost.new
+		post = PastebinPost.new(@database)
 		@database.transaction do
 			post.deletePostQueryInitialisation(postId, @database)
 			writePermissionCheck(request, post)
@@ -136,7 +136,7 @@ class PastebinHandler < SiteContainer
 	
 	def deleteUnit(request)
 		unitId = getRequestId request
-		post = PastebinPost.new
+		post = PastebinPost.new(@database)
 		deletedPost = nil
 		@database.transaction do
 			postId = post.deleteUnitQueryInitialisation(unitId, @database)
@@ -151,7 +151,7 @@ class PastebinHandler < SiteContainer
 	
 		def addUnit(request)
 		postId = getRequestId request
-		post = PastebinPost.new
+		post = PastebinPost.new(@database)
 		@database.transaction do
 			post.simpleInitialisation(postId, @database, true)
 			writePermissionCheck(request, post)
@@ -161,7 +161,7 @@ class PastebinHandler < SiteContainer
 	
 	def addPrivateUnit(request)
 		privateString = request.arguments.first
-		post = PastebinPost.new
+		post = PastebinPost.new(@database)
 		@database.transaction do
 			post.simpleInitialisation(postId, @database, true)
 			argumentError if post.privateString != privateString
