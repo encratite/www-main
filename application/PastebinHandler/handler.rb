@@ -159,6 +159,6 @@ class PastebinHandler < SiteContainer
 	end
 	
 	def submitUnit(request)
-		#not quite done yet
+		return processPostSubmission(request, :addUnit)
 	end
 end
