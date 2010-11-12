@@ -41,7 +41,7 @@ class PastebinHandler < SiteContainer
 		
 		#2. GET for a post => :post
 		#For public posts:
-		#    1. integer: 0 for a public post
+		#    1. integer: 0
 		#    2. integer: ID of the post
 		#For private posts:
 		#    1. integer: 1
@@ -53,6 +53,7 @@ class PastebinHandler < SiteContainer
 		#For private posts:
 		#    1. integer: ID of the unit
 		#    2. string: private string of the post
+		
 		handlers =
 		[
 			[:submitNewPostHandler, 'submitNewPost', :submitNewPost, nil],
@@ -71,23 +72,32 @@ class PastebinHandler < SiteContainer
 			[:submitUnitHandler, 'submitUnit', :submitUnit, nil],
 		]
 		
-		handlers.each do |handlerSymbol, string, methodSymbol, hasGetArguments|
+		handlers.each do |handlerSymbol, string, methodSymbol, argumentType|
 			actualMethod = method(methodSymbol)
-			if hasGetArguments
+			case argumentType
+			when :post
 				proxyMethod = lambda do |request|
 					arguments = request.arguments
 					isPrivate = arguments[0].to_i == 1
-					if isPrivate
-						privateString = arguments[1]
-						output = actualMethod.call(request, isPrivate, privateString)
-					else
-						id = arguments[1].to_i
-						output = actualMethod.call(request, isPrivate, id)
-					end
-					output
+					target = arguments[1]
+					target = target.to_i if isPrivate
+					actualMethod.call(request, isPrivate, target)
 				end
 				argumentCount = 2
-			else
+			when :unit
+				proxyMethod = lambda do |request|
+					arguments = request.arguments
+					unitId = arguments[0].to_i
+					isPrivate = arguments.size == 2
+					if isPrivate
+						privateString = arguments[1]
+					else
+						privateString = nil
+					end
+					actualMethod.call(request, unitId, privateString)
+				end
+				argumentCount = 1..2
+			when nil
 				proxyMethod = actualMethod
 				argumentCount = nil
 			end
