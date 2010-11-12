@@ -208,22 +208,6 @@ class PastebinHandler < SiteContainer
 		return id
 	end
 	
-	def processPostView(request, isPrivate)
-		if isPrivate
-			target = request.arguments[0]
-		else
-			target = getRequestId request
-		end
-		post = nil
-		tree = nil
-		@database.transaction do
-			post = PastebinPost.new
-			post.showPostQueryInitialisation(target, self, request, @database)
-			tree = PostTree.new(@database, post)
-		end
-		return showPastebinPost(request, post, tree)
-	end
-	
 	def parsePosts(posts)
 		output = []
 		lastId = nil
@@ -262,75 +246,10 @@ class PastebinHandler < SiteContainer
 		@posts.where(id: id).delete
 	end
 	
-	def deletePost(request)
-		postId = getRequestId request
-		post = PastebinPost.new
-		@database.transaction do
-			post.deletePostQueryInitialisation(postId, @database)
-			writePermissionCheck(request, post)
-			deletePostTree postId
-		end
-		return confirmPostDeletion(post, request)
-	end
-	
-	def deleteUnit(request)
-		unitId = getRequestId request
-		post = PastebinPost.new
-		deletedPost = nil
-		@database.transaction do
-			postId = post.deleteUnitQueryInitialisation(unitId, @database)
-			writePermissionCheck(request, post)
-			@units.where(id: unitId).delete
-			unitCount = @units.where(post_id: postId).count
-			deletedPost = unitCount == 0
-			deletePostTree postId if deletedPost
-		end
-		return confirmUnitDeletion(post, request, deletedPost)
-	end
-	
 	def writePermissionCheck(request, post)
 		raiseError(permissionError, request) if !hasWriteAccess(request, post)
 	end
-	
-	def isEditMode(mode)
-		return [:edit, :privateEdit].include?(mode)
-	end
-	
-	def isReplyMode(mode)
-		return [:reply, :privateReply].include?(mode)
-	end
-	
-	def isAddUnitMode(mode)
-		return [:addUnit, :privateAddUnit].include?(mode)
-	end
-			
-	def addUnit(request)
-		postId = getRequestId request
-		post = PastebinPost.new
-		@database.transaction do
-			post.simpleInitialisation(postId, @database, true)
-			writePermissionCheck(request, post)
-			return addUnitForm(post, request)
-		end
-	end
-	
-	def addPrivateUnit(request)
-		privateString = request.arguments.first
-		post = PastebinPost.new
-		@database.transaction do
-			post.simpleInitialisation(postId, @database, true)
-			argumentError if post.privateString != privateString
-			writePermissionCheck(request, post)
-			return addUnitForm(post, request)
-		end
-	end
-	
-	def submitUnit(request)
-	end
-	
-	def submitPrivateUnit(request)
-	end
-	
+
 	def editUnitForm(post, request)
 		unit = post.activeUnit
 		if unit.pasteType == nil

@@ -76,31 +76,26 @@ class PastebinHandler < SiteContainer
 		return processPostSubmission(request, :new)
 	end
 	
-	def submitUnitModification(request, isPrivate, target)
-		return processPostSubmission(request, :edit, isPrivate, target)
+	def submitUnitModification(request)
+		return processPostSubmission(request, :edit)
 	end
 	
-	def submitReply(request, isPrivate, target)
-		return processPostSubmission(request, :reply, isPrivate, target)
+	def submitReply(request)
+		return processPostSubmission(request, :reply)
 	end
 	
-	def viewPost(request)
-		return processPostView(request, false)
-	end
-	
-	def editUnit(request)
-		unitId = getRequestId request
-		post = PastebinPost.new
+	def viewPost(request, isPrivate, target)
+		post = nil
+		tree = nil
 		@database.transaction do
-			post.editUnitQueryInitialisation(unitId, @database)
-			writePermissionCheck(request, post)
-			return editUnitForm(post, request)
+			post = PastebinPost.new
+			post.showPostQueryInitialisation(target, self, request, @database)
+			tree = PostTree.new(@database, post)
 		end
+		return showPastebinPost(request, post, tree)
 	end
 	
-	def editPrivateUnit(request)
-		unitId = getRequestId request
-		privateString = request.arguments[1]
+	def editUnit(request, unitId, privateString)
 		post = PastebinPost.new
 		@database.transaction do
 			post.editUnitQueryInitialisation(unitId, @database)
@@ -110,9 +105,7 @@ class PastebinHandler < SiteContainer
 		end
 	end
 	
-	def download(request, isPrivate, target)
-		unitId = getRequestId request
-		
+	def download(request, unitId, privateString)
 		@database.transaction do
 			rows = @units.select(:post_id, :content).where(id: unitId).all
 			raiseError(argumentError, request) if rows.empty?
@@ -123,18 +116,60 @@ class PastebinHandler < SiteContainer
 			raiseError(internalError 'Missing post', request) if rows.empty?
 			post = rows.first
 			postPrivateString = post[:private_string]
-			#it's a public post and it's being viewed using the regular download handler
-			publicSuccess = (privateString == nil && postPrivateString == nil)
-			#this might seem redundant but I like verbosity
-			#it's a private post, it's being viewed using the private download handler and the private string specified in the argument matches that of the post
-			privateSuccess = (privateString != nil && postPrivateString != nil && privateString == postPrivateString)
-			if !(publicSuccess || privateSuccess)
-				argumentError
-			end
+			argumentError if privateString != postPrivateString
 			#return the actual code as plain text
 			reply = WWWLib::HTTPReply.new(unitContent)
 			reply.plain
 			return reply
 		end
+	end
+	
+	def deletePost(request, isPrivate, target)
+		post = PastebinPost.new
+		@database.transaction do
+			post.deletePostQueryInitialisation(postId, @database)
+			writePermissionCheck(request, post)
+			deletePostTree postId
+		end
+		return confirmPostDeletion(post, request)
+	end
+	
+	def deleteUnit(request)
+		unitId = getRequestId request
+		post = PastebinPost.new
+		deletedPost = nil
+		@database.transaction do
+			postId = post.deleteUnitQueryInitialisation(unitId, @database)
+			writePermissionCheck(request, post)
+			@units.where(id: unitId).delete
+			unitCount = @units.where(post_id: postId).count
+			deletedPost = unitCount == 0
+			deletePostTree postId if deletedPost
+		end
+		return confirmUnitDeletion(post, request, deletedPost)
+	end
+	
+		def addUnit(request)
+		postId = getRequestId request
+		post = PastebinPost.new
+		@database.transaction do
+			post.simpleInitialisation(postId, @database, true)
+			writePermissionCheck(request, post)
+			return addUnitForm(post, request)
+		end
+	end
+	
+	def addPrivateUnit(request)
+		privateString = request.arguments.first
+		post = PastebinPost.new
+		@database.transaction do
+			post.simpleInitialisation(postId, @database, true)
+			argumentError if post.privateString != privateString
+			writePermissionCheck(request, post)
+			return addUnitForm(post, request)
+		end
+	end
+	
+	def submitUnit(request)
 	end
 end
