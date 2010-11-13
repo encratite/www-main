@@ -17,6 +17,7 @@ class PastebinHandler < SiteContainer
 		editing = mode == :edit
 		replying = mode == :reply
 		addingUnit = mode == :addUnit
+		modifyingPost = editing || addingUnit
 		
 		sourceMap =
 		{
@@ -155,13 +156,18 @@ class PastebinHandler < SiteContainer
 				useReplyId.call(parentPost.id)
 				
 			when :addUnit
-				#?
-				
+				target = isPrivate ? privateString : getPostInt(request, :ReplyPostId)
+				argumentError if target == nil
+				addUnitPost = PastebinPost.new(@database)
+				addUnitPost.postInitialisation(isPrivate, target)
 			end
 			
-			editingPrimaryPost = (editing && editPost.replyTo == nil)
+			editingPrimaryPost = modifyingPost && editPost.replyTo == nil
+			argumentError if editingPrimaryPost && [privatePost, expirationIndex].include?(nil)
 			
-			if mode == :new || editingPrimaryPost
+			privateString = nil
+			
+			if new || editingPrimaryPost
 				expirationTime = now + PastebinConfiguration::ExpirationOptions[expirationIndex][1]
 				postExpiration = expiration == 0 ? nil : expirationTime
 			
@@ -172,41 +178,37 @@ class PastebinHandler < SiteContainer
 				privateString = isPrivate ? getPrivateString : nil
 			end
 			
-			#continue
-
-			if editing
-				if editingPrimaryPost
-					if editPost.isPrivate
-						if isPrivate
-							#the post remains private - reuse its private string in the refer(r)al
-							privateString = editPost.privateString
-						else
-							#the post was previously private and is now public
-							#this means that all its replies must now be made public, too
-							updatePostTreeVisibility(editPost.id, false)
-						end
+			if editingPrimaryPost
+				if editPost.isPrivate
+					if isPrivate
+						#the post remains private - reuse its private string in the refer(r)al
+						privateString = editPost.privateString
 					else
-						if isPrivate
-							#the post was previously public and is now private
-							#this means that all its replies must now be made private, too
-							updatePostTreeVisibility(editPost.id, true)
-						else
-							#the post remains public - no need to do anything
-						end
+						#the post was previously private and is now public
+						#this means that all its replies must now be made public, too
+						updatePostTreeVisibility(editPost.id, false)
 					end
-					
-					postData[:private_string] = privateString
+				else
+					if isPrivate
+						#the post was previously public and is now private
+						#this means that all its replies must now be made private, too
+						updatePostTreeVisibility(editPost.id, true)
+					else
+						#the post remains public - no need to do anything
+					end
 				end
+				
+				postData[:private_string] = privateString
+			end
+				
+			if modifyingPost
 				#increase the modification counter
 				postData[:modification_counter] = editPost.modificationCounter + 1
 				postData[:last_modification] = now
 				postId = editPost.id
 				@posts.where(id: postId).update(postData)
 			else
-				case mode
-				when :reply
-					privateString = parentPost.privateString
-				when :privateReply
+				if replying
 					privateString = parentPost.isPrivate ? getPrivateString : nil
 				end
 				postData[:private_string] = privateString
