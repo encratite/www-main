@@ -2,6 +2,12 @@ require 'SiteContainer'
 require 'PastebinForm'
 
 class PastebinHandler < SiteContainer
+	def createNewPost(request)
+		form = PastebinForm.new(request)
+		form.mode = :new
+		return @pastebinGenerator.get(['Pastebin', pastebinForm(form)], request)
+	end
+	
 	def viewPosts(request)
 		arguments = request.arguments
 		if arguments.empty?
@@ -48,42 +54,6 @@ class PastebinHandler < SiteContainer
 		end
 	end
 	
-	def createNewPost(request)
-		form = PastebinForm.new(request)
-		form.mode = :new
-		return @pastebinGenerator.get(['Pastebin', pastebinForm(form)], request)
-	end
-	
-	def createReply(request, isPrivate, target)
-		#check if the target is valid
-		if isPrivate
-			posts = @posts.where(private_string: target)
-		else
-			posts = @posts.where(id: target, private_string: nil)
-		end
-		mode = :reply
-		posts = posts.all
-		argumentError if posts.empty?
-		replyPost = PastebinPost.new(@database)
-		replyPost.transferSymbols(posts.first)
-		form = PastebinForm.new(request)
-		form.mode = mode
-		form.replyPost = replyPost
-		return @pastebinGenerator.get(['Reply to post', pastebinForm(form)], request)
-	end
-	
-	def submitNewPost(request)
-		return processPostSubmission(request, :new)
-	end
-	
-	def submitUnitModification(request)
-		return processPostSubmission(request, :edit)
-	end
-	
-	def submitReply(request)
-		return processPostSubmission(request, :reply)
-	end
-	
 	def viewPost(request, isPrivate, target)
 		post = nil
 		tree = nil
@@ -95,14 +65,8 @@ class PastebinHandler < SiteContainer
 		return showPastebinPost(request, post, tree)
 	end
 	
-	def editUnit(request, unitId, privateString)
-		isPrivate = privateString != nil
-		post = PastebinPost.new(@database)
-		@database.transaction do
-			post.editUnitQueryInitialisation(isPrivate, unitId, @database)
-			writePermissionCheck(request, post)
-			return editUnitForm(post, request)
-		end
+	def submitNewPost(request)
+		return processPostSubmission(request, :new)
 	end
 	
 	def download(request, unitId, privateString)
@@ -147,6 +111,42 @@ class PastebinHandler < SiteContainer
 			deletePostTree postId if deletedPost
 		end
 		return confirmUnitDeletion(post, request, deletedPost)
+	end
+	
+	def createReply(request, isPrivate, target)
+		#check if the target is valid
+		if isPrivate
+			posts = @posts.where(private_string: target)
+		else
+			posts = @posts.where(id: target, private_string: nil)
+		end
+		mode = :reply
+		posts = posts.all
+		argumentError if posts.empty?
+		replyPost = PastebinPost.new(@database)
+		replyPost.transferSymbols(posts.first)
+		form = PastebinForm.new(request)
+		form.mode = mode
+		form.replyPost = replyPost
+		return @pastebinGenerator.get(['Reply to post', pastebinForm(form)], request)
+	end
+	
+	def submitReply(request)
+		return processPostSubmission(request, :reply)
+	end
+	
+	def editUnit(request, unitId, privateString)
+		isPrivate = privateString != nil
+		post = PastebinPost.new(@database)
+		@database.transaction do
+			post.editUnitQueryInitialisation(isPrivate, unitId, @database)
+			writePermissionCheck(request, post)
+			return editUnitForm(post, request)
+		end
+	end	
+	
+	def submitUnitModification(request)
+		return processPostSubmission(request, :edit)
 	end
 	
 	def addUnit(request, isPrivate, target)
