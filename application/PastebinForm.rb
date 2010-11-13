@@ -70,9 +70,14 @@ class PastebinForm
 		:highlightingSelectionMode,
 		:lastSelection,
 		:expirationIndex,
+		
+		:isPrivate,
+		
 		:editUnitId,
+		
 		:editPost,
 		:replyPost,
+		
 		:mode,
 	)
 	

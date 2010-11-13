@@ -100,10 +100,10 @@ class PastebinHandler < SiteContainer
 				form.content = content
 				form.highlightingSelectionMode = highlightingSelectionMode
 				form.lastSelection = lastSelection
-				form.isPrivatePost = isPrivatePost
+				form.isPrivate = isPrivate
 				form.expirationIndex = expirationIndex
 				form.editUnitId = editUnitId
-				if editing
+				if modifyingPost
 					form.editPost = editPost
 				elsif replying
 					form.replyPost = parentPost

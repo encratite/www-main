@@ -268,6 +268,7 @@ class PastebinHandler < SiteContainer
 		form.highlightingSelectionMode = highlightingSelectionMode
 		form.lastSelection = lastSelection
 		form.expirationIndex = post.expirationIndex
+		form.isPrivate = post.isPrivate
 		form.editUnitId = unit.id
 		form.editPost = post
 		form.mode = :edit
@@ -282,6 +283,7 @@ class PastebinHandler < SiteContainer
 		form.postDescription = getDescriptionField post
 		form.expirationIndex = post.expirationIndex
 		form.editPost = post
+		form.isPrivate = post.isPrivate
 		form.mode = :addUnit
 		body = pastebinForm(form)
 		title = 'Add a unit to your post'
