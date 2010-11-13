@@ -56,8 +56,8 @@ class PastebinHandler < SiteContainer
 		
 		handlers =
 		[
-			[:submitNewPostHandler, 'submitNewPost', :submitNewPost, nil],
 			[:viewPostHandler, 'view', :viewPost, :post],
+			[:submitNewPostHandler, 'submitNewPost', :submitNewPost, nil],
 			[:downloadHandler, 'download', :download, :unit],
 			[:deletePostHandler, 'delete', :deletePost, :post],
 			[:deleteUnitHandler, 'deleteUnit', :deleteUnit, :unit],
@@ -267,11 +267,10 @@ class PastebinHandler < SiteContainer
 		form.content = unit.content
 		form.highlightingSelectionMode = highlightingSelectionMode
 		form.lastSelection = lastSelection
-		form.isPrivatePost = post.isPrivate
 		form.expirationIndex = post.expirationIndex
 		form.editUnitId = unit.id
 		form.editPost = post
-		form.mode = post.isPrivate ? :privateEdit : :edit
+		form.mode = :edit
 		body = pastebinForm(form)
 		title = 'Editing post'
 		return @pastebinGenerator.get([title, body], request)
@@ -281,10 +280,9 @@ class PastebinHandler < SiteContainer
 		form = PastebinForm.new(request)
 		form.author = post.editAuthor
 		form.postDescription = getDescriptionField post
-		form.isPrivatePost = post.isPrivate
 		form.expirationIndex = post.expirationIndex
 		form.editPost = post
-		form.mode = post.isPrivate ? :privateAddUnit : :addUnit
+		form.mode = :addUnit
 		body = pastebinForm(form)
 		title = 'Add a unit to your post'
 		return @pastebinGenerator.get([title, body], request)

@@ -120,13 +120,12 @@ class PastebinHandler < SiteContainer
 		else
 			posts = @posts.where(id: target, private_string: nil)
 		end
-		mode = :reply
 		posts = posts.all
 		argumentError if posts.empty?
 		replyPost = PastebinPost.new(@database)
 		replyPost.transferSymbols(posts.first)
 		form = PastebinForm.new(request)
-		form.mode = mode
+		form.mode = :reply
 		form.replyPost = replyPost
 		return @pastebinGenerator.get(['Reply to post', pastebinForm(form)], request)
 	end

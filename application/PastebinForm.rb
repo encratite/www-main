@@ -69,7 +69,6 @@ class PastebinForm
 		:content,
 		:highlightingSelectionMode,
 		:lastSelection,
-		:isPrivatePost,
 		:expirationIndex,
 		:editUnitId,
 		:editPost,
@@ -88,7 +87,6 @@ class PastebinForm
 		@content = nil
 		@highlightingSelectionMode = nil
 		@lastSelection = nil
-		@isPrivatePost = nil
 		@expirationIndex = nil
 		@editUnitId = nil
 		@replyPost = nil

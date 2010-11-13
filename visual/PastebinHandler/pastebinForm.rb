@@ -6,12 +6,22 @@ require 'configuration/loader'
 requireConfiguration 'cookie'
 
 class PastebinHandler < SiteContainer
+	def getPrivacyOptions(form)
+		privacyOptions =
+		[
+			WWWLib::SelectOption.new('Public post', '0', !form.isPrivatePost),
+			WWWLib::SelectOption.new('Private post', '1', form.isPrivatePost),
+		]
+	end
+	
 	def pastebinForm(form)
 		mode = form.mode
 		
-		editing = isEditMode(mode)
-		replying = isReplyMode(mode)
-		addingUnit = isAddUnitMode(mode)
+		new = mode == :new
+		editing = mode == :edit
+		replying = mode == :reply
+		addingUnit = mode == :addUnit
+		modifyingPost = editing || addingUnit
 		
 		output = ''
 		writer = SecuredFormWriter.new(output, form.request)
@@ -41,15 +51,9 @@ class PastebinHandler < SiteContainer
 		handlerMap =
 		{
 			new: @submitNewPostHandler,
-			
 			edit: @submitUnitModificationHandler,
-			privateEdit: @submitPrivateUnitModificationHandler,
-			
 			reply: @submitReplyHandler,
-			privateReply: @submitPrivateReplyHandler,
-			
-			addUnit: @addUnitHandler,
-			privateAddUnit: @addPrivateUnitHandler,
+			addUnit: @submitUnitHandler,
 		}
 		
 		handler = handlerMap[mode]
@@ -124,12 +128,6 @@ class PastebinHandler < SiteContainer
 			if form.isPrivatePost == nil
 				form.isPrivatePost = form.request.cookies[CookieConfiguration::Private] == '1'
 			end
-			
-			privacyOptions =
-			[
-				WWWLib::SelectOption.new('Public post', '0', !form.isPrivatePost),
-				WWWLib::SelectOption.new('Private post', '1', form.isPrivatePost),
-			]
 		
 			editPost = form.editPost
 			replyPost = form.replyPost
@@ -139,8 +137,9 @@ class PastebinHandler < SiteContainer
 			#-when editing a non-reply post
 			#-when adding a unit to a non-reply post
 			
-			if mode == :new || ((editing || addingUnit) && editPost.replyTo == nil)
-				writer.select(PastebinForm::PrivatePost,  privacyOptions, {label: 'Privacy options'})
+			modifyingRootPost = modifyingPost && editPost.replyTo == nil
+			if new || modifyingRootPost
+				writer.select(PastebinForm::PrivatePost,  getPrivacyOptions(form), {label: 'Privacy options'})
 
 				firstOffset = 0
 				
@@ -149,7 +148,7 @@ class PastebinHandler < SiteContainer
 					
 					if cookie != nil
 						begin
-							form.expirationIndex = Integer cookie
+							form.expirationIndex = Integer(cookie)
 						rescue ArgumentError
 							form.expirationIndex = firstOffset
 						end
@@ -179,23 +178,22 @@ class PastebinHandler < SiteContainer
 			case mode
 			when :new
 				writer.secureSubmit
-			when :edit, :privateEdit
+			when :edit, :addUnit
 				writer.hidden(PastebinForm::EditUnitId, form.editPost.id)
-				if mode == :privateEdit
-					writer.hidden(PastebinForm::EditPrivateString, form.editPost.privateString)
+				if form.editPost.isPrivate
+					writer.hidden(PastebinForm::PrivateString, form.editPost.privateString)
 				end
 				writer.secureSubmit('Edit')
-			when :reply, :privateReply
-				if mode == :reply
+			when :reply
+				if form.replyPost.isPrivate
 					writer.hidden(PastebinForm::ReplyPostId, form.replyPost.id)
 				else
 					writer.hidden(PastebinForm::ReplyPrivateString, form.replyPost.privateString)
 				end
 				writer.secureSubmit('Reply')
-			when :addUnit, :privateAddUnit
-				if mode == :addUnit
-					writer.hidden(PastebinForm::AddUnitPostId, form.editPost.id)
-				else
+			when :addUnit
+				writer.hidden(PastebinForm::AddUnitPostId, form.editPost.id)
+				if form.editPost.isPrivate
 					writer.hidden(PastebinForm::AddUnitPostPrivateString, form.editPost.privateString)
 				end
 				writer.secureSubmit('Add unit')
