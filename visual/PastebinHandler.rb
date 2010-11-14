@@ -271,7 +271,7 @@ class PastebinHandler < SiteContainer
 				description = trimString(post.bodyDescription, PastebinConfiguration::ListDescriptionLengthMaximum)
 				author = trimString(post.bodyAuthor, PastebinConfiguration::ListAuthorLengthMaximum)
 				writer.tr do
-					path = @viewPostHandler.getPath post.pastebinPostId.to_s
+					path = post.getPostPath(@viewPostHandler)
 					writer.td do
 						writer.a(href: path) do
 							description

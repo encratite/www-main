@@ -7,10 +7,11 @@ requireConfiguration 'cookie'
 
 class PastebinHandler < SiteContainer
 	def getPrivacyOptions(form)
+		isPrivate = form.isPrivate
 		privacyOptions =
 		[
-			WWWLib::SelectOption.new('Public post', '0', !form.isPrivatePost),
-			WWWLib::SelectOption.new('Private post', '1', form.isPrivatePost),
+			WWWLib::SelectOption.new('Public post', '0', !isPrivate),
+			WWWLib::SelectOption.new('Private post', '1', isPrivate),
 		]
 	end
 	
@@ -69,10 +70,11 @@ class PastebinHandler < SiteContainer
 		if handler == nil
 			raise "Encountered an unknown form mode: #{mode}"
 		end
+		return handler
 	end
 	
 	def writeTabScript(writer)
-		output.concat WWWLib.writeJavaScript(<<END
+		writer.write WWWLib.writeJavaScript(<<END
 showModeSelector();
 var content = document.getElementById('content');
 content.onkeydown = tabHandler;
@@ -129,7 +131,7 @@ END
 		writer.text('Description of the post (optional)', PastebinForm::PostDescription, form.postDescription, pasteFieldLength(:PostDescriptionLengthMaximum))
 	end
 	
-	def writeHighlightingSelectionMethod(form, writer, radioField)
+	def writeHighlightingSelectionMethod(form, writer)
 		formFields = formFields = getFormFields(form, writer)
 		
 		radioCounter = 0
@@ -238,6 +240,6 @@ END
 		
 		writeTabScript(writer)
 		
-		return output
+		return writer.output
 	end
 end

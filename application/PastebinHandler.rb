@@ -9,6 +9,7 @@ requireConfiguration 'pastebin'
 require 'visual/PastebinHandler'
 
 require 'PastebinHandler/processPostSubmission'
+require 'PastebinHandler/handler'
 
 require 'www-library/RequestManager'
 require 'www-library/random'
@@ -101,7 +102,7 @@ class PastebinHandler < SiteContainer
 				proxyMethod = actualMethod
 				argumentCount = nil
 			end
-			handler = WWWLib::RequestHandler.handler(name, proxyMethod, argumentCount)
+			handler = WWWLib::RequestHandler.handler(string, proxyMethod, argumentCount)
 			setMember(handlerSymbol, handler)
 		end
 		
