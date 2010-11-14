@@ -49,7 +49,8 @@ class PastebinPost < WWWLib::SymbolTransfer
 	
 	def transferSymbols(input)
 		super(input)
-		@id = @pastebinPostId
+		#required for ViewPosts
+		@id = @pastebinPostId if @pastebinPostId != nil
 	end
 	
 	def postInitialisation(isPrivate, target, fullPostInitialisation = true)
@@ -102,10 +103,10 @@ class PastebinPost < WWWLib::SymbolTransfer
 		return output
 	end
 	
-	def showPostQueryInitialisation(target, handler, request)
+	def showPostQueryInitialisation(isPrivate, target, handler, request)
 		dataset = @database.post
 		
-		if target.class == String
+		if isPrivate
 			postData = dataset.where(private_string: target)
 		else
 			postData = dataset.where(id: target, private_string: nil)

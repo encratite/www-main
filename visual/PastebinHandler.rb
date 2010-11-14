@@ -188,6 +188,8 @@ class PastebinHandler < SiteContainer
 		
 		links = []
 		actions.each do |handler, description|
+			#puts handler.inspect
+			puts description.inspect
 			linkWriter = WWWLib::HTMLWriter.new
 			linkWriter.a(href: post.getPostPath(handler)) { description }
 			links << linkWriter.output

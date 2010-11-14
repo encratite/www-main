@@ -59,7 +59,7 @@ class PastebinHandler < SiteContainer
 		tree = nil
 		@database.transaction do
 			post = PastebinPost.new(@database)
-			post.showPostQueryInitialisation(isPrivate, target, self, request, @database)
+			post.showPostQueryInitialisation(isPrivate, target, self, request)
 			tree = PostTree.new(@database, post)
 		end
 		return showPastebinPost(request, post, tree)
