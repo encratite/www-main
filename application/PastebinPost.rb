@@ -180,5 +180,22 @@ class PastebinPost < WWWLib::SymbolTransfer
 		
 		return
 	end
+	
+	def getPostPath(handler)
+		if @isPrivate
+			arguments = ['1', @privateString]
+		else
+			arguments = ['0', @id.to_s]
+		end
+		return handler.getPath(*arguments)
+	end
+	
+	def getUnitPath(handler, unit)
+		arguments = [unit.id.to_s]
+		if @isPrivate
+			arguments << @privateString
+		end
+		return handler.getPath(*arguments)
+	end
 end
 
