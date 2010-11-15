@@ -91,7 +91,7 @@ class PastebinHandler < SiteContainer
 	def deletePost(request, isPrivate, target)
 		post = PastebinPost.new(@database)
 		@database.transaction do
-			post.deletePostQueryInitialisation(isPrivate, target, @database)
+			post.deletePostQueryInitialisation(isPrivate, target)
 			writePermissionCheck(request, post)
 			deletePostTree postId
 		end
@@ -138,7 +138,7 @@ class PastebinHandler < SiteContainer
 		isPrivate = privateString != nil
 		post = PastebinPost.new(@database)
 		@database.transaction do
-			post.editUnitQueryInitialisation(isPrivate, unitId, @database)
+			post.editUnitQueryInitialisation(isPrivate, unitId)
 			writePermissionCheck(request, post)
 			return editUnitForm(post, request)
 		end

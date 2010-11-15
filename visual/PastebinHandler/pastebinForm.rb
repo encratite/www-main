@@ -20,7 +20,7 @@ class PastebinHandler < SiteContainer
 		when :new
 			writer.secureSubmit
 		when :edit, :addUnit
-			writer.hidden(PastebinForm::EditUnitId, form.editPost.id)
+			writer.hidden(PastebinForm::EditUnitId, form.editPost.activeUnit.id)
 			if form.editPost.isPrivate
 				writer.hidden(PastebinForm::PrivateString, form.editPost.privateString)
 			end

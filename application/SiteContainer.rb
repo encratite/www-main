@@ -26,8 +26,20 @@ class SiteContainer
 		randomString = request.getPost(SecuredFormWriter::RandomString)
 		formHash = request.getPost(SecuredFormWriter::HashField)
 		
-		fields = names.map { |name| request.getPost(name) }
-		fieldError if fields.include?(nil) || randomString == nil || formHash == nil
+		fieldError if randomString == nil || formHash == nil
+		missingSymbols = []
+		fields = names.map do |name|
+			output = request.getPost(name)
+			if output == nil
+				missingSymbols << name
+			end
+			output
+		end
+		
+		if !missingSymbols.empty?
+			puts "Missing symbols: #{missingSymbols.inspect}"
+			fieldError
+		end
 		
 		addressHash = fnv1a(request.address)
 		

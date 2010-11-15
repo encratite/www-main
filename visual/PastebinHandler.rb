@@ -71,7 +71,7 @@ class PastebinHandler < SiteContainer
 			id = unit.id.to_s
 			arguments = [id]
 				
-			unitActions << [downloadHandler, 'Download']
+			unitActions << [@downloadHandler, 'Download']
 			
 			if permission
 				unitActions +=
@@ -182,14 +182,15 @@ class PastebinHandler < SiteContainer
 			['Time created', post.creation]
 		]
 		
-		actions = [@createReplyHandler, 'Reply']
+		actions =
+		[
+			[@createReplyHandler, 'Reply']
+		]
 		permission = hasWriteAccess(request, post)
 		actions << [@deletePostHandler, 'Delete post'] if permission
 		
 		links = []
 		actions.each do |handler, description|
-			#puts handler.inspect
-			puts description.inspect
 			linkWriter = WWWLib::HTMLWriter.new
 			linkWriter.a(href: post.getPostPath(handler)) { description }
 			links << linkWriter.output

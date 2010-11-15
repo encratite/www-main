@@ -27,9 +27,9 @@ class PastebinHandler < SiteContainer
 			addUnit: :AddUnitPostFields,
 		}
 		
-		source = sourceMap[mode]
-		raise 'Invalid process submission mode specified' if source == nil
-		
+		sourceSymbol = sourceMap[mode]
+		raise 'Invalid process submission mode specified' if sourceSymbol == nil
+		source = PastebinForm.const_get(sourceSymbol)
 		input = processFormFields(request, source)
 
 		#CommonPostFields
@@ -140,10 +140,10 @@ class PastebinHandler < SiteContainer
 				
 			when :edit
 				#check if the unit ID is valid and determine the post associated with it
-				editUnitId = getInpost(request, :EditUnitId)
+				editUnitId = getIntPost(request, :EditUnitId)
 				argumentError if editUnitId == nil
 				editPost = PastebinPost.new(@database)
-				editPost.editPermissionQueryInitialisation(isPrivate, editUnitId, @database)
+				editPost.editPermissionQueryInitialisation(isPrivate, editUnitId)
 				argumentError if privateString != editPost.privateString
 				writePermissionCheck(request, editPost)
 				useReplyId.call(editPost.replyTo)
@@ -169,7 +169,7 @@ class PastebinHandler < SiteContainer
 			
 			if new || editingPrimaryPost
 				expirationTime = now + PastebinConfiguration::ExpirationOptions[expirationIndex][1]
-				postExpiration = expiration == 0 ? nil : expirationTime
+				postExpiration = expirationIndex == 0 ? nil : expirationTime
 			
 				postData[:expiration] = postExpiration
 				postData[:expiration_index] = expirationIndex

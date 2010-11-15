@@ -58,13 +58,13 @@ class PastebinPost < WWWLib::SymbolTransfer
 		#the data per row are rather small anyways, the actual problem is the content within the units
 		dataset = @database.post
 		if target.class == String
+			postData = dataset.where(private_string: target)
+		else
 			if isPrivate
 				postData = dataset.where(id: target)
 			else
 				postData = dataset.where(id: target, private_string: nil)
 			end
-		else
-			postData = dataset.where(private_string: target)
 		end
 		postData = postData.all
 		argumentError if postData.empty?
@@ -78,8 +78,8 @@ class PastebinPost < WWWLib::SymbolTransfer
 		return
 	end
 	
-	def unitInitialisation(isPrivate, id, fields, fullPostInitialisation = false, fullUnitInitialisation = true)
-		row = @database.unit.where(id: target).select(*fields).all
+	def unitInitialisation(isPrivate, unitId, fields, fullPostInitialisation = false, fullUnitInitialisation = true)
+		row = @database.unit.where(id: unitId).select(*fields).all
 		argumentError if row.empty?
 		unitData = row.first
 		unitData[:id] = unitId
@@ -89,16 +89,16 @@ class PastebinPost < WWWLib::SymbolTransfer
 		return postId
 	end
 	
-	def deleteUnitQueryInitialisation(isPrivate, target)
-		return unitInitialisation(isPrivate, target, [:post_id, :description, :paste_type])
+	def deleteUnitQueryInitialisation(isPrivate, unitId)
+		return unitInitialisation(isPrivate, unitId, [:post_id, :description, :paste_type])
 	end
 	
-	def editUnitQueryInitialisation(isPrivate, target)
-		return unitInitialisation(isPrivate, target, [:post_id, :description, :content, :paste_type], true)
+	def editUnitQueryInitialisation(isPrivate, unitId)
+		return unitInitialisation(isPrivate, unitId, [:post_id, :description, :content, :paste_type], true)
 	end
 	
-	def editPermissionQueryInitialisation(isPrivate, target)
-		output = unitInitialisation(isPrivate, target, [:post_id, :modification_counter], false, false)
+	def editPermissionQueryInitialisation(isPrivate, unitId)
+		output = unitInitialisation(isPrivate, unitId, [:post_id, :modification_counter], false, false)
 		@isPrivate = @privateString != nil
 		return output
 	end
