@@ -13,31 +13,24 @@ class PastebinPost < WWWLib::SymbolTransfer
 	NoDescription = 'No description'
 	
 	attr_reader(
-		:id,
 		:userId,
 		:user,
 		:units,
-		:name,
 		:author,
 		:bodyAuthor,
 		:noDescription,
-		:description,
 		:bodyDescription,
 		:pasteType,
-		:creation,
 		:contentSize,
-		:ip,
 		:activeUnit,
-		:modificationCounter,
-		:expiration,
-		:expirationIndex,
-		:privateString,
 		:editAuthor,
-		:replyTo,
 		:children,
 	)
 	
-	attr_accessor :pasteTypes, :isPrivate
+	attr_accessor(
+		:pasteTypes,
+		:isPrivate,
+	)
 	
 	def initialize(database)
 		@bodyAuthor = ''
@@ -202,6 +195,20 @@ class PastebinPost < WWWLib::SymbolTransfer
 			arguments << @privateString
 		end
 		return handler.getPath(*arguments)
+	end
+	
+	def self.publicEssentials(id)
+		output = PastebinPost.new(nil)
+		output.isPrivate = false
+		output.id = id
+		return output
+	end
+	
+	def self.privateEssentials(privateString)
+		output = PastebinPost.new(nil)
+		output.isPrivate = true
+		output.privateString = privateString
+		return output
 	end
 end
 

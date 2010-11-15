@@ -247,12 +247,7 @@ class PastebinHandler < SiteContainer
 				@units.insert(unitData)
 			end
 			
-			if privateString == nil
-				postPath = @viewPostHandler.getPath(postId)
-			else
-				postPath = @viewPrivatePostHandler.getPath(privateString)
-			end
-			
+			postPath = post.getPostPath(@viewPostHandler)
 			reply = WWWLib::HTTPReply.localRefer(request, postPath)
 			
 			if useSyntaxHighlighting
