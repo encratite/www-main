@@ -81,7 +81,7 @@ class PastebinHandler < SiteContainer
 					arguments = request.arguments
 					isPrivate = arguments[0].to_i == 1
 					target = arguments[1]
-					target = target.to_i if isPrivate
+					target = target.to_i if !isPrivate
 					actualMethod.call(request, isPrivate, target)
 				end
 				argumentCount = 2

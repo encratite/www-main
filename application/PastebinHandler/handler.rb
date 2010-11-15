@@ -103,7 +103,7 @@ class PastebinHandler < SiteContainer
 		deletedPost = nil
 		isPrivate = privateString != nil
 		@database.transaction do
-			postId = post.deleteUnitQueryInitialisation(isPrivate, unitId, @database)
+			postId = post.deleteUnitQueryInitialisation(isPrivate, unitId)
 			writePermissionCheck(request, post)
 			@units.where(id: unitId).delete
 			unitCount = @units.where(post_id: postId).count
@@ -114,16 +114,8 @@ class PastebinHandler < SiteContainer
 	end
 	
 	def createReply(request, isPrivate, target)
-		#check if the target is valid
-		if isPrivate
-			posts = @posts.where(private_string: target)
-		else
-			posts = @posts.where(id: target, private_string: nil)
-		end
-		posts = posts.all
-		argumentError if posts.empty?
 		replyPost = PastebinPost.new(@database)
-		replyPost.transferSymbols(posts.first)
+		replyPost.postInitialisation(isPrivate, target)
 		form = PastebinForm.new(request)
 		form.mode = :reply
 		form.replyPost = replyPost

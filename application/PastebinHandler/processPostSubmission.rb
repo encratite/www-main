@@ -149,14 +149,14 @@ class PastebinHandler < SiteContainer
 				useReplyId.call(editPost.replyTo)
 				
 			when :reply
-				target = isPrivate ? privateString : getPostInt(request, :ReplyPostId)
+				target = isPrivate ? privateString : getIntPost(request, :ReplyPostId)
 				argumentError if target == nil
 				parentPost = PastebinPost.new(@database)
 				parentPost.postInitialisation(isPrivate, target)
 				useReplyId.call(parentPost.id)
 				
 			when :addUnit
-				target = isPrivate ? privateString : getPostInt(request, :ReplyPostId)
+				target = isPrivate ? privateString : getIntPost(request, :AddUnitPostId)
 				argumentError if target == nil
 				addUnitPost = PastebinPost.new(@database)
 				addUnitPost.postInitialisation(isPrivate, target)
@@ -245,6 +245,12 @@ class PastebinHandler < SiteContainer
 			else
 				unitData[:time_added] = now
 				@units.insert(unitData)
+			end
+			
+			if privateString == nil
+				post = PastebinPost.publicEssentials(postId)
+			else
+				post = PastebinPost.privateEssentials(privateString)
 			end
 			
 			postPath = post.getPostPath(@viewPostHandler)

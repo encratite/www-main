@@ -55,10 +55,10 @@ class PastebinForm
 	]
 	
 	NewSubmissionPostFields = CommonPostFields + CreationPostFields
-	EditPostFields = NewSubmissionPostFields + [EditUnitId]
+	EditPostFields = CommonPostFields + [EditUnitId]
 	#ReplyPostId is only specified when it's a public post - otherwise it relies on PrivateString
 	ReplyPostFields = CommonPostFields
-	AddUnitPostFields = NewSubmissionPostFields + [AddUnitPostId]
+	AddUnitPostFields = CommonPostFields + [AddUnitPostId]
 	
 	attr_accessor(
 		:request,

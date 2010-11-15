@@ -15,28 +15,34 @@ class PastebinHandler < SiteContainer
 		]
 	end
 	
+	def writePrivateField(writer, post)
+		writer.hidden(PastebinForm::PrivateString, post.privateString)
+	end
+	
+	def conditionalPrivateField(writer, post)
+		if post.isPrivate
+			writePrivateField(writer, post)
+		end
+	end
+	
 	def createSubmissionSection(mode, writer, form)
 		case mode
 		when :new
 			writer.secureSubmit
-		when :edit, :addUnit
+		when :edit
 			writer.hidden(PastebinForm::EditUnitId, form.editPost.activeUnit.id)
-			if form.editPost.isPrivate
-				writer.hidden(PastebinForm::PrivateString, form.editPost.privateString)
-			end
+			conditionalPrivateField(writer, form.editPost)
 			writer.secureSubmit('Edit')
 		when :reply
 			if form.replyPost.isPrivate
-				writer.hidden(PastebinForm::ReplyPostId, form.replyPost.id)
+				writePrivateField(writer, form.replyPost)
 			else
-				writer.hidden(PastebinForm::ReplyPrivateString, form.replyPost.privateString)
+				writer.hidden(PastebinForm::ReplyPostId, form.replyPost.id)
 			end
 			writer.secureSubmit('Reply')
 		when :addUnit
 			writer.hidden(PastebinForm::AddUnitPostId, form.editPost.id)
-			if form.editPost.isPrivate
-				writer.hidden(PastebinForm::AddUnitPostPrivateString, form.editPost.privateString)
-			end
+			conditionalPrivateField(writer, form.editPost)
 			writer.secureSubmit('Add unit')
 		end
 	end
