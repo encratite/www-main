@@ -158,8 +158,8 @@ class PastebinHandler < SiteContainer
 			when :addUnit
 				target = isPrivate ? privateString : getIntPost(request, :AddUnitPostId)
 				argumentError if target == nil
-				addUnitPost = PastebinPost.new(@database)
-				addUnitPost.postInitialisation(isPrivate, target)
+				editPost = PastebinPost.new(@database)
+				editPost.postInitialisation(isPrivate, target)
 			end
 			
 			editingPrimaryPost = modifyingPost && editPost.replyTo == nil

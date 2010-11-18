@@ -78,6 +78,7 @@
 table.descriptionTable
 {
 	margin: 0 0 1em 0;
+	clear: both;
 }
 
 table.descriptionTable td.description
@@ -122,6 +123,7 @@ ul.contentList
 	border: 1px solid black;
 	border-left: none;
 	float: left;
+	margin-bottom: 1em;
 }
 
 ul.contentList li
@@ -160,7 +162,6 @@ ul.contentList span, ul.contentList a
 
 ul.postTree
 {
-	padding-top: 2em;
 	clear: both;
 }
 

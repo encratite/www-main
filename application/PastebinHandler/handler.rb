@@ -143,7 +143,7 @@ class PastebinHandler < SiteContainer
 	def addUnit(request, isPrivate, target)
 		post = PastebinPost.new(@database)
 		@database.transaction do
-			post.postInitialisation(isPrivate, target, @database, true)
+			post.postInitialisation(isPrivate, target, true)
 			writePermissionCheck(request, post)
 			return addUnitForm(post, request)
 		end
