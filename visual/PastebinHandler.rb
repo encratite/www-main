@@ -42,84 +42,80 @@ class PastebinHandler < SiteContainer
 
 	def processPastebinUnits(writer, post, permission)
 		unitOffset = 1
-		writer.ul do
-			post.units.each do |unit|
-				unitFields = []
+		post.units.each do |unit|
+			unitFields = []
+			
+			unitCount = post.units.size
+			
+			
+			if unitCount > 1
+				unitFields << ['Unit', "#{unitOffset}/#{unitCount}"]
+			end
 				
-				unitCount = post.units.size
+			if !unit.noDescription
+				unitFields << ['Description',  unit.bodyDescription]
+			end
+			
+			unitFields +=
+			[
+				['Type', unit.bodyPasteType],
+				['Size', WWWLib.getSizeString(unit.content.size)],
+			]
+			
+			if unit.timeAdded != post.creation
+				unitFields << ['Time added', unit.timeAdded]
+			end
+			
+			unitActions = []
+			
+			id = unit.id.to_s
+			arguments = [id]
 				
-				
-				if unitCount > 1
-					unitFields << ['Unit', "#{unitOffset}/#{unitCount}"]
-				end
-					
-				if !unit.noDescription
-					unitFields << ['Description',  unit.bodyDescription]
-				end
-				
-				unitFields +=
+			unitActions << [@downloadHandler, 'Download']
+			
+			if permission
+				unitActions +=
 				[
-					['Type', unit.bodyPasteType],
-					['Size', WWWLib.getSizeString(unit.content.size)],
+					[@editUnitHandler, 'Edit'],
+					[@deleteUnitHandler, 'Delete'],
 				]
-				
-				if unit.timeAdded != post.creation
-					unitFields << ['Time added', unit.timeAdded]
-				end
-				
-				unitActions = []
-				
-				id = unit.id.to_s
-				arguments = [id]
-					
-				unitActions << [@downloadHandler, 'Download']
-				
-				if permission
-					unitActions +=
-					[
-						[@editUnitHandler, 'Edit'],
-						[@deleteUnitHandler, 'Delete'],
-					]
-				end
-				
-				actions = []
-				unitActions.each do |handler, description|
-					linkWriter = WWWLib::HTMLWriter.new
-					linkWriter.a(href: post.getUnitPath(handler, unit)) { description }
-					actions << linkWriter.output
-				end
-				
-				actionsString = actions.join(', ')
-				
-				unitFields << ['Actions', actionsString]
-				
-				getModificationFields(unitFields, unit)
-				
-				writer.li do
-					writer.table(class: 'descriptionTable') do
-						unitFields.each do |description, value|
-							writer.tr do
-								writer.td(class: 'description') { description }
-								writer.td { value.to_s }
-							end
-						end
+			end
+			
+			actions = []
+			unitActions.each do |handler, description|
+				linkWriter = WWWLib::HTMLWriter.new
+				linkWriter.a(href: post.getUnitPath(handler, unit)) { description }
+				actions << linkWriter.output
+			end
+			
+			actionsString = actions.join(', ')
+			
+			unitFields << ['Actions', actionsString]
+			
+			getModificationFields(unitFields, unit)
+			
+			writer.table(class: 'descriptionTable') do
+				unitFields.each do |description, value|
+					writer.tr do
+						writer.td(class: 'description') { description }
+						writer.td { value.to_s }
 					end
 				end
-				
-				content = unit.highlightedContent || unit.content
-				
-				#generate a minimal amount of HTML entities to achieve the desired spacing
-				space = '&nbsp;'
-				content = content.gsub("\t", ' ' * 4)
-				content = content.gsub('  ', "#{space} ")
-				content = content.gsub("\r", '')
-				
-				contentLines = content.split "\n"
-				
-				renderContentAsList(writer, contentLines)
-				
-				unitOffset += 1
 			end
+			
+			content = unit.highlightedContent || unit.content
+			
+			#generate a minimal amount of HTML entities to achieve the desired spacing
+			space = '&nbsp;'
+			content = content.gsub("\t", ' ' * 4)
+			content = content.gsub('  ', "#{space} ")
+			content = content.gsub("\r", '')
+			
+			contentLines = content.split "\n"
+			
+			renderContentAsList(writer, contentLines)
+			
+			unitOffset += 1
 		end
 	end
 	
@@ -351,6 +347,7 @@ class PastebinHandler < SiteContainer
 			else
 				title = 'Unit deleted'
 			end
+			nil
 		end
 		return @pastebinGenerator.get([title, writer.output], request)
 	end

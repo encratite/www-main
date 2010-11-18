@@ -165,8 +165,6 @@ class PastebinHandler < SiteContainer
 			editingPrimaryPost = modifyingPost && editPost.replyTo == nil
 			argumentError if editingPrimaryPost && [privatePost, expirationIndex].include?(nil)
 			
-			privateString = nil
-			
 			if new || editingPrimaryPost
 				expirationTime = now + PastebinConfiguration::ExpirationOptions[expirationIndex][1]
 				postExpiration = expirationIndex == 0 ? nil : expirationTime
