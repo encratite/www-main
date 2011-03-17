@@ -17,65 +17,65 @@ require 'www-library/RequestHandler'
 require 'www-library/debug'
 
 class MainSite
-	attr_accessor :requestManager, :mainHandler
-	
-	def initialize
-		@database = getDatabaseObject
-		@sessionManager = SessionManager.new @database
-		
-		@requestManager = WWWLib::RequestManager.new(lambda { |environment| SiteRequest.new(@sessionManager, environment) } )
-		@mainHandler = WWWLib::RequestHandler.new('main')
-		@requestManager.addHandler @mainHandler
-		
-		@generator = getSiteGenerator
-		@pastebinGenerator = getSiteGenerator(['pastebin'], ['pastebin'])
-		
-		#set up additional addresses which will be able to view debugging output on exceptions thrown by scripts right in the browser
-		SiteConfiguration::DebuggingAddresses.each do |address|
-			WWWLib::PrivilegedAddresses.add(address)
-		end
-	end
-	
-	def getDatabaseObject
-		database =
-		Sequel.connect(
-			adapter: DatabaseConfiguration::Adapter,
-			host: DatabaseConfiguration::Host,
-			user: DatabaseConfiguration::User,
-			password: DatabaseConfiguration::Password,
-			database: DatabaseConfiguration::Database
-		)
-		return Database.new(database)
-	end
-	
-	def getSiteGenerator(stylesheets = [], scripts = [])
-		stylesheets = ['base'] + stylesheets
-		scripts = ['hash'] + scripts
-		output = MainSiteGenerator.new @requestManager
-		stylesheets.each { |path| output.addStylesheet(getStylesheet path) }
-		scripts.each { |script| output.addScript(getScript script) }
-		return output
-	end
-	
-	def getCookie(name, value)
-		sessionCookie = WWWLib::Cookie.new(name, value, mainHandler.getPath)
-		sessionCookie.expirationDays SiteConfiguration::CookieDurationInDays
-		return sessionCookie
-	end
-	
-	def getStaticPath(base, file)
-		return @mainHandler.getPath(SiteConfiguration::StaticDirectory, base, file)
-	end
+  attr_accessor :requestManager, :mainHandler
 
-	def getStylesheet(name)
-		getStaticPath(SiteConfiguration::StylesheetDirectory, name + '.css')
-	end
+  def initialize
+    @database = getDatabaseObject
+    @sessionManager = SessionManager.new @database
 
-	def getImage(file)
-		getStaticPath(SiteConfiguration::ImageDirectory, file)
-	end
+    @requestManager = WWWLib::RequestManager.new(lambda { |environment| SiteRequest.new(@sessionManager, environment) } )
+    @mainHandler = WWWLib::RequestHandler.new('main')
+    @requestManager.addHandler @mainHandler
 
-	def getScript(name)
-		getStaticPath(SiteConfiguration::ScriptDirectory, name + '.js')
-	end
+    @generator = getSiteGenerator
+    @pastebinGenerator = getSiteGenerator(['pastebin'], ['pastebin'])
+
+    #set up additional addresses which will be able to view debugging output on exceptions thrown by scripts right in the browser
+    SiteConfiguration::DebuggingAddresses.each do |address|
+      WWWLib::PrivilegedAddresses.add(address)
+    end
+  end
+
+  def getDatabaseObject
+    database =
+      Sequel.connect(
+                     adapter: DatabaseConfiguration::Adapter,
+                     host: DatabaseConfiguration::Host,
+                     user: DatabaseConfiguration::User,
+                     password: DatabaseConfiguration::Password,
+                     database: DatabaseConfiguration::Database
+                     )
+    return Database.new(database)
+  end
+
+  def getSiteGenerator(stylesheets = [], scripts = [])
+    stylesheets = ['base'] + stylesheets
+    scripts = ['hash'] + scripts
+    output = MainSiteGenerator.new @requestManager
+    stylesheets.each { |path| output.addStylesheet(getStylesheet path) }
+    scripts.each { |script| output.addScript(getScript script) }
+    return output
+  end
+
+  def getCookie(name, value)
+    sessionCookie = WWWLib::Cookie.new(name, value, mainHandler.getPath)
+    sessionCookie.expirationDays SiteConfiguration::CookieDurationInDays
+    return sessionCookie
+  end
+
+  def getStaticPath(base, file)
+    return @mainHandler.getPath(SiteConfiguration::StaticDirectory, base, file)
+  end
+
+  def getStylesheet(name)
+    getStaticPath(SiteConfiguration::StylesheetDirectory, name + '.css')
+  end
+
+  def getImage(file)
+    getStaticPath(SiteConfiguration::ImageDirectory, file)
+  end
+
+  def getScript(name)
+    getStaticPath(SiteConfiguration::ScriptDirectory, name + '.js')
+  end
 end

@@ -1,195 +1,195 @@
 *
 {
-	font-family: "Arial", sans-serif;
-	font-size: small;
-	margin: 0;
-	padding: 0;
+    font-family: "Arial", sans-serif;
+    font-size: small;
+    margin: 0;
+    padding: 0;
 }
 
 body
 {
-	color: #000000;
-	background: #ffffff;
+    color: #000000;
+    background: #ffffff;
 }
 
 a
 {
-	color: #008aff;
-	text-decoration: none;
-	background: none;
+    color: #008aff;
+    text-decoration: none;
+    background: none;
 }
 
 a:visited
 {
-	color: #0078de;
+    color: #0078de;
 }
 
 a:active
 {
-	color: #30a0ff;
+    color: #30a0ff;
 }
 
 a:hover
 {
-	color: #ffa200;
+    color: #ffa200;
 }
 
 p
 {
-	text-align: justify;
-	margin: 0 0 0.8em 0;
-	width: 64em;
+    text-align: justify;
+    margin: 0 0 0.8em 0;
+    width: 64em;
 }
 
 li
 {
-	list-style-type: none;
+    list-style-type: none;
 }
 
 input
 {
-	color: #000;
-	border: 1px solid #000;
-	background-color: #f8f8f8;
-	padding: 0.1em 0.4em 0.2em 0.4em;
+    color: #000;
+    border: 1px solid #000;
+    background-color: #f8f8f8;
+    padding: 0.1em 0.4em 0.2em 0.4em;
 }
 
 input.radio
 {
-	border: none;
-	background: none;
+    border: none;
+    background: none;
 }
 
 input.submit
 {
-	padding: 0 0.4em 0 0.4em;
+    padding: 0 0.4em 0 0.4em;
 }
 
 textarea
 {
-	color: #000;
-	border: 1px solid #000;
-	background-color: #f8f8f8;
+    color: #000;
+    border: 1px solid #000;
+    background-color: #f8f8f8;
 }
 
 select
 {
-	color: #000;
-	border: 1px solid #000;
-	background-color: #f8f8f8;
+    color: #000;
+    border: 1px solid #000;
+    background-color: #f8f8f8;
 }
 
 option
 {
-	padding: 0 0.2em 0 0.2em;
-	vertical-align: middle;
-	background-color: #f8f8f8;
+    padding: 0 0.2em 0 0.2em;
+    vertical-align: middle;
+    background-color: #f8f8f8;
 }
 
 table
 {
-	border-collapse: collapse;
-	background-color: #f8f8f8;
-	margin: 0 0 1em 0;
+    border-collapse: collapse;
+    background-color: #f8f8f8;
+    margin: 0 0 1em 0;
 }
 
 table p
 {
-	width: auto;
+    width: auto;
 }
 
 th
 {
-	border: 1px solid #000;
-	background-color: #e0e0e0;
+    border: 1px solid #000;
+    background-color: #e0e0e0;
 }
 
 td
 {
-	border: 1px solid #000;
-	vertical-align: top;
+    border: 1px solid #000;
+    vertical-align: top;
 }
 
 pre
 {
-	font-family: "Lucida Console", monospace;
-	margin: 0;
-	padding: 0;
+    font-family: "Lucida Console", monospace;
+    margin: 0;
+    padding: 0;
 }
 
 p.security
 {
-	display: none;
+    display: none;
 }
 
 p.indent
 {
-	margin-left: 2em;
+    margin-left: 2em;
 }
 
 ul.error
 {
-	margin: 0 0 1em 2em;
+    margin: 0 0 1em 2em;
 }
 
 ul.error li
 {
-	list-style-type: square;
-	color: #ff0000;
+    list-style-type: square;
+    color: #ff0000;
 }
 
 ul.formLabel
 {
-	padding-bottom: 0.5em;
+    padding-bottom: 0.5em;
 }
 
 ul.formLabel li
 {
-	padding-bottom: 0.1em;
+    padding-bottom: 0.1em;
 }
 
 #siteContent
 {
-	margin: 2em 2em 2em 2em;
+    margin: 2em 2em 2em 2em;
 }
 
 ul.menu
 {
-	white-space: nowrap;
-	padding: 3px 0 2px 2em;
+    white-space: nowrap;
+    padding: 3px 0 2px 2em;
 }
 
 ul.menu li
 {
-	font-weight: bold;
-	display: inline;
-	padding-right: 2px;
+    font-weight: bold;
+    display: inline;
+    padding-right: 2px;
 }
 
 ul.menu a
 {
-	text-decoration: none;
-	color: #fff;
-	padding: 0 2em 0 2em;
-	border: 1px solid black;
+    text-decoration: none;
+    color: #fff;
+    padding: 0 2em 0 2em;
+    border: 1px solid black;
 }
 
 #menu1 a
 {
-	background-color: #808080;
+    background-color: #808080;
 }
 
 #menu1 a:hover
 {
-	background-color: #000;
+    background-color: #000;
 }
 
 #menu2 a
 {
-	background-color: #b0b0b0;
+    background-color: #b0b0b0;
 }
 
 #menu2 a:hover
 {
-	background-color: #000;
+    background-color: #000;
 }

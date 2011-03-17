@@ -18,7 +18,7 @@ userHandler.addLogoutMenu
 EnvironmentHandler.new mainSite
 
 handler = lambda do |environment|
-	mainSite.requestManager.handleRequest(environment)
+  mainSite.requestManager.handleRequest(environment)
 end
 
 run(handler)
