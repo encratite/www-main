@@ -28,8 +28,9 @@ class PastebinPost < WWWLib::SymbolTransfer
               )
 
   attr_accessor(
-		:pasteTypes,
-		:isPrivate,
+                :id,
+                :pasteTypes,
+                :isPrivate,
                 )
 
   def initialize(database)
@@ -211,4 +212,3 @@ class PastebinPost < WWWLib::SymbolTransfer
     return output
   end
 end
-
