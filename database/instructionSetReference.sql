@@ -31,7 +31,7 @@ create table instruction_opcode
 
 create index instruction_opcode_instruction_id_index on instruction_opcode(instruction_id);
 
-drop table instruction_opcode_encoding if exists;
+drop table if exists instruction_opcode_encoding cascade;
 
 create table instruction_opcode_encoding
 (
@@ -43,7 +43,7 @@ create table instruction_opcode_encoding
 
 create index instruction_opcode_encoding_instruction_id_index on instruction_opcode_encoding(instruction_id);
 
-drop instruction_opcode_encoding_description if exists;
+drop table if exists instruction_opcode_encoding_description cascade;
 
 create table instruction_opcode_encoding_description
 (
@@ -52,8 +52,6 @@ create table instruction_opcode_encoding_description
         instruction_opcode_encoding_id integer references instruction_opcode_encoding(id),
         description text not null
 );
-
-create index instruction_opcode_encoding_description_instruction_opcode_encoding_id on instruction_opcode_encoding_description(instruction_opcode_encoding_id);
 
 create index instruction_opcode_encoding_description_instruction_opcode_encoding_id_index on instruction_opcode_encoding_description(instruction_opcode_encoding_id);
 
