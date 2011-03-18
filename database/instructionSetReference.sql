@@ -24,12 +24,38 @@ create table instruction_opcode
         opcode text not null,
         mnemonic_description text not null,
         encoding_identifier text,
-        long_mode_validity text not null,
-        legacy_mode_validity text not null,
+        long_mode_validity text,
+        legacy_mode_validity text,
         description text not null
 );
 
 create index instruction_opcode_instruction_id_index on instruction_opcode(instruction_id);
+
+drop table instruction_opcode_encoding if exists;
+
+create table instruction_opcode_encoding
+(
+        id serial primary key,
+
+        instruction_id integer references instruction(id),
+        identifier text not null
+);
+
+create index instruction_opcode_encoding_instruction_id_index on instruction_opcode_encoding(instruction_id);
+
+drop instruction_opcode_encoding_description if exists;
+
+create table instruction_opcode_encoding_description
+(
+        id serial primary key,
+
+        instruction_opcode_encoding_id integer references instruction_opcode_encoding(id),
+        description text not null
+);
+
+create index instruction_opcode_encoding_description_instruction_opcode_encoding_id on instruction_opcode_encoding_description(instruction_opcode_encoding_id);
+
+create index instruction_opcode_encoding_description_instruction_opcode_encoding_id_index on instruction_opcode_encoding_description(instruction_opcode_encoding_id);
 
 drop table if exists instruction_exception_category cascade;
 
