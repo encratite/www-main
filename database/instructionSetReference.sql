@@ -37,7 +37,7 @@ create table instruction_exception_category
 (
         id serial primary key,
 
-        category_name text not null,
+        category_name text not null
 );
 
 drop table if exists instruction_exception cascade;
@@ -47,7 +47,7 @@ create table instruction_exception
         id serial primary key,
 
         instruction_id integer references instruction(id),
-        category_id integer references instruction_exception_description(id),
+        category_id integer references instruction_exception_category(id),
 
         exception_name text,
         description text not null
