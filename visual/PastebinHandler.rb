@@ -13,11 +13,11 @@ require 'visual/PastebinHandler/pastebinForm'
 class PastebinHandler < SiteContainer
   HighlightingGroups =
     [
-     'Use no syntax highlighting (plain text)',
-     "Common programming languages (#{SyntaxHighlighting::CommonScripts.size} available)",
-     "All syntax highlighting types (#{SyntaxHighlighting::AllScripts.size} available)",
-     'Expert mode (manually specify the name of a vim script)'
-    ]
+    'Use no syntax highlighting (plain text)',
+    "Common programming languages (#{SyntaxHighlighting::CommonScripts.size} available)",
+    "All syntax highlighting types (#{SyntaxHighlighting::AllScripts.size} available)",
+    'Expert mode (manually specify the name of a vim script)'
+  ]
 
   PlainTextHighlightingIndex = 0
   AllSyntaxHighlightingTypesIndex = 2
@@ -58,9 +58,9 @@ class PastebinHandler < SiteContainer
 
       unitFields +=
         [
-         ['Type', unit.bodyPasteType],
-         ['Size', WWWLib.getSizeString(unit.content.size)],
-        ]
+        ['Type', unit.bodyPasteType],
+        ['Size', WWWLib.getSizeString(unit.content.size)],
+      ]
 
       if unit.timeAdded != post.creation
         unitFields << ['Time added', unit.timeAdded]
@@ -76,9 +76,9 @@ class PastebinHandler < SiteContainer
       if permission
         unitActions +=
           [
-           [@editUnitHandler, 'Edit'],
-           [@deleteUnitHandler, 'Delete'],
-          ]
+          [@editUnitHandler, 'Edit'],
+          [@deleteUnitHandler, 'Delete'],
+        ]
       end
 
       actions = []
@@ -98,8 +98,8 @@ class PastebinHandler < SiteContainer
         unitFields.each do |description, value|
           writer.tr do
             writer.td(class: 'description') { description }
-                      writer.td { value.to_s }
-                    end
+            writer.td { value.to_s }
+          end
         end
       end
 
@@ -117,7 +117,7 @@ class PastebinHandler < SiteContainer
 
       unitOffset += 1
     end
-                 end
+  end
 
   def renderContentAsList(writer, contentLines)
     writer.ul(class: 'lineNumbers') do
@@ -131,8 +131,8 @@ class PastebinHandler < SiteContainer
       nil
     end
 
-              isEven = false
-              writer.ul(class: 'contentList') do
+    isEven = false
+    writer.ul(class: 'contentList') do
       lineCounter = 1
       contentLines.each do |line|
         if lineCounter == contentLines.size
@@ -141,86 +141,86 @@ class PastebinHandler < SiteContainer
           lineClass = isEven ? 'evenLine' : 'oddLine'
         end
         writer.li(class: lineClass) { line }
-                  isEven = !isEven
-                  lineCounter += 1
-                end
+        isEven = !isEven
+        lineCounter += 1
+      end
     end
   end
 
-                        def drawPostTree(writer, post, isRoot = true)
-                          treeRootClass = 'postTreeRoot'
-                          listClass = isRoot ? treeRootClass : 'postTreeChild'
-                          writer.li(class: listClass, newlineType: :final) do
+  def drawPostTree(writer, post, isRoot = true)
+    treeRootClass = 'postTreeRoot'
+    listClass = isRoot ? treeRootClass : 'postTreeChild'
+    writer.li(class: listClass, newlineType: :final) do
       target = post.getPostPath(@viewPostHandler)
       writer.a(href: target) do
         post.bodyDescription
       end
     end
-                                    children = post.children
-                                    if !children.empty?
-                                      arguments = {newlineType: :full}
-                                      if isRoot
-                                        arguments[:class] = treeRootClass
-                                      end
-                                      writer.tagCall('li', arguments) do
+    children = post.children
+    if !children.empty?
+      arguments = {newlineType: :full}
+      if isRoot
+        arguments[:class] = treeRootClass
+      end
+      writer.tagCall('li', arguments) do
         writer.ul(class: 'innerPostTree') do
           children.each do |child|
             drawPostTree(writer, child, false)
           end
         end
-                end
+      end
     end
-                                    end
+  end
 
-                                    def showPastebinPost(request, post, tree)
-                                      writer = WWWLib::HTMLWriter.new
+  def showPastebinPost(request, post, tree)
+    writer = WWWLib::HTMLWriter.new
 
-                                      fields =
-                                        [
-                                         ['Author', post.bodyAuthor],
-                                         ['Description', getDescription(post, false)],
-                                         ['Time created', post.creation]
-                                        ]
+    fields =
+      [
+      ['Author', post.bodyAuthor],
+      ['Description', getDescription(post, false)],
+      ['Time created', post.creation]
+    ]
 
-                                      actions =
-                                        [
-                                         [@createReplyHandler, 'Reply']
-                                        ]
-                                      permission = hasWriteAccess(request, post)
-                                      if permission
-                                        actions +=
-                                          [
-                                           [@addUnitHandler, 'Add unit'],
-                                           [@deletePostHandler, 'Delete post'],
-                                          ]
-                                      end
+    actions =
+      [
+      [@createReplyHandler, 'Reply']
+    ]
+    permission = hasWriteAccess(request, post)
+    if permission
+      actions +=
+        [
+        [@addUnitHandler, 'Add unit'],
+        [@deletePostHandler, 'Delete post'],
+      ]
+    end
 
-                                      links = []
-                                      actions.each do |handler, description|
+    links = []
+    actions.each do |handler, description|
       linkWriter = WWWLib::HTMLWriter.new
       linkWriter.a(href: post.getPostPath(handler)) { description }
       links << linkWriter.output
     end
 
-                                      fields << ['Actions', links.join(', ')]
+    fields << ['Actions', links.join(', ')]
 
-                                      getModificationFields(fields, post)
+    getModificationFields(fields, post)
 
-                                      if post.expiration != nil
-                                        fields << ['Expires', post.expiration]
-                                      end
+    if post.expiration != nil
+      fields << ['Expires', post.expiration]
+    end
 
-                                      unitCount = post.units.size
-                                      if unitCount > 1
-                                        fields << ['Number of units', unitCount]
-                                      end
+    unitCount = post.units.size
+    if unitCount > 1
+      fields << ['Number of units', unitCount]
+    end
 
-                                      writer.table(class: 'descriptionTable') do
+    writer.table(class: 'descriptionTable') do
       fields.each do |description, value|
         writer.tr do
           writer.td(class: 'description') { description }
-                    writer.td { value.to_s }
-                  end
+          writer.td { value.to_s }
+        end
       end
     end
 
@@ -232,12 +232,12 @@ class PastebinHandler < SiteContainer
         writer.li { 'Posts in this thread:' }
         drawPostTree(writer, root)
       end
-              end
-
-      title = "#{getDescription(post)} - Pastebin"
-
-      return @pastebinGenerator.get([title, writer.output], request)
     end
+
+    title = "#{getDescription(post)} - Pastebin"
+
+    return @pastebinGenerator.get([title, writer.output], request)
+  end
 
   def getTypeString(post)
     limit = 3
@@ -263,12 +263,12 @@ class PastebinHandler < SiteContainer
 
     columns =
       [
-       'Description',
-       'Author',
-       'Type',
-       'Size',
-       'Date',
-      ]
+      'Description',
+      'Author',
+      'Type',
+      'Size',
+      'Date',
+    ]
 
     writer.table(class: 'postList') do
       writer.tr do
@@ -291,10 +291,10 @@ class PastebinHandler < SiteContainer
           sizeString = WWWLib.getSizeString(post.contentSize)
 
           [
-           author,
-           typeString,
-           sizeString,
-           post.creation.to_s
+            author,
+            typeString,
+            sizeString,
+            post.creation.to_s
           ].each do |column|
             writer.td { column }
           end
@@ -302,31 +302,31 @@ class PastebinHandler < SiteContainer
       end
     end
 
-                 if page == 1
-                   title = 'Most recent pastes'
-                 else
-                   title = "Viewing pastes - page #{page}/#{pageCount}"
-                 end
+    if page == 1
+      title = 'Most recent pastes'
+    else
+      title = "Viewing pastes - page #{page}/#{pageCount}"
+    end
 
-                 return [title, writer.output]
-               end
+    return [title, writer.output]
+  end
 
-    def confirmPostDeletion(post, request)
-      title = 'Post deleted'
-      writer = WWWLib::HTMLWriter.new
-      writer.p do
+  def confirmPostDeletion(post, request)
+    title = 'Post deleted'
+    writer = WWWLib::HTMLWriter.new
+    writer.p do
       writer.write 'Your post '
       writer.b { "\"#{post.bodyDescription}\"" }
       writer.write ' and all the replies to it have been removed.'
     end
-      return @pastebinGenerator.get([title, writer.output], request)
-    end
+    return @pastebinGenerator.get([title, writer.output], request)
+  end
 
-    def confirmUnitDeletion(post, request, deletedPost)
-      unit = post.activeUnit
-      writer = WWWLib::HTMLWriter.new
-      title = nil
-      writer.p do
+  def confirmUnitDeletion(post, request, deletedPost)
+    unit = post.activeUnit
+    writer = WWWLib::HTMLWriter.new
+    title = nil
+    writer.p do
       if unit.noDescription
         writer.write "Your #{unit.bodyDescription} unit has been deleted."
       else
@@ -349,10 +349,10 @@ class PastebinHandler < SiteContainer
       end
       nil
     end
-      return @pastebinGenerator.get([title, writer.output], request)
-    end
-
-    def getDescriptionField(object)
-      return object.noDescription ? '' : object.description
-    end
+    return @pastebinGenerator.get([title, writer.output], request)
   end
+
+  def getDescriptionField(object)
+    return object.noDescription ? '' : object.description
+  end
+end

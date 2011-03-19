@@ -61,24 +61,24 @@ class PastebinForm
   AddUnitPostFields = CommonPostFields + [AddUnitPostId]
 
   attr_accessor(
-		:request,
-		:errors,
-		:author,
-		:postDescription,
-		:unitDescription,
-		:content,
-		:highlightingSelectionMode,
-		:lastSelection,
-		:expirationIndex,
+                :request,
+                :errors,
+                :author,
+                :postDescription,
+                :unitDescription,
+                :content,
+                :highlightingSelectionMode,
+                :lastSelection,
+                :expirationIndex,
 
-		:isPrivate,
+                :isPrivate,
 
-		:editUnitId,
+                :editUnitId,
 
-		:editPost,
-		:replyPost,
+                :editPost,
+                :replyPost,
 
-		:mode,
+                :mode,
                 )
 
   #valid modes: :new, :edit, :reply, :addUnit

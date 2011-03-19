@@ -13,6 +13,6 @@ class InstructionSetReferenceHandler < SiteContainer
   end
 
   def instructionList(request)
-    
+    instructions = @database.instruction.select(:instruction_name, :summary)
   end
 end

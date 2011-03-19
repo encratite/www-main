@@ -5,6 +5,7 @@ create table instruction
         id serial primary key,
 
         instruction_name text not null,
+        summary text not null,
         description text not null,
         pseudo_code text,
         flags_affected text,
