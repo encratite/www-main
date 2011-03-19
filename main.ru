@@ -6,12 +6,14 @@ require 'IndexHandler'
 require 'UserHandler'
 require 'PastebinHandler'
 require 'EnvironmentHandler'
+require 'InstructionSetReferenceHandler'
 
 mainSite = MainSite.new
 
 IndexHandler.new mainSite
 userHandler = UserHandler.new mainSite
 PastebinHandler.new mainSite
+InstructionSetReferenceHandler.new mainSite
 
 userHandler.addLogoutMenu
 
