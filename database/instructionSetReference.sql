@@ -6,7 +6,7 @@ create table instruction
 
         instruction_name text not null,
         description text not null,
-        pseudo_code text not null,
+        pseudo_code text,
         flags_affected text,
         fpu_flags_affected text
 );
