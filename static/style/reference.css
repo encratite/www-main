@@ -29,7 +29,7 @@ p
     margin-left: 2em;
 }
 
-#instructionOpcodeTable
+table
 {
     max-width: 90em;
 }
@@ -47,4 +47,15 @@ span.invalidField
 span.validField
 {
     color: #00b000;
+}
+
+#instructionDescription ul
+{
+    margin: 0 0 1em 4em;
+}
+
+
+#instructionDescription li
+{
+    list-style-type: circle;
 }

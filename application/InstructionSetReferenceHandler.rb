@@ -50,7 +50,18 @@ class InstructionSetReferenceHandler < SiteContainer
       end
       encodings[identifier] = descriptions
     end
-    content = printViewInstruction(instruction, opcodes, encodings)
+    exceptionCategories = {}
+    exceptions = @database.instructionException.where(instruction_id: instructionId).left_outer_join(:instruction_exception_category, :id => :category_id).all
+    exceptions.each do |exception|
+      category = exception[:category_name]
+      categoryExceptions = exceptionCategories[category]
+      if categoryExceptions == nil
+        categoryExceptions = []
+      end
+      categoryExceptions << exception
+      exceptionCategories[category] = categoryExceptions
+    end
+    content = printViewInstruction(instruction, opcodes, encodings, exceptionCategories)
     return generate("#{instruction} - #{MainTitle}", content, request)
   end
 end

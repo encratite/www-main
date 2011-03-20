@@ -97,7 +97,56 @@ EOF
     end
   end
 
-  def printViewInstruction(instruction, opcodes, encodings)
+  def isExceptionTable(exceptions)
+    test = exceptions.first
+    return test[:exception_name] != nil
+  end
+
+  def writeExceptions(writeTitle, writer, exceptionCategories)
+    puts exceptionCategories.inspect
+    return if exceptionCategories.empty?
+    writeTitle.call('Exceptions')
+    exceptionCategories.each do |category, exceptions|
+      writer.h3 { category }
+      #writeTitle.call(category)
+      if isExceptionTable(exceptions)
+        writer.table do
+          writer.tr do
+            ['Exception', 'Description'].each do |title|
+              writer.th { title }
+            end
+          end
+          exceptions.each do |exception|
+            writer.tr do
+              fields = [
+                :exception_name,
+                :description,
+              ]
+              fields.each do |symbol|
+                value = exception[symbol]
+                writer.td { value }
+              end
+            end
+          end
+        end
+      else
+        exceptions = exceptions.map do |exception|
+          exception[:description]
+        end
+        if exceptions.size == 1
+          writer.p { exceptions.first }
+        else
+          writer.ul do
+            exceptions.each do |description|
+              writer.li { description }
+            end
+          end
+        end
+      end
+    end
+  end
+
+  def printViewInstruction(instruction, opcodes, encodings, exceptionCategories)
     instructionId = instruction[:id]
     name = instruction[:instruction_name]
     summary = instruction[:summary]
@@ -147,6 +196,7 @@ EOF
       writeTitle.call('FPU Flags Affected')
       writer.p(id: 'instructionFPUFlagsAffected') { fpuFlagsAffected }
     end
+    writeExceptions(writeTitle, writer, exceptionCategories)
     return writer.output
   end
 end
