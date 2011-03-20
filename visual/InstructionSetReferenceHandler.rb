@@ -103,7 +103,6 @@ EOF
   end
 
   def writeExceptions(writeTitle, writer, exceptionCategories)
-    puts exceptionCategories.inspect
     return if exceptionCategories.empty?
     writeTitle.call('Exceptions')
     exceptionCategories.each do |category, exceptions|
@@ -118,13 +117,13 @@ EOF
           end
           exceptions.each do |exception|
             writer.tr do
-              fields = [
-                :exception_name,
-                :description,
-              ]
-              fields.each do |symbol|
-                value = exception[symbol]
-                writer.td { value }
+              name = exception[:exception_name]
+              description = exception[:description]
+              if name == nil
+                writer.td(colspan: 2) { description }
+              else
+                writer.td { name }
+                writer.td { description }
               end
             end
           end
