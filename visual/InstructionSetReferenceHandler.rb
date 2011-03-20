@@ -34,20 +34,35 @@ EOF
 
   def processOpcode(writer, opcode)
     fields = [
-      :opcode,
-      :mnemonic_description,
-      :encoding_identifier,
-      :long_mode_validity,
-      :legacy_mode_validity,
-      :description,
+      [:opcode, false],
+      [:mnemonic_description, false],
+      [:encoding_identifier, false],
+      [:long_mode_validity, true],
+      [:legacy_mode_validity, true],
+      [:description, false],
     ]
+    colours = {
+      'Invalid' => 'invalidField',
+      'Valid' => 'validField',
+    }
     writer.tr do
-      fields.each do |symbol|
+      fields.each do |symbol, isValidityField|
         value = opcode[symbol]
         if value == nil
           value = 'None'
         end
-        writer.td { value }
+        writer.td do
+          if isValidityField
+            validityClass = colours[value]
+            if validityClass == nil
+              value
+            else
+              writer.span(class: validityClass) { value }
+            end
+          else
+            value
+          end
+        end
       end
     end
   end

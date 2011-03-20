@@ -38,3 +38,13 @@ table
 {
     margin-left: 2em;
 }
+
+span.invalidField
+{
+    color: #ff0000;
+}
+
+span.validField
+{
+    color: #00b000;
+}
