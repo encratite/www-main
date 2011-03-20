@@ -12,11 +12,11 @@ class Database
     floodProtection: :flood_protection,
 
     instruction: :instruction,
-    instruction_opcode: :instructionOpcode,
-    instruction_opcode_encoding: :instructionOpcodeEncoding,
-    instruction_opcode_encoding_description: :instructionOpcodeEncodingDescription,
-    instruction_exception_category: :instructionExceptionCategory,
-    instruction_exception: :instructionException,
+    instructionOpcode: :instruction_opcode,
+    instructionOpcodeEncoding: :instruction_opcode_encoding,
+    instructionOpcodeEncodingDescription: :instruction_opcode_encoding_description,
+    instructionExceptionCategory: :instruction_exception_category,
+    instructionException: :instruction_exception,
   }
 
   def initialize(database)

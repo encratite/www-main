@@ -32,21 +32,61 @@ EOF
     return writer.output
   end
 
-  def printViewInstruction(instructionRow)
-    instructionId = instructionRow[:id]
-    name = instructionRow[:instruction_name]
-    summary = instructionRow[:summary]
-    description = instructionRow[:description]
+  def processOpcode(writer, opcode)
+    fields = [
+      :opcode,
+      :mnemonic_description,
+      :encoding_identifier,
+      :long_mode_validity,
+      :legacy_mode_validity,
+      :description,
+    ]
+    writer.tr do
+      fields.each do |symbol|
+        value = opcode[symbol]
+        if value == nil
+          value = 'None'
+        end
+        writer.td { value }
+      end
+    end
+  end
+
+  def printViewInstruction(instruction, opcodes)
+    instructionId = instruction[:id]
+    name = instruction[:instruction_name]
+    summary = instruction[:summary]
+    description = instruction[:description]
     #the following three entries may be NULL
-    pseudoCode = instructionRow[:pseudo_code]
-    flagsAffected = instructionRow[:flags_affected]
-    fpuFlagsAffected = instructionRow[:fpu_flags_affected]
+    pseudoCode = instruction[:pseudo_code]
+    flagsAffected = instruction[:flags_affected]
+    fpuFlagsAffected = instruction[:fpu_flags_affected]
     writer = WWWLib::HTMLWriter.new
     writeTitle = lambda do |title|
       writer.h2(id: 'instructionSectionTitle') { title }
     end
     writer.h1(id: 'instructionTitle') { name }
     writer.p(id: 'instructionSummary') { summary }
+    writeTitle.call('Opcodes')
+    writer.table(id: 'instructionOpcodeTable') do
+      writer.tr do
+        headers = [
+          'Hex',
+          'Mnemonic',
+          'Encoding',
+          'Long Mode',
+          'Legacy Mode',
+          'Description',
+        ]
+        headers.each do |header|
+          writer.th { header }
+        end
+      end
+      opcodes.each do |opcode|
+        processOpcode(writer, opcode)
+      end
+      nil
+    end
     writeTitle.call('Description')
     writer.div(id: 'instructionDescription') { description }
     if pseudoCode != nil

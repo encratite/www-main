@@ -30,13 +30,15 @@ class InstructionSetReferenceHandler < SiteContainer
   end
 
   def viewInstruction(request)
-    instruction = request.arguments.first
-    instructionRows = @database.instruction.where(instruction_name: instruction).all
+    instructionName = request.arguments.first
+    instructionRows = @database.instruction.where(instruction_name: instructionName).all
     if instructionRows.empty?
       argumentError
     end
-    instructionRow = instructionRows.first
-    content = printViewInstruction(instructionRow)
+    instruction = instructionRows.first
+    instructionId = instruction[:id]
+    opcodes = @database.instructionOpcode.where(instruction_id: instructionId)
+    content = printViewInstruction(instruction, opcodes)
     return generate("#{instruction} - #{MainTitle}", content, request)
   end
 end
