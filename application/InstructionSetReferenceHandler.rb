@@ -38,7 +38,19 @@ class InstructionSetReferenceHandler < SiteContainer
     instruction = instructionRows.first
     instructionId = instruction[:id]
     opcodes = @database.instructionOpcode.where(instruction_id: instructionId)
-    content = printViewInstruction(instruction, opcodes)
+    opcodeEncodingRows = @database.instructionOpcodeEncoding.where(instruction_id: instructionId)
+    encodings = {}
+    opcodeEncodingRows.each do |opcodeEncodingRow|
+      id = opcodeEncodingRow[:id]
+      identifier = opcodeEncodingRow[:identifier]
+      descriptions = []
+      encodingDescriptionRows = @database.instructionOpcodeEncodingDescription.where(instruction_opcode_encoding_id: id)
+      encodingDescriptionRows.each do |encodingDescriptionRow|
+        descriptions << encodingDescriptionRow[:description]
+      end
+      encodings[identifier] = descriptions
+    end
+    content = printViewInstruction(instruction, opcodes, encodings)
     return generate("#{instruction} - #{MainTitle}", content, request)
   end
 end

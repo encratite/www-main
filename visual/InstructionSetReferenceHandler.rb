@@ -52,7 +52,37 @@ EOF
     end
   end
 
-  def printViewInstruction(instruction, opcodes)
+  def writeEncodings(writer, encodings)
+    encodings.each do |identifier, descriptions|
+      writer.tr do
+        writer.td { identifier }
+        descriptions.each do |description|
+          writer.td { description }
+        end
+        nil
+      end
+    end
+    return
+  end
+
+  def writeEncodingTable(writeTitle, writer, encodings)
+    return if encodings.empty?
+    writeTitle.call('Instruction Operand Encoding')
+    writer.table(id: 'instructionEncodingsTable') do
+      writer.tr do
+        fields = ['Op/En']
+        4.times do |i|
+          fields << "Operand #{i}"
+        end
+        fields.each do |field|
+          writer.th { field }
+        end
+      end
+      writeEncodings(writer, encodings)
+    end
+  end
+
+  def printViewInstruction(instruction, opcodes, encodings)
     instructionId = instruction[:id]
     name = instruction[:instruction_name]
     summary = instruction[:summary]
@@ -87,6 +117,7 @@ EOF
       end
       nil
     end
+    writeEncodingTable(writeTitle, writer, encodings)
     writeTitle.call('Description')
     writer.div(id: 'instructionDescription') { description }
     if pseudoCode != nil
