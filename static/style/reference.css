@@ -1,0 +1,30 @@
+#instructionListDescription
+{
+    margin-bottom: 2em;
+}
+
+#instructionList td
+{
+    padding: 0 0.5em 0 0.5em;
+}
+
+#instructionSummary
+{
+    margin-left: 2em;
+    font-style: italic;
+    font-size: 1.2em;
+}
+
+#instructionPseudoCode
+{
+    display: table;
+    margin: 0 0 1em 2em;
+    padding: 0.5em;
+    border: 1px solid black;
+    background-color: #f8f8f8;
+}
+
+p
+{
+    margin-left: 2em;
+}

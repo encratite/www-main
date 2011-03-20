@@ -1,6 +1,6 @@
 require 'www-library/HTMLWriter'
 
-def visualIndex()
+def visualIndex
   writer = WWWLib::HTMLWriter.new
   writer.p { 'After coming into contact with a religious man, I always feel the need to wash my hands.' }
   return writer.output

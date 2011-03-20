@@ -23,7 +23,7 @@ def hashError
 end
 
 def argumentError
-  puts getStackTrace
+  #puts getStackTrace
   plainError 'You have specified invalid arguments.'
 end
 

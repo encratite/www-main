@@ -12,6 +12,6 @@ class IndexHandler < SiteContainer
   end
 
   def getIndex(request)
-    @generator.get([Description, visualIndex], request)
+    @generator.get([Description, visualIndex()], request)
   end
 end
