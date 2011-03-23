@@ -113,37 +113,9 @@ class PastebinHandler < SiteContainer
 
       contentLines = content.split "\n"
 
-      renderContentAsList(writer, contentLines)
+      WWWLib.getCodeList(writer, content)
 
       unitOffset += 1
-    end
-  end
-
-  def renderContentAsList(writer, contentLines)
-    writer.ul(class: 'lineNumbers') do
-      lineCounter = 1
-      contentLines.size.times do |i|
-        arguments = {}
-        arguments[:class] = 'lastLine' if lineCounter == contentLines.size
-        writer.li(arguments) { lineCounter.to_s }
-        lineCounter += 1
-      end
-      nil
-    end
-
-    isEven = false
-    writer.ul(class: 'contentList') do
-      lineCounter = 1
-      contentLines.each do |line|
-        if lineCounter == contentLines.size
-          lineClass = isEven ? 'evenLastLine' : 'oddLastLine'
-        else
-          lineClass = isEven ? 'evenLine' : 'oddLine'
-        end
-        writer.li(class: lineClass) { line }
-        isEven = !isEven
-        lineCounter += 1
-      end
     end
   end
 

@@ -44,7 +44,7 @@ module SyntaxHighlighting
   end
 
   def self.highlight(script, code)
-    output = WWWLib.syntaxHighlighting(script, code, 'vim')
+    output = WWWLib.getSyntaxHighlightedMarkup(script, code, 'vim')
     if output == nil
       plainError 'Unable to extract the highlighted code from the vim output.'
     end
