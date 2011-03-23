@@ -1,17 +1,13 @@
-require 'fileutils'
-
 require 'SecuredFormWriter'
 require 'error'
 
 require 'configuration/loader'
 requireConfiguration 'VimSyntax'
 
-require 'nil/file'
-
 require 'www-library/HTML'
-require 'www-library/string'
+require 'www-library/syntaxHighlighting'
 
-class SyntaxHighlighting
+module SyntaxHighlighting
   def self.generateList(isCommon)
     output = []
     VimSyntax::Scripts.each do |script|
@@ -28,7 +24,7 @@ class SyntaxHighlighting
     VimSyntax::Scripts.each do |file, description|
       return true if file == script
     end
-    return fakse
+    return false
   end
 
   def self.getSelectionList(isCommon, selection)
@@ -47,58 +43,12 @@ class SyntaxHighlighting
     return output
   end
 
-  def self.highlight(script, input)
-    outputFile = Tempfile.new('outputFile')
-    outputFile.close
-
-    input = input.delete("\r")
-    inputFile = Tempfile.new('inputFile')
-    inputFile << input
-    inputFile.close
-
-    flags = ['f', 'n', 'X', 'e', 's']
-
-    vimDirectory = Nil.joinPaths(Dir.home, '.vim')
-    #scriptFile = 'pastebin.vim'
-    scriptFile = 'pastebin.vim'
-    localPath = Nil.joinPaths('vim', scriptFile)
-    scriptPath = Nil.joinPaths('syntax', scriptFile)
-    fullPath = Nil.joinPaths(vimDirectory, scriptPath)
-
-    FileUtils.mkdir_p(File.dirname(fullPath))
-    FileUtils.cp(localPath, fullPath)
-
-    vimCommands =
-      [
-       "set filetype=#{script}",
-       'set background=light',
-       'set wrap linebreak textwidth=0',
-       'syntax on',
-       'let html_use_css=1',
-       "run #{scriptPath}",
-       "wq! #{outputFile.path}",
-       'q',
-      ]
-
-    flags = flags.map { |flag| "-#{flag}" }
-    flags = flags.join ' '
-
-    vimCommands = vimCommands.map { |cFlag| "-c \"#{cFlag}\"" }
-    vimCommands = vimCommands.join ' '
-
-    #output = system "#{PastebinConfiguration::VimPath} #{flags} #{vimCommands} #{inputFile.path}"
-    #plainError 'A vim error occured' if !output
-    line = "#{PastebinConfiguration::VimPath} #{flags} #{vimCommands} #{inputFile.path}"
-    output = `#{line}`
-
-    markup = outputFile.open.read
-
-    code = WWWLib.extractString(markup, "<pre>\n", "</pre>")
-    if code == nil
-      plainError 'Unable to extract code from vim output.'
+  def self.highlight(script, code)
+    output = WWWLib.syntaxHighlighting(script, code, 'vim')
+    if output == nil
+      plainError 'Unable to extract the highlighted code from the vim output.'
     end
-
-    return code
+    return output
   end
 
   def self.getScriptDescription(script)

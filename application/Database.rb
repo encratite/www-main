@@ -3,6 +3,8 @@ require 'nil/symbol'
 class Database
   include SymbolicAssignment
 
+  attr_reader :connection
+
   TableMap =
     {
     user: :site_user,

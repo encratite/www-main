@@ -33,6 +33,4 @@ class PastebinConfiguration
      ['One day', DayHours * HourSeconds],
      ['One week', WeekDays * DayHours * HourSeconds]
     ]
-
-  VimPath = 'vim'
 end
