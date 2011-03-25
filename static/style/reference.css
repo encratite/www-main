@@ -3,11 +3,6 @@
     margin-bottom: 2em;
 }
 
-td, th
-{
-    padding: 0 0.5em 0 0.5em;
-}
-
 #instructionSummary
 {
     margin-left: 2em;
@@ -27,11 +22,6 @@ td, th
 p
 {
     margin-left: 2em;
-}
-
-table
-{
-    max-width: 90em;
 }
 
 table

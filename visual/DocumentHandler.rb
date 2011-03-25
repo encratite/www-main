@@ -24,4 +24,12 @@ class DocumentHandler < SiteContainer
     end
     return writer.output
   end
+
+  def renderViewDocument(document)
+    writer = WWWLib::HTMLWriter.new
+    writer.div(id: 'document') do
+      document
+    end
+    return writer.output
+  end
 end

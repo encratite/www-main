@@ -25,7 +25,7 @@ class PastebinHandler < SiteContainer
     super
     @posts = @database.post
     @units = @database.unit
-    @pastebinGenerator = @generatorMethod.call(['pastebin'], ['pastebin'])
+    @pastebinGenerator = @generatorMethod.call(['pastebin', 'syntaxHighlighting'], ['pastebin'])
   end
 
   def installHandlers

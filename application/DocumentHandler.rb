@@ -16,7 +16,7 @@ class DocumentHandler < SiteContainer
 
   def initialize(site)
     super
-    @documentGenerator = @generatorMethod.call(['documents', 'syntaxHighlighting'])
+    @documentGenerator = @generatorMethod.call(['document', 'syntaxHighlighting'])
   end
 
   def installHandlers
@@ -35,7 +35,8 @@ class DocumentHandler < SiteContainer
     document = request.arguments.first
     Documents.each do |title, description, base|
       next if base != document
-      content = Nil.readFile(Nil.joinPaths('static', 'document', base, "#{base}.html"))
+      document = Nil.readFile(Nil.joinPaths('static', 'document', base, "#{base}.html"))
+      content = renderViewDocument(document)
       return @documentGenerator.get([title, content], request)
     end
     argumentError

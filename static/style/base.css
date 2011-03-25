@@ -56,17 +56,20 @@ p
 {
     text-align: justify;
     margin: 0 0 0.8em 0;
-    width: 64em;
 }
 
-li
+ol
+{
+    margin: 0 0 1em 4em;
+}
+
+ul li
 {
     list-style-type: none;
 }
 
 ul.regular
 {
-    width: 62em;
     margin-left: 2em;
 }
 
@@ -131,12 +134,14 @@ th
 {
     border: 1px solid #000;
     background-color: #e0e0e0;
+    padding: 0 1em 0 1em;
 }
 
 td
 {
     border: 1px solid #000;
     vertical-align: top;
+    padding: 0 1em 0 1em;
 }
 
 pre
@@ -179,13 +184,14 @@ ul.formLabel li
 
 #siteContent
 {
-    margin: 2em 2em 2em 2em;
+    margin: 32px;
+    width: 1200px;
 }
 
 ul.menu
 {
     white-space: nowrap;
-    padding: 3px 0 2px 2em;
+    padding: 3px 0 2px 32px;
 }
 
 ul.menu li
