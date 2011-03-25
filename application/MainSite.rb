@@ -28,8 +28,7 @@ class MainSite
     @requestManager.addHandler @mainHandler
 
     @generator = getSiteGenerator
-    @pastebinGenerator = getSiteGenerator(['pastebin'], ['pastebin'])
-    @referenceGenerator = getSiteGenerator(['reference'])
+    @generatorMethod = method(:getSiteGenerator)
 
     #set up additional addresses which will be able to view debugging output on exceptions thrown by scripts right in the browser
     SiteConfiguration::DebuggingAddresses.each do |address|

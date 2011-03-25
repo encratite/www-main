@@ -10,6 +10,7 @@ class InstructionSetReferenceHandler < SiteContainer
 
   def initialize(site)
     super
+    @referenceGenerator = @generatorMethod.call(['reference'])
   end
 
   def installHandlers
