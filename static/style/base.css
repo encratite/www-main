@@ -64,6 +64,17 @@ li
     list-style-type: none;
 }
 
+ul.regular
+{
+    width: 62em;
+    margin-left: 2em;
+}
+
+ul.regular li
+{
+    list-style-type: square;
+}
+
 input
 {
     color: #000;
