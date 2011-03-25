@@ -16,7 +16,7 @@ class DocumentHandler < SiteContainer
       Documents.each do |title, description, base|
         writer.li do
           writer.b do
-            writer.a(href: @viewDocumentHandler.getPath(base)) { title }
+            writer.a(href: @viewDocumentHandler.getSlashPath(base)) { title }
           end
           writer.write ": #{description}"
         end
