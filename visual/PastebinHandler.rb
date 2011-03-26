@@ -40,13 +40,13 @@ class PastebinHandler < SiteContainer
     return post.bodyDescription
   end
 
-  def processPastebinUnits(writer, post, permission)
+  def processPastebinUnits(post, permission)
+    writer = WWWLib::HTMLWriter.new
     unitOffset = 1
     post.units.each do |unit|
       unitFields = []
 
       unitCount = post.units.size
-
 
       if unitCount > 1
         unitFields << ['Unit', "#{unitOffset}/#{unitCount}"]
@@ -104,19 +104,10 @@ class PastebinHandler < SiteContainer
       end
 
       content = unit.highlightedContent || unit.content
-
-      #generate a minimal amount of HTML entities to achieve the desired spacing
-      space = '&nbsp;'
-      content = content.gsub("\t", ' ' * 4)
-      content = content.gsub('  ', "#{space} ")
-      content = content.gsub("\r", '')
-
-      contentLines = content.split "\n"
-
       WWWLib.getCodeTable(writer, content)
-
       unitOffset += 1
     end
+    return WWWLib.fixWhitespace(writer.output)
   end
 
   def drawPostTree(writer, post, isRoot = true)
@@ -196,7 +187,8 @@ class PastebinHandler < SiteContainer
       end
     end
 
-    processPastebinUnits(writer, post, permission)
+    unitContent = processPastebinUnits(post, permission)
+    writer.write(unitContent)
 
     root = tree.root
     if !root.children.empty?
