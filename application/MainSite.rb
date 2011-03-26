@@ -51,7 +51,7 @@ class MainSite
   def getSiteGenerator(stylesheets = [], scripts = [])
     stylesheets = ['base'] + stylesheets
     scripts = ['hash'] + scripts
-    output = MainSiteGenerator.new @requestManager
+    output = MainSiteGenerator.new(self, @requestManager)
     stylesheets.each { |path| output.addStylesheet(getStylesheet path) }
     scripts.each { |script| output.addScript(getScript script) }
     return output
