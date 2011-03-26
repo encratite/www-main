@@ -189,45 +189,37 @@ ul.formLabel li
     margin-right: auto;
 }
 
-ul.menu
+div.menu
 {
-    white-space: nowrap;
-    padding: 0.5em 0 0.5em 0;
+    padding: 1px 0 1px 4em;
 }
 
-ul.menu li
-{
-    font-weight: bold;
-    display: inline;
-    padding-right: 2px;
-}
-
-ul.menu a
+div.menu a
 {
     text-decoration: none;
     color: #fff;
-    padding: 0.1em 2em 0.1em 2em;
-    border: 1px solid black;
+    font-weight: bold;
+    margin-right: 2em;
 }
 
-#menu1 a
+#menu1
 {
-    background-color: #808080;
+    background-color: #000;
 }
 
 #menu1 a:hover
 {
-    background-color: #000;
+    color: #808080;
 }
 
-#menu2 a
+#menu2
 {
-    background-color: #b0b0b0;
+    background-color: #606060;
 }
 
 #menu2 a:hover
 {
-    background-color: #000;
+    color: #000000;
 }
 
 #menuContainer
@@ -237,5 +229,5 @@ ul.menu a
 
 #logo
 {
-    margin-left: 6em;
+    display: block;
 }

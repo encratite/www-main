@@ -7,17 +7,16 @@ class MenuRenderer
     writer = WWWLib::HTMLWriter.new
     level = 1
     menu.each do |menuLevel|
-      writer.ul(class: 'menu', id: "menu#{level}") do
+      writer.div(class: 'menu', id: "menu#{level}") do
         menuLevel.each do |item|
           if item.condition.(request)
-            writer.li do
-              writer.a(href: WWWLib.slashify(item.path)) { item.description }
-            end
+            path = item.path.reject { |x| x == nil }
+            writer.a(href: WWWLib.slashify(path)) { item.description }
           end
         end
       end
-                level += 1
-              end
+      level += 1
+    end
     return writer.output
   end
-  end
+end
