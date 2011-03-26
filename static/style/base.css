@@ -184,14 +184,15 @@ ul.formLabel li
 
 #siteContent
 {
-    margin: 32px;
-    width: 1200px;
+    width: 1260px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 ul.menu
 {
     white-space: nowrap;
-    padding: 3px 0 2px 32px;
+    padding: 0.5em 0 0.5em 0;
 }
 
 ul.menu li
@@ -205,7 +206,7 @@ ul.menu a
 {
     text-decoration: none;
     color: #fff;
-    padding: 0 2em 0 2em;
+    padding: 0.1em 2em 0.1em 2em;
     border: 1px solid black;
 }
 
@@ -227,4 +228,9 @@ ul.menu a
 #menu2 a:hover
 {
     background-color: #000;
+}
+
+#menuContainer
+{
+    margin-bottom: 1em;
 }

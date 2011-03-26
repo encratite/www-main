@@ -35,3 +35,33 @@ span.monospace
 {
     vertical-align: middle;
 }
+
+span.red
+{
+    font-family: "Lucida Console", monospace;
+    color: #ff0000;
+}
+
+span.green
+{
+    font-family: "Lucida Console", monospace;
+    color: #00a000;
+}
+
+span.bitShift
+{
+    font-family: "Lucida Console", monospace;
+    color: #ff0000;
+}
+
+p.codeTitle
+{
+    font-family: "Lucida Console", monospace;
+    margin: 0 0 0 4em;
+    color: #a0a0a0;
+}
+
+table.function td
+{
+    text-align: center;
+}

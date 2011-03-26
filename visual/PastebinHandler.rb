@@ -113,7 +113,7 @@ class PastebinHandler < SiteContainer
 
       contentLines = content.split "\n"
 
-      WWWLib.getCodeList(writer, content)
+      WWWLib.getCodeTable(writer, content)
 
       unitOffset += 1
     end
