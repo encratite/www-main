@@ -19,6 +19,12 @@ require 'www-library/debug'
 class MainSite
   attr_accessor :requestManager, :mainHandler
 
+  Icon = 'caput'
+
+  MetaKeywords = 'assembly,asm,programming,optimization,optimisation,c,c++,x86,pastebin,opcode,opcodes,dictionary,intel,amd,download,downloads,tutorial'
+  MetaDescription = 'x86 assembly tutorials, x86/x64 opcode reference, programming, pastebin with syntax highlighting'
+  MetaRobots = 'index, follow'
+
   def initialize
     @database = getDatabaseObject
     @sessionManager = SessionManager.new @database
@@ -52,7 +58,10 @@ class MainSite
     stylesheets = ['base'] + stylesheets
     scripts = ['hash'] + scripts
     output = MainSiteGenerator.new(self, @requestManager)
-    output.setIcon(getIcon('caput'))
+    output.setIcon(getIcon(Icon))
+    output.setMeta('keywords', MetaKeywords)
+    output.setMeta('description', MetaDescription)
+    output.setMeta('robots', MetaRobots)
     stylesheets.each { |path| output.addStylesheet(getStylesheet path) }
     scripts.each { |script| output.addScript(getScript script) }
     return output
