@@ -1,6 +1,7 @@
 require 'SiteContainer'
 
 require 'www-library/HTMLWriter'
+require 'www-library/HTML'
 
 class InstructionSetReferenceHandler < SiteContainer
   def printInstructionList(rows)
@@ -185,7 +186,7 @@ EOF
     writer.div(id: 'instructionDescription') { description }
     if pseudoCode != nil
       writeTitle.call('Pseudo Code')
-      writer.pre(id: 'instructionPseudoCode') { pseudoCode }
+      writer.pre(id: 'instructionPseudoCode') { WWWLib::HTMLEntities.encode(pseudoCode) }
     end
     if flagsAffected != nil
       writeTitle.call('Flags Affected')
