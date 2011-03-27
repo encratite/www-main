@@ -1,8 +1,9 @@
-class SiteConfiguration
+module SiteConfiguration
   StaticDirectory = 'static'
   StylesheetDirectory = 'style'
   ImageDirectory = 'image'
   ScriptDirectory = 'script'
+  IconDirectory = 'icon'
 
   GeneralStringLengthMaximum = 128
 

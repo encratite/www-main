@@ -52,6 +52,7 @@ class MainSite
     stylesheets = ['base'] + stylesheets
     scripts = ['hash'] + scripts
     output = MainSiteGenerator.new(self, @requestManager)
+    output.setIcon(getIcon('caput'))
     stylesheets.each { |path| output.addStylesheet(getStylesheet path) }
     scripts.each { |script| output.addScript(getScript script) }
     return output
@@ -68,14 +69,18 @@ class MainSite
   end
 
   def getStylesheet(name)
-    getStaticPath(SiteConfiguration::StylesheetDirectory, name + '.css')
+    return getStaticPath(SiteConfiguration::StylesheetDirectory, name + '.css')
   end
 
   def getImage(file)
-    getStaticPath(SiteConfiguration::ImageDirectory, file)
+    return getStaticPath(SiteConfiguration::ImageDirectory, file)
+  end
+
+  def getIcon(name)
+    return getStaticPath(SiteConfiguration::IconDirectory, name + '.ico')
   end
 
   def getScript(name)
-    getStaticPath(SiteConfiguration::ScriptDirectory, name + '.js')
+    return getStaticPath(SiteConfiguration::ScriptDirectory, name + '.js')
   end
 end
