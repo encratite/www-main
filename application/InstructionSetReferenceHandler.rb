@@ -21,7 +21,7 @@ class InstructionSetReferenceHandler < SiteContainer
   end
 
   def instructionList(request)
-    instructions = @database.instruction.select(:instruction_name, :summary)
+    instructions = @database.instruction.select(:instruction_name, :summary).order(:instruction_name)
     content = printInstructionList(instructions)
     return @generator.get([MainTitle, content], request)
   end
