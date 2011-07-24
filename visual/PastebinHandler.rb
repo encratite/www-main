@@ -240,7 +240,7 @@ class PastebinHandler < SiteContainer
           writer.th { column }
         end
       end
-      posts.reverse_each do |post|
+      posts.each do |post|
         description = trimString(post.bodyDescription, PastebinConfiguration::ListDescriptionLengthMaximum)
         author = trimString(post.bodyAuthor, PastebinConfiguration::ListAuthorLengthMaximum)
         writer.tr do

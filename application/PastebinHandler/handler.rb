@@ -35,6 +35,7 @@ class PastebinHandler < SiteContainer
                            :site_user__name,
                            )
 
+      posts = posts.reverse_order(:pastebin_post__creation)
       posts = posts.limit(postsPerPage, offset)
 
       posts = posts.from_self(alias: :user_post)
