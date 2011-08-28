@@ -6,7 +6,7 @@ class User < WWWLib::SymbolTransfer
 
   def initialize(data = nil)
     return if data == nil
-    transferSymbols data
+    transferSymbols(data, {}, [:password])
     @htmlName = WWWLib::HTMLEntities.encode(@name)
   end
 
