@@ -73,7 +73,7 @@ class UserHandler < SiteContainer
 
     result = @database.user.where(name: user, password: passwordHash).first
     if result == nil
-      return @generator.get visualLoginError, request
+      return @generator.get(visualLoginError, request)
     else
       user = User.new result
       request.sessionUser = user
