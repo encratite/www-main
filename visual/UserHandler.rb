@@ -36,7 +36,7 @@ END
         writer.a href: path do 'Register a new account' end
       end
 
-               writer.p { 'Specify your username and your password in the following writer and submit the data in order to log into your account.' }
+               writer.p { 'Specify your username and your password in the following form and submit the data in order to log into your account.' }
 
                writer.securedForm(@performLoginRequestHandler.getPath, request) do
         writer.text('User name', UserForm::User, nil, getFieldLength(:UserNameLengthMaximum))
@@ -61,12 +61,12 @@ END
 
             error.each { |message| writer.li { message } }
           end
-                    writer.p { 'Please go over the writer again and correct the invalid entries.' }
+                    writer.p { 'Please go over the form again and correct the invalid entries.' }
                   else
                     writer.p do
             lines =
               <<END
-Fill out the following writer and submit the data in order to create a new account.
+Fill out the following form and submit the data in order to create a new account.
 It is not necessary to specify an e-mail address but it may be useful to do so in case you forget your password.
 END
             writer.write lines
