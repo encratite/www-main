@@ -35,7 +35,7 @@ class PastebinHandler < SiteContainer
     WWWLib::RequestHandler.newBufferedObjectsGroup
 
     WWWLib::RequestHandler.menu('Create new post', nil, method(:createNewPost))
-    WWWLib::RequestHandler.menu('View posts', 'list', method(:viewPosts), 0..1)
+    @viewPostsHandler = WWWLib::RequestHandler.menu('View posts', 'list', method(:viewPosts), 0..1)
 
     #The handlers basically feature three types of argument passing.
 

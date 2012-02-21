@@ -266,6 +266,16 @@ class PastebinHandler < SiteContainer
       end
     end
 
+    if page < pageCount
+      writer.p(class: 'nextPage') do
+        nextPage = page + 1
+        path = @viewPostsHandler.getPath(nextPage.to_s)
+        writer.a(href: path) do
+          'Next page'
+        end
+      end
+    end
+
     if page == 1
       title = 'Most recent pastes'
     else

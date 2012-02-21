@@ -13,7 +13,11 @@ class PastebinHandler < SiteContainer
     if arguments.empty?
       page = 0
     else
-      page = WWWLib.readId(arguments[0]) - 1
+      page = WWWLib.readId(arguments[0])
+      if page == nil
+        argumentError
+      end
+      page = page - 1
     end
 
     @database.transaction do
@@ -23,8 +27,10 @@ class PastebinHandler < SiteContainer
       posts = @posts.where(private_string: nil, reply_to: nil)
       count = posts.count
       pageCount = count == 0 ? 1 : (Float(count) / postsPerPage).ceil
-      pastebinError('Invalid page specified.', request) if page >= pageCount
-      offset = [count - (page + 1) * postsPerPage, 0].max
+      if page >= pageCount
+        pastebinError('Invalid page specified.', request)
+      end
+      offset = page * postsPerPage
 
       posts = posts.left_outer_join(:site_user, :id => :user_id)
       posts = posts.filter(pastebin_post__private_string: nil, pastebin_post__reply_to: nil)
