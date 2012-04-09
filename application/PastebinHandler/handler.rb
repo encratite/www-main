@@ -100,7 +100,7 @@ class PastebinHandler < SiteContainer
     @database.transaction do
       post.deletePostQueryInitialisation(isPrivate, target)
       writePermissionCheck(request, post)
-      deletePostTree postId
+      deletePostTree(post.id)
     end
     return confirmPostDeletion(post, request)
   end
