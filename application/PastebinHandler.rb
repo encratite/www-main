@@ -215,7 +215,6 @@ class PastebinHandler < SiteContainer
     lastId = nil
     currentPost = nil
     posts.reverse.each do |rawPost|
-      puts rawPost.inspect
       post = PastebinPost.new(@database)
       post.transferSymbols(rawPost)
       post.initialiseMembers
