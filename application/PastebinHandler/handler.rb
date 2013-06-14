@@ -36,7 +36,7 @@ class PastebinHandler < SiteContainer
       posts = posts.filter(pastebin_post__private_string: nil, pastebin_post__reply_to: nil)
 
       posts = posts.select(
-                           :pastebin_post__id.as(:pastebin_post_id), :pastebin_post__user_id, :pastebin_post__author, :pastebin_post__description, :pastebin_post__creation,
+                           Sequel.as(:pastebin_post__id, :pastebin_post_id), :pastebin_post__user_id, :pastebin_post__author, :pastebin_post__description, :pastebin_post__creation,
                            #:site_user__name.as(:user_name),
                            :site_user__name,
                            )
@@ -51,7 +51,7 @@ class PastebinHandler < SiteContainer
                            :user_post__pastebin_post_id, :user_post__user_id, :user_post__author, :user_post__description, :user_post__creation,
                            :user_post__name,
                            :pastebin_unit__paste_type,
-                           'length(pastebin_unit.content)'.lit.as(:content_size)
+                           Sequel.as(Sequel.lit('length(pastebin_unit.content)'), :content_size)
                            )
 
       posts = posts.all
